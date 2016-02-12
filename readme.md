@@ -10,13 +10,13 @@
 
 > :pray: This repository contains the IOC container for adonis framework. It can be used standalone too.
 
-Fold is an IOC container for Node applications to make dependency injection simpler and powerful. It has following features and used in [adonis framework](](http://adonisjs.com))
+Fold is an IOC container for Node applications to make dependency injection simpler and powerful. It has the following features and is used in [adonis framework](http://adonisjs.com).
 
 1. Service Provider
 2. Service Manager
 3. Namespaces/Auto Loading
 
-IOC container enables solid Dependency Injection through out your application and makes it easier for you to test your modules by mocking dependencies with ease.
+IOC container enables solid Dependency Injection throughout your application and makes it easier for you to test your modules by mocking dependencies with ease.
 
 You can learn more about AdonisJS and all of its awesomeness on http://adonisjs.com :evergreen_tree:
 
