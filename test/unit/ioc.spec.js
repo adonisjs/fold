@@ -3,7 +3,7 @@
 /* global describe, it, context,beforeEach */
 /**
  * adonis-fold
- * Copyright(c) 2015-2015 Harminder Virk
+ * Copyright(c) 2015-2016 Harminder Virk
  * MIT Licensed
 */
 
