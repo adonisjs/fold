@@ -14,6 +14,23 @@ const requireStack = require('require-stack')
 let Registrar = exports = module.exports = {}
 
 /**
+ * @description requires an array of provider names and returns
+ * an array of the provider instances
+ * @method mapProviders
+ * @param  {Array} arrayOfProviderPaths
+ * @return {Array}
+ * @public
+ */
+Registrar.mapProviders = function (arrayOfProviderPaths) {
+  return _.unique(arrayOfProviderPaths).map((provider) => {
+    const trimmedProvider = provider.trim()
+    const Module = requireStack(trimmedProvider)
+
+    return new Module()
+  })
+}
+
+/**
  * @description requires an array of provider and returns
  * their register method
  * @method require
@@ -22,14 +39,8 @@ let Registrar = exports = module.exports = {}
  * @public
  */
 Registrar.require = function (arrayOfProviders) {
-  return _.chain(arrayOfProviders)
-  .unique()
-  .map(function (provider) {
-    provider = provider.trim()
-    const Module = requireStack(provider)
-    const module = new Module()
-    return module.register()
-  }).value()
+  return Registrar.mapProviders(arrayOfProviders)
+    .map((provider) => provider.register())
 }
 
 /**
@@ -41,7 +52,9 @@ Registrar.require = function (arrayOfProviders) {
  * @public
  */
 Registrar.register = function (arrayOfProviders) {
+  // const providers = Registrar.mapProviders(arrayOfProviders)
   arrayOfProviders = Registrar.require(arrayOfProviders)
+
   return co(function * () {
     return yield parallel(arrayOfProviders)
   })
