@@ -23,13 +23,13 @@ let Registrar = exports = module.exports = {}
  */
 Registrar.require = function (arrayOfProviders) {
   return _.chain(arrayOfProviders)
-  .unique()
-  .map(function (provider) {
-    provider = provider.trim()
-    const Module = requireStack(provider)
-    const module = new Module()
-    return module.register()
-  }).value()
+    .unique()
+    .map(function (provider) {
+      provider = provider.trim()
+      const Module = requireStack(provider)
+      const module = new Module()
+      return module.register()
+    }).value()
 }
 
 /**

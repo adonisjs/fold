@@ -2,11 +2,11 @@
 
 class Baz {
 
-  static get inject() {
+  static get inject () {
     return ['App/Services/Bar']
   }
 
-  constructor( Bar) {
+  constructor (Bar) {
     this.bar = Bar.bar
     this.baz = 'baz'
   }
