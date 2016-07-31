@@ -43,6 +43,18 @@ Registrar.registerProviders = function (arrayOfProviders) {
 }
 
 /**
+ * @description requires an array of provider instances
+ * and runs boot foreach provider
+ * @method bootProviders
+ * @param  {Array} arrayOfProviders
+ * @return {Array}
+ * @public
+ */
+Registrar.bootProviders = function (arrayOfProviders) {
+  return arrayOfProviders.map((provider) => provider.boot())
+}
+
+/**
  * @description requires an array of provider and returns
  * their register method
  * @method require
@@ -68,6 +80,7 @@ Registrar.register = function (arrayOfProviderPaths) {
   const arrayOfProviders = Registrar.mapProviders(arrayOfProviderPaths)
 
   return co(function * () {
-    return yield parallel(Registrar.registerProviders(arrayOfProviders))
+    yield parallel(Registrar.registerProviders(arrayOfProviders))
+    return yield parallel(Registrar.bootProviders(arrayOfProviders))
   })
 }
