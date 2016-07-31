@@ -31,16 +31,29 @@ Registrar.mapProviders = function (arrayOfProviderPaths) {
 }
 
 /**
- * @description requires an array of provider and returns
- * their register method
- * @method require
+ * @description requires an array of provider instances
+ * and runs register foreach provider
+ * @method registerProviders
  * @param  {Array} arrayOfProviders
  * @return {Array}
  * @public
  */
-Registrar.require = function (arrayOfProviders) {
-  return Registrar.mapProviders(arrayOfProviders)
-    .map((provider) => provider.register())
+Registrar.registerProviders = function (arrayOfProviders) {
+  return arrayOfProviders.map((provider) => provider.register())
+}
+
+/**
+ * @description requires an array of provider and returns
+ * their register method
+ * @method require
+ * @param  {Array} arrayOfProviderPaths
+ * @return {Array}
+ * @public
+ */
+Registrar.require = function (arrayOfProviderPaths) {
+  const arrayOfProviders = Registrar.mapProviders(arrayOfProviderPaths)
+
+  return Registrar.registerProviders(arrayOfProviders)
 }
 
 /**
@@ -51,11 +64,10 @@ Registrar.require = function (arrayOfProviders) {
  * @return {void}
  * @public
  */
-Registrar.register = function (arrayOfProviders) {
-  // const providers = Registrar.mapProviders(arrayOfProviders)
-  arrayOfProviders = Registrar.require(arrayOfProviders)
+Registrar.register = function (arrayOfProviderPaths) {
+  const arrayOfProviders = Registrar.mapProviders(arrayOfProviderPaths)
 
   return co(function * () {
-    return yield parallel(arrayOfProviders)
+    return yield parallel(Registrar.registerProviders(arrayOfProviders))
   })
 }
