@@ -2,7 +2,7 @@
 
 class Bar {
 
-  constructor() {
+  constructor () {
     this.bar = 'bar'
   }
 
