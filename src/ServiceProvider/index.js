@@ -23,6 +23,10 @@ class ServiceProvider {
     this.app = Ioc
   }
 
+  * boot () {
+
+  }
+
 }
 
 module.exports = ServiceProvider

@@ -14,22 +14,58 @@ const requireStack = require('require-stack')
 let Registrar = exports = module.exports = {}
 
 /**
- * @description requires an array of provider and returns
- * their register method
- * @method require
+ * @description requires an array of provider names and returns
+ * an array of the provider instances
+ * @method mapProviders
+ * @param  {Array} arrayOfProviderPaths
+ * @return {Array}
+ * @public
+ */
+Registrar.mapProviders = function (arrayOfProviderPaths) {
+  return _.unique(arrayOfProviderPaths).map((provider) => {
+    const trimmedProvider = provider.trim()
+    const Module = requireStack(trimmedProvider)
+
+    return new Module()
+  })
+}
+
+/**
+ * @description requires an array of provider instances
+ * and runs register foreach provider
+ * @method registerProviders
  * @param  {Array} arrayOfProviders
  * @return {Array}
  * @public
  */
-Registrar.require = function (arrayOfProviders) {
-  return _.chain(arrayOfProviders)
-  .unique()
-  .map(function (provider) {
-    provider = provider.trim()
-    const Module = requireStack(provider)
-    const module = new Module()
-    return module.register()
-  }).value()
+Registrar.registerProviders = function (arrayOfProviders) {
+  return arrayOfProviders.map((provider) => provider.register())
+}
+
+/**
+ * @description requires an array of provider instances
+ * and runs boot foreach provider
+ * @method bootProviders
+ * @param  {Array} arrayOfProviders
+ * @return {Array}
+ * @public
+ */
+Registrar.bootProviders = function (arrayOfProviders) {
+  return arrayOfProviders.map((provider) => provider.boot())
+}
+
+/**
+ * @description requires an array of provider and returns
+ * their register method
+ * @method require
+ * @param  {Array} arrayOfProviderPaths
+ * @return {Array}
+ * @public
+ */
+Registrar.require = function (arrayOfProviderPaths) {
+  const arrayOfProviders = Registrar.mapProviders(arrayOfProviderPaths)
+
+  return Registrar.registerProviders(arrayOfProviders)
 }
 
 /**
@@ -40,9 +76,11 @@ Registrar.require = function (arrayOfProviders) {
  * @return {void}
  * @public
  */
-Registrar.register = function (arrayOfProviders) {
-  arrayOfProviders = Registrar.require(arrayOfProviders)
+Registrar.register = function (arrayOfProviderPaths) {
+  const arrayOfProviders = Registrar.mapProviders(arrayOfProviderPaths)
+
   return co(function * () {
-    return yield parallel(arrayOfProviders)
+    yield parallel(Registrar.registerProviders(arrayOfProviders))
+    return yield parallel(Registrar.bootProviders(arrayOfProviders))
   })
 }
