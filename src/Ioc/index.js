@@ -94,6 +94,30 @@ class Ioc {
      * @type {Object}
      */
     this._extendCalls = []
+
+    /**
+     * Reference to the alias breakpoint
+     * Used to short define alias before bindings
+     *
+     * @attribute _aliasBreakpoint
+     * @type {String}
+     * @private
+     */
+    this._aliasBreakpoint = null
+  }
+
+  /**
+   * Convert namespace to dot notation
+   *
+   * @method _namespaceToNotation
+   * @private
+   *
+   * @param namespace
+   * @type {String}
+   * @returns {String}
+   */
+  _namespaceToNotation(namespace) {
+    return namespace.split('/').join('.')
   }
 
   /**
@@ -131,7 +155,8 @@ class Ioc {
    * @return {Boolean}
    */
   _isBinding (namespace) {
-    return this._bindings[namespace]
+    const notation = this._namespaceToNotation(namespace)
+    return _.has(this._bindings, notation)
   }
 
   /**
@@ -225,7 +250,9 @@ class Ioc {
    * @return {Mixed}
    */
   _resolveBinding (namespace) {
-    const binding = this._bindings[namespace]
+    const notation = this._namespaceToNotation(namespace)
+    const binding = _.get(this._bindings, notation)
+
     debug('resolving %s namespace as a binding', namespace)
     if (binding.singleton) {
       return (binding.cachedValue = binding.cachedValue || binding.closure(this))
@@ -399,11 +426,19 @@ class Ioc {
    *
    * @example
    * ```
+   * Ioc.alias('View').singleton('Adonis/Src/View', ...)
+   *
    * Ioc.alias('Adonis/Src/View', 'View')
    * ```
    */
   alias (namespace, alias) {
+    if (!alias) {
+      this._aliasBreakpoint = namespace
+      return this
+    }
+
     debug('defining %s as an alias for %s namespace', alias, namespace)
+    this._aliasBreakpoint = null
     this._aliases[alias] = namespace
   }
 
@@ -457,13 +492,17 @@ class Ioc {
       throw GE.InvalidArgumentException.invalidParameter('Ioc.bind expects 2nd parameter to be a closure', closure)
     }
 
-    debug('binding %s namespace to ioc container', namespace)
+    if (this._aliasBreakpoint) {
+      this.alias(namespace, this._aliasBreakpoint)
+    }
 
-    this._bindings[namespace] = {
+    debug('binding %s namespace to ioc container', namespace)
+    const notation = this._namespaceToNotation(namespace)
+    _.set(this._bindings, notation, {
       closure,
       singleton: false,
       cachedValue: null
-    }
+    })
   }
 
   /**
@@ -499,11 +538,12 @@ class Ioc {
 
     debug('binding %s namespace as singleton to ioc container', namespace)
 
-    this._bindings[namespace] = {
+    const notation = this._namespaceToNotation(namespace)
+    _.set(this._bindings, notation, {
       closure,
       singleton: true,
       cachedValue: null
-    }
+    })
   }
 
   /**
@@ -677,7 +717,7 @@ class Ioc {
    * ```
    */
   restore (...namespaces) {
-    namespaces = namespaces[0] instanceof Array ? namespaces[0] : namespaces
+    namespaces = Array.isArray(namespaces[0]) ? namespaces[0] : namespaces
     if (!namespaces.length) {
       debug('restoring all fakes')
       this._fakes.clear()

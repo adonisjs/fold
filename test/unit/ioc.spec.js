@@ -117,6 +117,24 @@ test.group('Ioc', function () {
     assert.equal(packageFile.name, '@adonisjs/fold')
   })
 
+  test('should be able to short define aliases for bindings', function () {
+    const ioc = new Ioc()
+    const fooFn = function () {}
+    const barFn = function () {}
+    ioc.alias('Foo').bind('App/Foo', fooFn)
+    ioc.alias('Bar').singleton('App/Bar', barFn)
+
+    assert.equal(ioc.getAliases()['Foo'], 'App/Foo')
+    assert.equal(ioc.getAliases()['Bar'], 'App/Bar')
+  })
+
+  test('should be able to short define aliases for singletons', function () {
+    const ioc = new Ioc()
+    const fooFn = function () {}
+    ioc.alias('Foo').singleton('App/Foo', fooFn)
+    assert.equal(ioc.getAliases()['Foo'], 'App/Foo')
+  })
+
   test('should be able to define aliases for bindings', function () {
     const ioc = new Ioc()
     const fooFn = function () {}

@@ -4,3 +4,4 @@ node_modules
 npm-debug.log
 out
 .nyc_output
+.idea
