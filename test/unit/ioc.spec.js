@@ -142,7 +142,8 @@ test.group('Ioc', function () {
     assert.equal(ioc.getAutoloads()['App'], path.join(__dirname, './app'))
   })
 
-  test('should be able to call a closure when loading has been successful using with', function () {
+  test('should be able to call a closure when loading has been successful using with', (assert) => {
+    assert.plan(1)
     const ioc = new Ioc()
     const fooFn = function () {
       return 'foo'
@@ -154,7 +155,8 @@ test.group('Ioc', function () {
     })
   })
 
-  test('should be able to call a closure when loading has been successful using with', function () {
+  test('should be able to call a closure when loading has been successful using with', (assert) => {
+    assert.plan(2)
     const ioc = new Ioc()
     const fooFn = function () {
       return 'foo'
@@ -171,7 +173,8 @@ test.group('Ioc', function () {
     })
   })
 
-  test('should fail silently when loading has been unsuccessful using with', function () {
+  test('should fail silently when loading has been unsuccessful using with', (assert) => {
+    assert.plan(1)
     const ioc = new Ioc()
     ioc.with(['App/Foo'], (Foo) => {
       assert.equal(true, false)

@@ -743,6 +743,9 @@ class Ioc {
   }
 
   /**
+   * Attempts to resolve given namespaces and forward
+   * them to the given callback.
+   *
    * @method with
    *
    * @param  {string|string[]}  namespaces
@@ -755,7 +758,7 @@ class Ioc {
       : [namespaces]
 
     try {
-      const resolved = namespaces.map(this.use)
+      const resolved = namespaces.map(namespace => this.use(namespace))
 
       next(...resolved)
     } catch (e) {}
