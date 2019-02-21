@@ -22,9 +22,33 @@ You can learn more about AdonisJS and all of its awesomeness on http://adonisjs.
 
 ## Table of Contents
 
+* [Installation](#installation)
+* [Basic Usage](#basic-usage)
 * [Team Members](#team-members)
 * [Requirements](#requirements)
 * [Contribution Guidelines](#contribution-guidelines)
+
+## <a name="installation"></a>Installation
+You can install the package from npm.
+```bash
+npm i --save adonis-fold
+```
+
+## <a name="basic-usage"></a>Basic Usage
+
+```js
+const { Ioc } = require('adonis-fold')
+
+class Foo {
+}
+
+Ioc.bind('App/Foo', function () {
+  return new Foo()
+})
+
+const foo = Ioc.use('App/Foo')
+// return Foo class instance
+```
 
 ## <a name="team-members"></a>Team Members
 
