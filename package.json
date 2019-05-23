@@ -2,59 +2,20 @@
   "name": "@adonisjs/fold",
   "version": "4.0.9",
   "description": "Dependency manager and ioc container for your next NodeJs application",
-  "main": "index.js",
-  "files": [
-    "src",
-    "index.js"
-  ],
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
     "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
-    "posttest": "npm run coverage",
-    "test:local": "FORCE_COLOR=true node bin/index.js --local",
-    "test": "nyc japa",
-    "test:win": "node ./node_modules/japa-cli/index.js",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "test": "node japaFile.js",
+    "lint": "tslint --project tsconfig.json",
+    "clean": "del build",
+    "compile": "npm run lint && npm run clean && tsc",
+    "build": "npm run compile && typedoc --excludePrivate && git add docs",
     "commit": "git-cz",
-    "lint": "standard"
+    "release": "np",
+    "version": "npm run build"
   },
-  "standard": {
-    "globals": [
-      "describe",
-      "it",
-      "before",
-      "use",
-      "make"
-    ],
-    "ignore": [
-      "**/out/"
-    ]
-  },
-  "author": "adonisjs",
+  "author": "adonisjs,virk",
   "license": "MIT",
-  "devDependencies": {
-    "@adonisjs/mrm-preset": "^1.0.9",
-    "commitizen": "^2.10.1",
-    "coveralls": "^3.0.2",
-    "cz-conventional-changelog": "^2.1.0",
-    "japa": "^1.0.6",
-    "japa-cli": "^1.0.1",
-    "mrm": "^1.2.1",
-    "nyc": "^12.0.2",
-    "pkg-ok": "^2.2.0",
-    "semver": "^5.5.0",
-    "standard": "^11.0.1"
-  },
-  "dependencies": {
-    "@adonisjs/generic-exceptions": "^2.0.1",
-    "caller": "^1.0.1",
-    "debug": "^3.1.0",
-    "lodash": "^4.17.11",
-    "require-stack": "^1.0.2"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/poppinss/adonis-fold.git"
@@ -71,21 +32,51 @@
     "url": "https://github.com/poppinss/adonis-fold/issues"
   },
   "homepage": "https://github.com/poppinss/adonis-fold#readme",
+  "devDependencies": {
+    "@adonisjs/mrm-preset": "^2.0.3",
+    "@types/node": "^12.0.2",
+    "commitizen": "^3.1.1",
+    "cz-conventional-changelog": "^2.1.0",
+    "del-cli": "^1.1.0",
+    "doctoc": "^1.4.0",
+    "husky": "^2.3.0",
+    "japa": "^2.0.10",
+    "mrm": "^1.2.2",
+    "np": "^5.0.2",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "typedoc": "^0.14.2",
+    "typedoc-plugin-external-module-name": "^2.1.0",
+    "typescript": "^3.4.5"
+  },
+  "nyc": {
+    "exclude": [
+      "test"
+    ],
+    "extension": [
+      ".ts"
+    ]
+  },
+  "main": "build/index.js",
+  "files": [
+    "build/src",
+    "build/index.d.ts",
+    "build/index.js"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "doctoc README.md --title='## Table of contents' && git add README.md",
+      "commit-msg": "node ./node_modules/@adonisjs/mrm-preset/validateCommit/conventional/validate.js"
+    }
+  },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
   },
-  "nyc": {
-    "include": [
-      "src"
-    ],
-    "exclude": [
-      "test",
-      "japaFile.js"
-    ]
-  },
-  "bin": {
-    "fold": "index.js"
+  "np": {
+    "contents": ".",
+    "anyBranch": false
   }
 }

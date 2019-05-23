@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of contents
+
+- [AdonisJs Fold 🚀](#adonisjs-fold-)
+  - [Features](#features)
+  - [Installation](#installation)
+  - [Basic Usage](#basic-usage)
+  - [Moving Forward](#moving-forward)
+  - [Tests](#tests)
+  - [Release History](#release-history)
+  - [Meta](#meta)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # AdonisJs Fold 🚀
 > Dependency manager and IoC container for Node.js
 
