@@ -53,15 +53,6 @@ test.group('Ioc', (group) => {
     assert.strictEqual(ioc.use('App/Foo'), ioc.use('App/Foo'))
   })
 
-  test('do not compute value everytime when binded as singleton', (assert) => {
-    const ioc = new Ioc()
-    ioc.singleton('App/Foo', () => {
-      return Symbol('foo')
-    })
-
-    assert.strictEqual(ioc.use('App/Foo'), ioc.use('App/Foo'))
-  })
-
   test('define alias for a binding', (assert) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
@@ -454,7 +445,7 @@ test.group('Ioc', (group) => {
     ioc.clearAutoloadCache(undefined, true)
   })
 
-  test('do not make modules that fallsback to node require', async (assert) => {
+  test('do not make modules that fallback to node require', async (assert) => {
     const ioc = new Ioc()
     assert.deepEqual(ioc.make('japa'), test)
   })

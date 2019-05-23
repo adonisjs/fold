@@ -11,12 +11,20 @@
 * file that was distributed with this source code.
 */
 
+import { EventEmitter } from 'events'
+export interface TracerContract extends EventEmitter {
+  in (namespace: string, cached: boolean): void
+  out (): void
+}
+
 /**
- * IIOC container interface
+ * Ioc container interface
  */
 export interface IocContract {
+  tracer: TracerContract,
   autoloads: { [namespace: string]: string },
   autoloadedAliases: string[],
+  useProxies (): this,
   bind (name: string, callback: BindCallback): void
   singleton (name: string, callback: BindCallback): void
   alias (namespace: string, alias: string): void
@@ -34,6 +42,23 @@ export interface IocContract {
   getAutoloadBaseNamespace (namespace: string): string | undefined
   restore (name: string): void
   with (namespaces: string[], cb: (...args: any[]) => void): void
+}
+
+/**
+ * Shape of binding stored inside the IoC container
+ */
+export type Binding = {
+  callback: BindCallback,
+  singleton: boolean,
+  cachedValue?: unknown,
+}
+
+/**
+ * Shape of autoloaded cache entry
+ */
+export type AutoloadCacheItem = {
+  diskPath: string,
+  cachedValue: any,
 }
 
 export type BindCallback = (app: IocContract) => unknown

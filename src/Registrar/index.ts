@@ -63,7 +63,7 @@ export class Registrar {
    * Boot all the providers by calling the `boot` method.
    * Boot methods are called in series.
    */
-  public async boot (providers) {
+  public async boot (providers: any[]) {
     for (let provider of providers) {
       /* istanbul ignore else */
       if (typeof (provider.boot) === 'function') {

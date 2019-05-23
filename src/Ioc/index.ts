@@ -11,31 +11,14 @@
 * file that was distributed with this source code.
 */
 
-import { normalize, resolve, dirname } from 'path'
 import { esmRequire } from '@poppinss/utils'
+import { normalize, resolve, dirname } from 'path'
 
-import { IocContract, BindCallback } from '../Contracts'
-import { IoCProxyObject, IocProxyClass } from './IoCProxy'
 import tracer from './Tracer'
+import { IocContract, BindCallback, Binding, AutoloadCacheItem } from '../Contracts'
+import { IoCProxyObject, IocProxyClass } from './IoCProxy'
 
 const toString = Function.prototype.toString
-
-/**
- * Shape of binding stored inside the IoC container
- */
-export type Binding = {
-  callback: BindCallback,
-  singleton: boolean,
-  cachedValue?: unknown,
-}
-
-/**
- * Shape of autoloaded cache entry
- */
-export type AutoloadCacheItem = {
-  diskPath: string,
-  cachedValue: any,
-}
 
 /**
  * Ioc container to manage and compose dependencies of your application
@@ -122,7 +105,7 @@ export class Ioc implements IocContract {
    * Raises error with a message when callback is not
    * a function.
    */
-  private _ensureCallback (callback, message) {
+  private _ensureCallback (callback: Function, message: string) {
     if (typeof (callback) !== 'function') {
       throw new Error(message)
     }
@@ -166,7 +149,7 @@ export class Ioc implements IocContract {
    * Make instance of a class by auto-injecting it's defined
    * dependencies.
    */
-  private _makeInstanceOf (value, relativeFrom) {
+  private _makeInstanceOf (value: any, relativeFrom?: string) {
     if (!this._isClass(value) || value.makePlain === true) {
       return value
     }
@@ -296,7 +279,7 @@ export class Ioc implements IocContract {
    * Returns a boolean to differentiate between classes and plain
    * functions
    */
-  private _isClass (fn) {
+  private _isClass (fn: any) {
     return typeof (fn) === 'function' && /^class\s/.test(toString.call(fn))
   }
 
@@ -304,7 +287,7 @@ export class Ioc implements IocContract {
    * Returns a boolean to differentiate between null and objects
    * and arrays too
    */
-  private _isObject (value): boolean {
+  private _isObject (value: any): boolean {
     return value && typeof (value) === 'object' && !Array.isArray(value)
   }
 
@@ -513,8 +496,7 @@ export class Ioc implements IocContract {
    * doing.
    *
    * This method is internally used by ioc container proxy objects to
-   * point to a fake when `ADONIS_IOC_PROXY` is set to true and fake
-   * exists.
+   * point to a fake when `useProxies` is called and fake exists.
    */
   public useFake<T extends any = any> (namespace: string): T {
     const fake = this._fakes.get(namespace)

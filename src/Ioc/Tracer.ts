@@ -12,22 +12,23 @@
 */
 
 import * as Emitter from 'events'
+import { TracerContract } from '../Contracts'
 
 /**
  * Tracer is used to emit event from the IoC container
  * at different steps. Read the guides to understand
  * how tracer works
  */
-export class Tracer extends Emitter {
+export class Tracer extends Emitter implements TracerContract {
   private _namespaces: string[] = []
 
-  public in (namespace, cached) {
+  public in (namespace: string, cached: boolean): void {
     const parent = this._namespaces[this._namespaces.length - 1]
     this.emit('use', { namespace, cached, parent })
     this._namespaces.push(namespace)
   }
 
-  public out () {
+  public out (): void {
     this._namespaces.pop()
   }
 }
@@ -36,16 +37,11 @@ export class Tracer extends Emitter {
  * Fake tracer that noops every operation. This is done
  * to keep code using tracer free of if/else
  */
-class NoopTracer {
+class NoopTracer extends Emitter implements TracerContract {
   public in () {}
   public out () {}
-  public emit () {}
-  public on () {}
-  public once () {}
-  public removeListener () {}
-  public removeListeners () {}
 }
 
-export default function tracer (enabled) {
+export default function tracer (enabled: boolean) {
   return enabled ? new Tracer() : (new NoopTracer() as unknown) as Tracer
 }
