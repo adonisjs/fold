@@ -1,5 +1,5 @@
 /**
- * @module main
+ * @module @adonisjs/fold
  */
 
 /*
@@ -13,5 +13,5 @@
 
 export { Ioc } from './src/Ioc'
 export { Registrar } from './src/Registrar'
-export { IocContract } from './src/Contracts'
+export { IocContract, TracerContract } from './src/Contracts'
 export { inject } from './src/decorators'

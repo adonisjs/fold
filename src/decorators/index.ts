@@ -1,8 +1,8 @@
 /**
- * @module main
+ * @module @adonisjs/fold
  */
 
- /*
+/*
 * @adonisjs/fold
 *
 * (c) Harminder Virk <virk@adonisjs.com>

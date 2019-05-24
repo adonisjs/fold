@@ -1,0 +1,1170 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Ioc | @adonisjs/fold</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">@adonisjs/fold</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../index.html">Globals</a>
+				</li>
+				<li>
+					<a href="../modules/_adonisjs_fold.html">@adonisjs/fold</a>
+				</li>
+				<li>
+					<a href="_adonisjs_fold.ioc.html">Ioc</a>
+				</li>
+			</ul>
+			<h1>Class Ioc</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Ioc container to manage and compose dependencies of your application
+						with ease.</p>
+					</div>
+					<p>The container follows and encourages the use of dependency injection
+						in your application and provides all the neccessary tools to make
+					DI simpler.</p>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">Ioc</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel">
+				<h3>Implements</h3>
+				<ul class="tsd-hierarchy">
+					<li><a href="../interfaces/_adonisjs_fold.ioccontract.html" class="tsd-signature-type">IocContract</a></li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#autoloadedaliases" class="tsd-kind-icon">autoloaded<wbr>Aliases</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#autoloads" class="tsd-kind-icon">autoloads</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#tracer" class="tsd-kind-icon">tracer</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#alias" class="tsd-kind-icon">alias</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#autoload" class="tsd-kind-icon">autoload</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#bind" class="tsd-kind-icon">bind</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="_adonisjs_fold.ioc.html#call" class="tsd-kind-icon">call</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#clearautoloadcache" class="tsd-kind-icon">clear<wbr>Autoload<wbr>Cache</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#fake" class="tsd-kind-icon">fake</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#getaliasnamespace" class="tsd-kind-icon">get<wbr>Alias<wbr>Namespace</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#getautoloadbasenamespace" class="tsd-kind-icon">get<wbr>Autoload<wbr>Base<wbr>Namespace</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#hasalias" class="tsd-kind-icon">has<wbr>Alias</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#hasbinding" class="tsd-kind-icon">has<wbr>Binding</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#hasfake" class="tsd-kind-icon">has<wbr>Fake</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#isautoloadnamespace" class="tsd-kind-icon">is<wbr>Autoload<wbr>Namespace</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="_adonisjs_fold.ioc.html#make" class="tsd-kind-icon">make</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#restore" class="tsd-kind-icon">restore</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#singleton" class="tsd-kind-icon">singleton</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="_adonisjs_fold.ioc.html#use" class="tsd-kind-icon">use</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="_adonisjs_fold.ioc.html#usefake" class="tsd-kind-icon">use<wbr>Fake</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#useproxies" class="tsd-kind-icon">use<wbr>Proxies</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_adonisjs_fold.ioc.html#with" class="tsd-kind-icon">with</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Ioc<span class="tsd-signature-symbol">(</span>_emitEvents<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_adonisjs_fold.ioc.html" class="tsd-signature-type">Ioc</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L71">Ioc/index.ts:71</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> _emitEvents: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_adonisjs_fold.ioc.html" class="tsd-signature-type">Ioc</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="autoloadedaliases" class="tsd-anchor"></a>
+					<h3>autoloaded<wbr>Aliases</h3>
+					<div class="tsd-signature tsd-kind-icon">autoloaded<wbr>Aliases<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#autoloadedaliases">autoloadedAliases</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L43">Ioc/index.ts:43</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>An array of autoloaded aliases, stored along side with
+							<code>_autoloads</code> for a quick lookup on keys</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="autoloads" class="tsd-anchor"></a>
+					<h3>autoloads</h3>
+					<div class="tsd-signature tsd-kind-icon">autoloads<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#autoloads">autoloads</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L37">Ioc/index.ts:37</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Autoloaded directories under a namespace</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>namespace: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="tracer" class="tsd-anchor"></a>
+					<h3>tracer</h3>
+					<div class="tsd-signature tsd-kind-icon">tracer<span class="tsd-signature-symbol">:</span> <a href="_adonisjs_fold.tracer.html" class="tsd-signature-type">Tracer</a><span class="tsd-signature-symbol"> =&nbsp;tracer(this._emitEvents)</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#tracer">tracer</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L32">Ioc/index.ts:32</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="alias" class="tsd-anchor"></a>
+					<h3>alias</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">alias<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, alias<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#alias">alias</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L371">Ioc/index.ts:371</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Define alias for an existing binding. IoC container doesn&#39;t handle uniqueness
+										conflicts for you and it&#39;s upto you to make sure that all aliases are
+									unique.</p>
+								</div>
+								<p>Use method <a href="_adonisjs_fold.ioc.html#hasalias">hasAlias</a> to know, if an alias already exists.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>alias: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="autoload" class="tsd-anchor"></a>
+					<h3>autoload</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">autoload<span class="tsd-signature-symbol">(</span>directoryPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#autoload">autoload</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L407">Ioc/index.ts:407</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Define an alias for an existing directory and require
+									files without fighting with relative paths.</p>
+								</div>
+								<p>Giving the following directory structure</p>
+								<pre><code class="language-sh">.app/
+├── controllers
+│   └── foo.js
+├── services
+│   └── foo.js
+├── models
+│   └── foo.js</code></pre>
+								<p>You are in file <code>controllers/foo.js</code></p>
+								<h3 id="without-autoload">Without autoload</h3>
+								<pre><code class="language-js"><span class="hljs-built_in">require</span>(<span class="hljs-string">'../services/foo'</span>)
+<span class="hljs-built_in">require</span>(<span class="hljs-string">'../models/foo'</span>)</code></pre>
+								<h3 id="with-outoload">With outoload</h3>
+								<pre><code>ioc.autoload(join(__dirname, <span class="hljs-string">'app'</span>), <span class="hljs-string">'App'</span>)
+
+<span class="hljs-function"><span class="hljs-title">use</span><span class="hljs-params">(<span class="hljs-string">'App/services/foo'</span>)</span></span>
+<span class="hljs-function"><span class="hljs-title">use</span><span class="hljs-params">(<span class="hljs-string">'App/mdoels/foo'</span>)</span></span></code></pre>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>directoryPath: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="bind" class="tsd-anchor"></a>
+					<h3>bind</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">bind<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><a href="../modules/_adonisjs_fold.html#bindcallback" class="tsd-signature-type">BindCallback</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#bind">bind</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L340">Ioc/index.ts:340</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Add a new binding with a namespace. Keeping the namespace unique
+										is the responsibility of the user. We do not restrict duplicate
+										namespaces, since it&#39;s perfectly acceptable to provide new
+									values for existing bindings.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-js">ioc.bind(<span class="hljs-string">'App/User'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+ <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> User()
+})</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>callback: <a href="../modules/_adonisjs_fold.html#bindcallback" class="tsd-signature-type">BindCallback</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+					<a name="call" class="tsd-anchor"></a>
+					<h3>call</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">call&lt;T, K&gt;<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">K</span>, args<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#call">call</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L658">Ioc/index.ts:658</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Call method on an object and inject dependencies to it automatically.</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></h4>
+								</li>
+								<li>
+									<h4>K<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">keyof T</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>target: <span class="tsd-signature-type">T</span></h5>
+								</li>
+								<li>
+									<h5>method: <span class="tsd-signature-type">K</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="clearautoloadcache" class="tsd-anchor"></a>
+					<h3>clear<wbr>Autoload<wbr>Cache</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">clear<wbr>Autoload<wbr>Cache<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span>, clearRequireCache<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L424">Ioc/index.ts:424</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Clear the autoload cache for all the cached files or for a
+									single namespace.</p>
+								</div>
+								<p>Optionally, you can remove it from <code>require</code> cache too.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> namespace: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> clearRequireCache: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="fake" class="tsd-anchor"></a>
+					<h3>fake</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">fake<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><a href="../modules/_adonisjs_fold.html#bindcallback" class="tsd-signature-type">BindCallback</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#fake">fake</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L450">Ioc/index.ts:450</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Register a fake for an existing binding. The fakes only work when
+										<code>ADONIS_IOC_PROXY</code> environment variable is set to <code>true</code>. AdonisJs
+									will set it to true automatically during testing.</p>
+								</div>
+								<p>NOTE: The return value of fakes is always cached, since multiple
+								calls to <code>use</code> after that should point to a same return value.</p>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-js">ioc.fake(<span class="hljs-string">'App/User'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+ <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> FakeUser()
+})</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>callback: <a href="../modules/_adonisjs_fold.html#bindcallback" class="tsd-signature-type">BindCallback</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getaliasnamespace" class="tsd-anchor"></a>
+					<h3>get<wbr>Alias<wbr>Namespace</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Alias<wbr>Namespace<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#getaliasnamespace">getAliasNamespace</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L579">Ioc/index.ts:579</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the complete namespace for a given alias. To avoid
+										<code>undefined</code> values, it is recommended to use <code>hasAlias</code>
+									before using this method.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span>
+								<span class="tsd-signature-symbol"> | </span>
+								<span class="tsd-signature-type">undefined</span>
+							</h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getautoloadbasenamespace" class="tsd-anchor"></a>
+					<h3>get<wbr>Autoload<wbr>Base<wbr>Namespace</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Autoload<wbr>Base<wbr>Namespace<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#getautoloadbasenamespace">getAutoloadBaseNamespace</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L620">Ioc/index.ts:620</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the base namespace for an autoloaded namespace.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-js">ioc.autoload(join(__dirname, <span class="hljs-string">'app'</span>), <span class="hljs-string">'App'</span>)
+
+ioc.getAutoloadBaseNamespace(<span class="hljs-string">'App/Services/Foo'</span>) <span class="hljs-comment">// returns App</span></code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span>
+								<span class="tsd-signature-symbol"> | </span>
+								<span class="tsd-signature-type">undefined</span>
+							</h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="hasalias" class="tsd-anchor"></a>
+					<h3>has<wbr>Alias</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Alias<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#hasalias">hasAlias</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L551">Ioc/index.ts:551</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a boolean telling if an alias
+									exists</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="hasbinding" class="tsd-anchor"></a>
+					<h3>has<wbr>Binding</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Binding<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, checkAliases<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L565">Ioc/index.ts:565</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a boolean telling if binding for a given namespace
+									exists or not. Also optionally check for aliases too.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-js">ioc.hasBinding(<span class="hljs-string">'Adonis/Src/View'</span>)    <span class="hljs-comment">// namespace</span>
+ioc.hasBinding(<span class="hljs-string">'View'</span>)               <span class="hljs-comment">// alias</span></code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> checkAliases: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="hasfake" class="tsd-anchor"></a>
+					<h3>has<wbr>Fake</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Fake<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#hasfake">hasFake</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L543">Ioc/index.ts:543</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>A boolean telling if a fake exists for a binding or
+									not.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="isautoloadnamespace" class="tsd-anchor"></a>
+					<h3>is<wbr>Autoload<wbr>Namespace</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Autoload<wbr>Namespace<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#isautoloadnamespace">isAutoloadNamespace</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L606">Ioc/index.ts:606</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a boolean telling if namespace is part of autoloads or not.
+										This method results may vary from the <a href="_adonisjs_fold.ioc.html#use">use</a> method, since
+									the <code>use</code> method gives prefrence to the <code>bindings</code> first.</p>
+								</div>
+								<h3 id="note-">NOTE:</h3>
+								<p>Check the following example carefully.</p>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-js"><span class="hljs-comment">// Define autoload namespace</span>
+ioc.autoload(join(__dirname, <span class="hljs-string">'app'</span>), <span class="hljs-string">'App'</span>)
+
+ioc.bind(<span class="hljs-string">'App/Services/Foo'</span>, () =&gt; {
+})
+
+<span class="hljs-comment">// return true</span>
+ioc.isAutoloadNamespace(<span class="hljs-string">'App/Services/Foo'</span>)
+
+<span class="hljs-comment">// Returns value from `bind` and not disk</span>
+ioc.use(<span class="hljs-string">'isAutoloadNamespace'</span>)</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+					<a name="make" class="tsd-anchor"></a>
+					<h3>make</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">make&lt;T&gt;<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, relativeFrom<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L499">Ioc/index.ts:499</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Make an instance of class and auto inject it&#39;s dependencies. The instance
+										is only created if <code>namespace</code> is part of an autoload or is an class
+									constructor.</p>
+								</div>
+								<p>The bindings added via <code>ioc.bind</code> or <code>ioc.singleton</code> controls their state
+								by themselves.</p>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> relativeFrom: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="restore" class="tsd-anchor"></a>
+					<h3>restore</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">restore<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#restore">restore</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L627">Ioc/index.ts:627</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Restore the fake</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="singleton" class="tsd-anchor"></a>
+					<h3>singleton</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">singleton<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><a href="../modules/_adonisjs_fold.html#bindcallback" class="tsd-signature-type">BindCallback</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#singleton">singleton</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L358">Ioc/index.ts:358</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Add a new binding as a singleton. This method behaves similar to
+										<a href="_adonisjs_fold.ioc.html#bind">bind</a>, just the value is cached after the first use. The
+									<code>callback</code> will be invoked only once.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-js">ioc.singleton(<span class="hljs-string">'App/User'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+ <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> User()
+})</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>callback: <a href="../modules/_adonisjs_fold.html#bindcallback" class="tsd-signature-type">BindCallback</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+					<a name="use" class="tsd-anchor"></a>
+					<h3>use</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">use&lt;T&gt;<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, relativeFrom<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#use">use</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L473">Ioc/index.ts:473</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Use the binding by resolving it from the container. The resolve method
+									does some great work to resolve the value for you.</p>
+								</div>
+								<ol>
+									<li>The name will be searched for an existing binding.</li>
+									<li>Checked against aliases.</li>
+									<li>Checked against autoloaded directories.</li>
+									<li>Fallback to Node.js <code>require</code> call.</li>
+								</ol>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-js">ioc.use(<span class="hljs-string">'View'</span>)                <span class="hljs-comment">// alias</span>
+ioc.use(<span class="hljs-string">'Adonis/Src/View'</span>)     <span class="hljs-comment">// binding</span>
+ioc.use(<span class="hljs-string">'App/Services/User'</span>)   <span class="hljs-comment">// Autoload</span>
+ioc.use(<span class="hljs-string">'lodash'</span>)              <span class="hljs-comment">// Fallback to Node.js require</span></code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> relativeFrom: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+					<a name="usefake" class="tsd-anchor"></a>
+					<h3>use<wbr>Fake</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">use<wbr>Fake&lt;T&gt;<span class="tsd-signature-symbol">(</span>namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#usefake">useFake</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L525">Ioc/index.ts:525</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Use the fake for a given namespace. You don&#39;t have to manually
+										read values from this method, unless you know what you are
+									doing.</p>
+								</div>
+								<p>This method is internally used by ioc container proxy objects to
+								point to a fake when <code>useProxies</code> is called and fake exists.</p>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespace: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="useproxies" class="tsd-anchor"></a>
+					<h3>use<wbr>Proxies</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">use<wbr>Proxies<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_adonisjs_fold.ioccontract.html">IocContract</a>.<a href="../interfaces/_adonisjs_fold.ioccontract.html#useproxies">useProxies</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L322">Ioc/index.ts:322</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Instruct IoC container to use proxies when returning
+									bindings from <code>use</code> and <code>make</code> methods.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="with" class="tsd-anchor"></a>
+					<h3>with</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">with<span class="tsd-signature-symbol">(</span>namespaces<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/poppinss/adonis-fold/blob/cb60c16/src/Ioc/index.ts#L648">Ioc/index.ts:648</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Execute a callback by resolving bindings from the container and only
+									executed when all bindings exists in the container.</p>
+								</div>
+								<p>This is a clean way to use bindings, when you are not that user application
+								is using them or not.</p>
+								<pre><code class="language-js">boot () {
+ <span class="hljs-keyword">this</span>.app.with([<span class="hljs-string">'Adonis/Src/Auth'</span>], (Auth) =&gt; {
+   Auth.extend(<span class="hljs-string">'mongo'</span>, <span class="hljs-string">'serializer'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+     <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> MongoSerializer()
+   })
+ })
+}</code></pre>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>namespaces: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>callback: <span class="tsd-signature-type">function</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../index.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-external-module">
+						<a href="../modules/_adonisjs_fold.html">@adonisjs/fold</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_adonisjs_fold.iocproxyobject.html" class="tsd-kind-icon">IoCProxy<wbr>Object</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_adonisjs_fold.ioc.html" class="tsd-kind-icon">Ioc</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#autoloadedaliases" class="tsd-kind-icon">autoloaded<wbr>Aliases</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#autoloads" class="tsd-kind-icon">autoloads</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#tracer" class="tsd-kind-icon">tracer</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#alias" class="tsd-kind-icon">alias</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#autoload" class="tsd-kind-icon">autoload</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#bind" class="tsd-kind-icon">bind</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+								<a href="_adonisjs_fold.ioc.html#call" class="tsd-kind-icon">call</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#clearautoloadcache" class="tsd-kind-icon">clear<wbr>Autoload<wbr>Cache</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#fake" class="tsd-kind-icon">fake</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#getaliasnamespace" class="tsd-kind-icon">get<wbr>Alias<wbr>Namespace</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#getautoloadbasenamespace" class="tsd-kind-icon">get<wbr>Autoload<wbr>Base<wbr>Namespace</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#hasalias" class="tsd-kind-icon">has<wbr>Alias</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#hasbinding" class="tsd-kind-icon">has<wbr>Binding</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#hasfake" class="tsd-kind-icon">has<wbr>Fake</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#isautoloadnamespace" class="tsd-kind-icon">is<wbr>Autoload<wbr>Namespace</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+								<a href="_adonisjs_fold.ioc.html#make" class="tsd-kind-icon">make</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#restore" class="tsd-kind-icon">restore</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#singleton" class="tsd-kind-icon">singleton</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+								<a href="_adonisjs_fold.ioc.html#use" class="tsd-kind-icon">use</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+								<a href="_adonisjs_fold.ioc.html#usefake" class="tsd-kind-icon">use<wbr>Fake</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#useproxies" class="tsd-kind-icon">use<wbr>Proxies</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_adonisjs_fold.ioc.html#with" class="tsd-kind-icon">with</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_adonisjs_fold.registrar.html" class="tsd-kind-icon">Registrar</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_adonisjs_fold.tracer.html" class="tsd-kind-icon">Tracer</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="../interfaces/_adonisjs_fold.ioccontract.html" class="tsd-kind-icon">Ioc<wbr>Contract</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="../interfaces/_adonisjs_fold.tracercontract.html" class="tsd-kind-icon">Tracer<wbr>Contract</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_adonisjs_fold.html#autoloadcacheitem" class="tsd-kind-icon">Autoload<wbr>Cache<wbr>Item</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_adonisjs_fold.html#bindcallback" class="tsd-kind-icon">Bind<wbr>Callback</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_adonisjs_fold.html#binding" class="tsd-kind-icon">Binding</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module">
+						<a href="../modules/_adonisjs_fold.html#iocproxyclass" class="tsd-kind-icon">Ioc<wbr>Proxy<wbr>Class</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module">
+						<a href="../modules/_adonisjs_fold.html#inject" class="tsd-kind-icon">inject</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module">
+						<a href="../modules/_adonisjs_fold.html#tracer-1" class="tsd-kind-icon">tracer</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

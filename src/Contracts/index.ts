@@ -1,5 +1,5 @@
 /**
- * @module main
+ * @module @adonisjs/fold
  */
 
 /*
