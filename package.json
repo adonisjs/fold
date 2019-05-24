@@ -1,6 +1,6 @@
 {
   "name": "@adonisjs/fold",
-  "version": "5.0.9",
+  "version": "6.0.0",
   "description": "Dependency manager and ioc container for your next NodeJs application",
   "scripts": {
     "mrm": "mrm --preset=@adonisjs/mrm-preset",
