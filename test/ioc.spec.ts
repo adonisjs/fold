@@ -7,6 +7,7 @@
 * file that was distributed with this source code.
 */
 
+import 'reflect-metadata'
 import { outputFile, remove } from 'fs-extra'
 import { join } from 'path'
 

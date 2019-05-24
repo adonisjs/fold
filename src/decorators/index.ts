@@ -11,8 +11,6 @@
 * file that was distributed with this source code.
 */
 
-import 'reflect-metadata'
-
 /**
  * Injects bindings to the class constructor
  */

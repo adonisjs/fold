@@ -45,6 +45,7 @@
     "japa": "^2.0.10",
     "mrm": "^1.2.2",
     "np": "^5.0.2",
+    "reflect-metadata": "^0.1.13",
     "ts-node": "^8.1.0",
     "tslint": "^5.16.0",
     "tslint-eslint-rules": "^5.4.0",
@@ -83,8 +84,7 @@
     "anyBranch": false
   },
   "dependencies": {
-    "@poppinss/utils": "^1.0.1",
-    "reflect-metadata": "^0.1.13"
+    "@poppinss/utils": "^1.0.1"
   },
   "publishConfig": {
     "access": "public",
