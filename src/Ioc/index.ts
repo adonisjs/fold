@@ -146,6 +146,21 @@ export class Ioc implements IocContract {
   }
 
   /**
+   * Returns a boolean telling if value is a primitive or object constructor.
+   */
+  private _isConstructorObject (value: any): boolean {
+    return [String, Function, Object, Date, Number, Boolean].indexOf(value) > -1
+  }
+
+  /**
+   * Returns exception for disallowing constructor injections.
+   */
+  private _getConstructorInjectionException (value: any, parentName: string, index: number) {
+    const primitiveName = `{${value.name} Constructor}`
+    return new Error(`Cannot inject ${primitiveName} to {${parentName}} at position ${index + 1}`)
+  }
+
+  /**
    * Make instance of a class by auto-injecting it's defined
    * dependencies.
    */
@@ -154,8 +169,17 @@ export class Ioc implements IocContract {
       return value
     }
 
-    const injections = (value.inject || []).map((injection) => this.make(injection, relativeFrom))
-    return new value(...injections)
+    const injections = value.inject && value.inject.instance ? value.inject.instance : []
+
+    /**
+     * Disallow object and primitive constructors
+     */
+    const index = injections.findIndex((injection: any) => this._isConstructorObject(injection))
+    if (index > -1) {
+      throw this._getConstructorInjectionException(injections[index], value.name, index)
+    }
+
+    return new value(...injections.map((injection: any) => this.make(injection, relativeFrom)))
   }
 
   /**
@@ -626,5 +650,48 @@ export class Ioc implements IocContract {
     if (namespaces.every((namespace) => this.hasBinding(namespace, true))) {
       callback(...namespaces.map((namespace) => this.use(namespace)))
     }
+  }
+
+  /**
+   * Call method on an object and inject dependencies to it automatically.
+   */
+  public call<T extends object, K extends keyof T = any> (target: T, method: K, args?: any[]): any {
+    const injections = target.constructor['inject'][method] || []
+    const parentName = target.constructor.name
+
+    if (typeof (target[method]) !== 'function') {
+      throw new Error(`Missing method ${method} on ${parentName}`)
+    }
+
+    /**
+     * When the list of supplied arguments is more than the detected
+     * injections, we simply pass the args to the method, since
+     * the supplied arguments has preference over detected
+     * injections
+     */
+    if (args && args.length > injections.length) {
+      return target[method as string](...args)
+    }
+
+    /**
+     * Otherwise, we loop over the injections and give priority to supplied arguments
+     * for a given index.
+     */
+    const finalArgs = injections.map((injection: any, index: number) => {
+      if (args && args[index] !== undefined) {
+        return args[index]
+      }
+
+      /**
+       * Disallow object and primitive constructors
+       */
+      if (this._isConstructorObject(injection)) {
+        throw this._getConstructorInjectionException(injection, `${parentName}.${method}`, index)
+      }
+
+      return this.make(injection)
+    })
+
+    return target[method as string](...finalArgs)
   }
 }

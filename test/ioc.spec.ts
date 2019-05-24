@@ -12,6 +12,7 @@ import { join } from 'path'
 
 import * as test from 'japa'
 import { Ioc } from '../src/Ioc'
+import { inject } from '../src/decorators'
 
 const APP = join(__dirname, './app')
 
@@ -371,7 +372,9 @@ test.group('Ioc', (group) => {
       }
 
       static get inject () {
-        return ['App/Bar']
+        return {
+          instance: ['App/Bar'],
+        }
       }
     }
 
@@ -913,5 +916,188 @@ test.group('Ioc | Proxy', () => {
     })
 
     assert.equal(value, 'foo')
+  })
+})
+
+test.group('Ioc | inject decorator', () => {
+  test('set inject property for constructor injections', (assert) => {
+    @inject(['App/Bar'])
+    class Foo {
+      constructor (public bar: any) {
+      }
+    }
+
+    assert.deepEqual(Foo['inject'], {
+      instance: ['App/Bar'],
+    })
+  })
+
+  test('set inject property for constructor injections via reflection', (assert) => {
+    class Bar {}
+
+    @inject()
+    class Foo {
+      constructor (public bar: Bar) {
+      }
+    }
+
+    assert.deepEqual(Foo['inject'], {
+      instance: [Bar],
+    })
+  })
+
+  test('set inject property for constructor by mix-matching reflection and custom injections', (assert) => {
+    class Bar {}
+
+    @inject(['App/Baz'])
+    class Foo {
+      constructor (public baz: any, public bar: Bar) {
+      }
+    }
+
+    assert.deepEqual(Foo['inject'], { instance: ['App/Baz', Bar] })
+  })
+
+  test('define custom injections after reflection index', (assert) => {
+    class Bar {}
+
+    @inject([null, 'App/Baz'])
+    class Foo {
+      constructor (public bar: Bar, public baz: any) {
+      }
+    }
+
+    assert.deepEqual(Foo['inject'], { instance: [Bar, 'App/Baz'] })
+  })
+
+  test('set injections when parameter is no information', (assert) => {
+    class Bar {}
+
+    @inject()
+    class Foo {
+      constructor (public bar: Bar, public baz) {
+      }
+    }
+
+    assert.deepEqual(Foo['inject'], { instance: [Bar, Object] })
+  })
+
+  test('set parameter injections', (assert) => {
+    class Bar {}
+
+    class Foo {
+      @inject()
+      public greet (_bar: Bar) {
+      }
+    }
+
+    assert.deepEqual(Foo['inject'], { greet: [Bar] })
+  })
+
+  test('param inject multiple dependencies', (assert) => {
+    class Bar {}
+
+    class Foo {
+      @inject()
+      public greet (_bar: Bar, _baz: any) {
+      }
+    }
+
+    assert.deepEqual(Foo['inject'], { greet: [Bar, Object] })
+  })
+})
+
+test.group('Ioc | make', () => {
+  test('inject dependencies injected via decorator', (assert) => {
+    const ioc = new Ioc()
+    class Bar {}
+
+    @inject()
+    class Foo {
+      constructor (public bar: Bar) {}
+    }
+
+    assert.instanceOf(ioc.make(Foo).bar, Bar)
+  })
+
+  test('raise error when class has primitive or object constructor injections', (assert) => {
+    const ioc = new Ioc()
+
+    @inject()
+    class Foo {
+      constructor (public baz: string) {}
+    }
+
+    const fn = () => ioc.make(Foo)
+    assert.throw(fn, `Cannot inject {String Constructor} to {Foo} at position 1`)
+  })
+
+  test('inject method dependencies injected via decorator', (assert) => {
+    assert.plan(1)
+
+    const ioc = new Ioc()
+    class Bar {}
+
+    class Foo {
+      @inject()
+      public greet (bar: Bar) {
+        assert.instanceOf(bar, Bar)
+      }
+    }
+
+    ioc.call(ioc.make(Foo), 'greet')
+  })
+
+  test('inject method dependencies with inline arguments', (assert) => {
+    assert.plan(2)
+
+    const ioc = new Ioc()
+    class Bar {}
+
+    class Foo {
+      @inject()
+      public greet (username: string, bar: Bar) {
+        assert.equal(username, 'virk')
+        assert.instanceOf(bar, Bar)
+      }
+    }
+
+    ioc.call(ioc.make(Foo), 'greet', ['virk'])
+  })
+
+  test('inject method dependencies with interface type hinting', (assert) => {
+    assert.plan(2)
+
+    const ioc = new Ioc()
+    interface BarContract {}
+    class Bar {}
+
+    ioc.bind('App/Bar', () => {
+      return new Bar()
+    })
+
+    class Foo {
+      @inject([null, 'App/Bar'])
+      public greet (username: string, bar: BarContract) {
+        assert.equal(username, 'virk')
+        assert.instanceOf(bar, Bar)
+      }
+    }
+
+    ioc.call(ioc.make(Foo), 'greet', ['virk'])
+  })
+
+  test('raise error when method has primitive or object constructor injections', (assert) => {
+    const ioc = new Ioc()
+    class Bar {}
+
+    class Foo {
+      @inject()
+      public greet (_username: string, _bar: Bar) {
+      }
+    }
+
+    const fn = () => ioc.call(ioc.make<Foo>(Foo), 'greet', [])
+    assert.throw(fn, 'Cannot inject {String Constructor} to {Foo.greet} at position 1')
   })
 })

@@ -82,7 +82,8 @@
     "anyBranch": false
   },
   "dependencies": {
-    "@poppinss/utils": "^1.0.1"
+    "@poppinss/utils": "^1.0.1",
+    "reflect-metadata": "^0.1.13"
   },
   "publishConfig": {
     "access": "public",

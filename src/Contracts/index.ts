@@ -42,6 +42,7 @@ export interface IocContract {
   getAutoloadBaseNamespace (namespace: string): string | undefined
   restore (name: string): void
   with (namespaces: string[], cb: (...args: any[]) => void): void
+  call<T extends object, K extends keyof T = any> (target: T, method: K, args: any[]): any
 }
 
 /**
