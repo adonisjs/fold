@@ -489,6 +489,20 @@ export class Ioc implements IocContract {
   }
 
   /**
+   * Wraps the return value of `use` to an ESM module. This is used
+   * by the AdonisJs typescript transformer.
+   */
+  public useEsm<T extends any = any> (
+    namespace: string,
+    relativeFrom?: string,
+  ): { default: T, __esModule: true } {
+    return {
+      default: this.use(namespace, relativeFrom),
+      __esModule: true,
+    }
+  }
+
+  /**
    * Make an instance of class and auto inject it's dependencies. The instance
    * is only created if `namespace` is part of an autoload or is an class
    * constructor.

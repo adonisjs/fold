@@ -32,6 +32,7 @@ export interface IocContract {
   clearAutoloadCache (namespace?: string, clearRequireCache?: boolean): void
   fake (name: string, callback: BindCallback): void
   use<T extends any = any> (name: string, relativeFrom?: string): T
+  useEsm<T extends any = any> (name: string, relativeFrom?: string): { default: T, __esModule: true }
   make<T extends any = any> (name: string, relativeFrom?: string): T
   useFake<T extends any = any> (name: string): T
   hasFake (name: string): boolean

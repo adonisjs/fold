@@ -492,6 +492,17 @@ test.group('Ioc', (group) => {
       throw new Error('Never expected to be called')
     })
   })
+
+  test('wrap return value to esm module', (assert) => {
+    const ioc = new Ioc()
+    class Foo {}
+
+    ioc.bind('App/Foo', () => {
+      return new Foo()
+    })
+
+    assert.instanceOf(ioc.useEsm<Foo>('App/Foo').default, Foo)
+  })
 })
 
 test.group('Ioc | Proxy', () => {
