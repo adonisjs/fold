@@ -504,7 +504,7 @@ ___
 
 ###  useEsm
 
-▸ **useEsm**<`T`>(namespace: *`string`*, relativeFrom?: *`undefined` \| `string`*): `object`
+▸ **useEsm**<`T`>(namespace: *`string`*, relativeFrom?: *`undefined` \| `string`*): `T`
 
 Wraps the return value of `use` to an ESM module. This is used by the AdonisJs typescript transformer.
 
@@ -518,7 +518,7 @@ Wraps the return value of `use` to an ESM module. This is used by the AdonisJs t
 | namespace | `string` |
 | `Optional` relativeFrom | `undefined` \| `string` |
 
-**Returns:** `object`
+**Returns:** `T`
 
 ___
 <a id="usefake"></a>

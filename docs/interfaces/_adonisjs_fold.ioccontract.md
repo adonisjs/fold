@@ -340,7 +340,7 @@ ___
 
 ###  useEsm
 
-▸ **useEsm**<`T`>(name: *`string`*, relativeFrom?: *`undefined` \| `string`*): `object`
+▸ **useEsm**<`T`>(name: *`string`*, relativeFrom?: *`undefined` \| `string`*): `T`
 
 **Type parameters:**
 
@@ -352,7 +352,7 @@ ___
 | name | `string` |
 | `Optional` relativeFrom | `undefined` \| `string` |
 
-**Returns:** `object`
+**Returns:** `T`
 
 ___
 <a id="usefake"></a>
