@@ -11,7 +11,6 @@
 * file that was distributed with this source code.
 */
 
-import { esmRequire } from '@poppinss/utils'
 import { normalize, resolve, dirname } from 'path'
 
 import tracer from './Tracer'
@@ -137,7 +136,7 @@ export class Ioc implements IocContract {
      */
     if (!cacheEntry) {
       const absPath = this._makeRequirePath(baseNamespace, namespace)
-      const importValue = esmRequire(absPath)
+      const importValue = require(absPath)
       this._autoloadsCache.set(namespace, { diskPath: absPath, cachedValue: importValue })
     }
 
@@ -194,20 +193,35 @@ export class Ioc implements IocContract {
     return require(modulePath)
   }
 
+  private _toEsm (value: any) {
+    const esm = {
+      default: value,
+    }
+    Object.defineProperty(esm, '__esModule', { value: true })
+    return esm
+  }
+
   /**
    * Resolve the value for a namespace by trying all possible
    * combinations of `bindings`, `aliases`, `autoloading`
    * and finally falling back to `nodejs require`.
    */
-  private _resolve (name: string, relativeFrom?: string) {
+  private _resolve (name: string, asEsm: boolean, relativeFrom?: string) {
     if (this.hasBinding(name)) {
-      return this._resolveBinding(name)
+      return asEsm ? this._toEsm(this._resolveBinding(name)) : this._resolveBinding(name)
     }
 
     if (this.hasAlias(name)) {
-      return this._resolve(this.getAliasNamespace(name)!)
+      return this._resolve(this.getAliasNamespace(name)!, asEsm)
     }
 
+    /**
+     * The actual require statements are never checked and expected to be an ES module
+     * by default.
+     *
+     * If require output doesn't return ES modules, then there is no point of forcing
+     * IoC container to return bindings as ESM.
+     */
     if (this.isAutoloadNamespace(name)) {
       return this._autoload(name)
     }
@@ -231,11 +245,23 @@ export class Ioc implements IocContract {
     }
 
     if (this.hasAlias(name)) {
-      return this._resolve(this.getAliasNamespace(name)!)
+      /**
+       * In case of `make` we never force the `_resolve` method to wrap the binding
+       * in ES modules, coz we are not importing them, we are injecting them and
+       * at the time of injecting dependencies, we anyways unwrap ES modules, so
+       * wrapping and then un-wrapping doesn't make much sense.
+       */
+      return this._resolve(this.getAliasNamespace(name)!, false)
     }
 
     if (this.isAutoloadNamespace(name)) {
-      return this._makeInstanceOf(this._autoload(name), relativeFrom)
+      /**
+       * Unwrapping the es module default value and making an instance of it. Making
+       * instances of named modules isn't possible at all.
+       */
+      const value = this._autoload(name)
+      const normalizedValue = value && value.__esModule && value.default ? value.default : value
+      return this._makeInstanceOf(normalizedValue, relativeFrom)
     }
 
     return this._requireModule(name, relativeFrom)
@@ -471,7 +497,7 @@ export class Ioc implements IocContract {
    * ```
    */
   public use<T extends any = any> (namespace: string, relativeFrom?: string): T {
-    const value = this._resolve(namespace, relativeFrom)
+    const value = this._resolve(namespace, false, relativeFrom)
 
     if (!this._useProxies) {
       return value as T
@@ -495,11 +521,33 @@ export class Ioc implements IocContract {
   public useEsm<T extends any = any> (
     namespace: string,
     relativeFrom?: string,
-  ): { default: T, __esModule: true } {
-    return {
-      default: this.use(namespace, relativeFrom),
-      __esModule: true,
+  ): T {
+    const value = this._resolve(namespace, true, relativeFrom)
+    if (!value.__esModule) {
+      throw new Error(`${namespace} must be an ES module`)
     }
+
+    /**
+     * Proxies are allowed only for ESM modules
+     * with default exports
+     */
+    if (!this._useProxies || !value.default) {
+      return value
+    }
+
+    if (this._isObject(value.default)) {
+      return {
+        default: new IoCProxyObject(namespace, value.default, this),
+      } as unknown as T
+    }
+
+    if (this._isClass(value.default)) {
+      return {
+        default: IocProxyClass(namespace, value.default, this),
+      } as unknown as T
+    }
+
+    return value
   }
 
   /**
