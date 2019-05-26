@@ -38,6 +38,7 @@ Ioc container interface
 * [restore](_adonisjs_fold.ioccontract.md#restore)
 * [singleton](_adonisjs_fold.ioccontract.md#singleton)
 * [use](_adonisjs_fold.ioccontract.md#use)
+* [useEsm](_adonisjs_fold.ioccontract.md#useesm)
 * [useFake](_adonisjs_fold.ioccontract.md#usefake)
 * [useProxies](_adonisjs_fold.ioccontract.md#useproxies)
 * [with](_adonisjs_fold.ioccontract.md#with)
@@ -333,6 +334,25 @@ ___
 | `Optional` relativeFrom | `undefined` \| `string` |
 
 **Returns:** `T`
+
+___
+<a id="useesm"></a>
+
+###  useEsm
+
+▸ **useEsm**<`T`>(name: *`string`*, relativeFrom?: *`undefined` \| `string`*): `object`
+
+**Type parameters:**
+
+#### T :  `any`
+**Parameters:**
+
+| Name | Type |
+| ------ | ------ |
+| name | `string` |
+| `Optional` relativeFrom | `undefined` \| `string` |
+
+**Returns:** `object`
 
 ___
 <a id="usefake"></a>

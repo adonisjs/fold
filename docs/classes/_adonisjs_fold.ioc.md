@@ -44,6 +44,7 @@ The container follows and encourages the use of dependency injection in your app
 * [restore](_adonisjs_fold.ioc.md#restore)
 * [singleton](_adonisjs_fold.ioc.md#singleton)
 * [use](_adonisjs_fold.ioc.md#use)
+* [useEsm](_adonisjs_fold.ioc.md#useesm)
 * [useFake](_adonisjs_fold.ioc.md#usefake)
 * [useProxies](_adonisjs_fold.ioc.md#useproxies)
 * [with](_adonisjs_fold.ioc.md#with)
@@ -497,6 +498,27 @@ ioc.use('lodash')              // Fallback to Node.js require
 | `Optional` relativeFrom | `undefined` \| `string` |
 
 **Returns:** `T`
+
+___
+<a id="useesm"></a>
+
+###  useEsm
+
+▸ **useEsm**<`T`>(namespace: *`string`*, relativeFrom?: *`undefined` \| `string`*): `object`
+
+Wraps the return value of `use` to an ESM module. This is used by the AdonisJs typescript transformer.
+
+**Type parameters:**
+
+#### T :  `any`
+**Parameters:**
+
+| Name | Type |
+| ------ | ------ |
+| namespace | `string` |
+| `Optional` relativeFrom | `undefined` \| `string` |
+
+**Returns:** `object`
 
 ___
 <a id="usefake"></a>
