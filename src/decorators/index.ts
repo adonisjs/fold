@@ -22,7 +22,12 @@ export function inject (value?: any) {
      * Consturctor injections
      */
     if (!propertyKey) {
-      target.inject = target.inject || {}
+      if (!target.hasOwnProperty('inject')) {
+        Object.defineProperty(target, 'inject', {
+          value: {},
+        })
+      }
+
       target.inject.instance = target.inject.instance || []
 
       const constructorParams = Reflect.getMetadata('design:paramtypes', target)
@@ -42,7 +47,12 @@ export function inject (value?: any) {
     /**
      * Parameter injections
      */
-    target.constructor.inject = target.constructor.inject || {}
+    if (!target.constructor.hasOwnProperty('inject')) {
+      Object.defineProperty(target.constructor, 'inject', {
+        value: {},
+      })
+    }
+
     target.constructor.inject[propertyKey] = target.constructor.inject[propertyKey] || []
 
     const methodParams = Reflect.getMetadata('design:paramtypes', target, propertyKey)

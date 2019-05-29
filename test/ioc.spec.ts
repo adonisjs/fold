@@ -8,7 +8,7 @@
 */
 
 import 'reflect-metadata'
-import { Filesystem } from '@adonisjs/dev-utils'
+import { Filesystem } from '@poppinss/dev-utils'
 import { join } from 'path'
 
 import * as test from 'japa'
@@ -1289,5 +1289,18 @@ test.group('Ioc | make', () => {
 
     const fn = () => ioc.call(ioc.make<Foo>(Foo), 'greet', [])
     assert.throw(fn, 'Cannot inject {String Constructor} to {Foo.greet} at position 1')
+  })
+
+  test('call object method even when it has zero injections', (assert) => {
+    assert.plan(1)
+
+    const ioc = new Ioc()
+    class Foo {
+      public greet () {
+        assert.isTrue(true)
+      }
+    }
+
+    ioc.call(ioc.make(Foo), 'greet')
   })
 })

@@ -168,7 +168,10 @@ export class Ioc implements IocContract {
       return value
     }
 
-    const injections = value.inject && value.inject.instance ? value.inject.instance : []
+    let injections = []
+    if (value.hasOwnProperty('inject')) {
+      injections = value.inject.instance || []
+    }
 
     /**
      * Disallow object and primitive constructors
@@ -718,7 +721,11 @@ export class Ioc implements IocContract {
    * Call method on an object and inject dependencies to it automatically.
    */
   public call<T extends object, K extends keyof T = any> (target: T, method: K, args?: any[]): any {
-    const injections = target.constructor['inject'][method] || []
+    let injections = []
+    if (target.constructor.hasOwnProperty('inject')) {
+      injections = target.constructor['inject'][method] || []
+    }
+
     const parentName = target.constructor.name
 
     if (typeof (target[method]) !== 'function') {

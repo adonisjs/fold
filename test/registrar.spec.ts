@@ -7,7 +7,7 @@
 * file that was distributed with this source code.
 */
 
-import { Filesystem } from '@adonisjs/dev-utils'
+import { Filesystem } from '@poppinss/dev-utils'
 import { join } from 'path'
 
 import * as test from 'japa'
