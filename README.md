@@ -141,11 +141,13 @@ Wow! The IoC container will also satisfy all the dependencies of the `Redis` cla
 ## Usage
 Install the package from npm registery as follows:
 
+> `reflect-metadata` package is required if you are planning to make use of Decorators.
+
 ```sh
-npm i @adonisjs/fold
+npm i @adonisjs/fold reflect-metadata
 
 # yarn user
-yarn add @adonisjs/fold
+yarn add @adonisjs/fold reflect-metadata
 ```
 
 And use the package as follows
