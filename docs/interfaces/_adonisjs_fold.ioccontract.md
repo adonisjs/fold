@@ -1,4 +1,6 @@
-[@adonisjs/fold](../README.md) > [@adonisjs/fold](../modules/_adonisjs_fold.md) > [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)
+> **[@adonisjs/fold](../README.md)**
+
+[Globals](../README.md) / [@adonisjs/fold](../modules/_adonisjs_fold.md) / [IocContract](_adonisjs_fold.ioccontract.md) /
 
 # Interface: IocContract
 
@@ -6,21 +8,21 @@ Ioc container interface
 
 ## Hierarchy
 
-**IocContract**
+* **IocContract**
 
 ## Implemented by
 
 * [Ioc](../classes/_adonisjs_fold.ioc.md)
 
-## Index
+### Index
 
-### Properties
+#### Properties
 
 * [autoloadedAliases](_adonisjs_fold.ioccontract.md#autoloadedaliases)
 * [autoloads](_adonisjs_fold.ioccontract.md#autoloads)
 * [tracer](_adonisjs_fold.ioccontract.md#tracer)
 
-### Methods
+#### Methods
 
 * [alias](_adonisjs_fold.ioccontract.md#alias)
 * [autoload](_adonisjs_fold.ioccontract.md#autoload)
@@ -43,359 +45,338 @@ Ioc container interface
 * [useProxies](_adonisjs_fold.ioccontract.md#useproxies)
 * [with](_adonisjs_fold.ioccontract.md#with)
 
----
-
 ## Properties
-
-<a id="autoloadedaliases"></a>
 
 ###  autoloadedAliases
 
-**● autoloadedAliases**: *`string`[]*
+• **autoloadedAliases**: *string[]*
 
 ___
-<a id="autoloads"></a>
 
 ###  autoloads
 
-**● autoloads**: *`object`*
+• **autoloads**: *object*
 
-#### Type declaration
+#### Type declaration:
 
-[namespace: `string`]: `string`
+● \[▪ **namespace**: *string*\]: string
 
 ___
-<a id="tracer"></a>
 
 ###  tracer
 
-**● tracer**: *[TracerContract](_adonisjs_fold.tracercontract.md)*
-
-___
+• **tracer**: *[TracerContract](_adonisjs_fold.tracercontract.md)*
 
 ## Methods
 
-<a id="alias"></a>
-
 ###  alias
 
-▸ **alias**(namespace: *`string`*, alias: *`string`*): `void`
+▸ **alias**(`namespace`: string, `alias`: string): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| namespace | `string` |
-| alias | `string` |
+Name | Type |
+------ | ------ |
+`namespace` | string |
+`alias` | string |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="autoload"></a>
 
 ###  autoload
 
-▸ **autoload**(directoryPath: *`string`*, namespace: *`string`*): `void`
+▸ **autoload**(`directoryPath`: string, `namespace`: string): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| directoryPath | `string` |
-| namespace | `string` |
+Name | Type |
+------ | ------ |
+`directoryPath` | string |
+`namespace` | string |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="bind"></a>
 
 ###  bind
 
-▸ **bind**(name: *`string`*, callback: *[BindCallback](../modules/_adonisjs_fold.md#bindcallback)*): `void`
+▸ **bind**(`name`: string, `callback`: [BindCallback](../modules/_adonisjs_fold.md#bindcallback)): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| callback | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
+Name | Type |
+------ | ------ |
+`name` | string |
+`callback` | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="call"></a>
 
 ###  call
 
-▸ **call**<`T`,`K`>(target: *`T`*, method: *`K`*, args: *`any`[]*): `any`
+▸ **call**<**T**, **K**>(`target`: `T`, `method`: `K`, `args`: any[]): *any*
 
 **Type parameters:**
 
-#### T :  `object`
-#### K :  `keyof T`
+▪ **T**: *object*
+
+▪ **K**: *keyof T*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| target | `T` |
-| method | `K` |
-| args | `any`[] |
+Name | Type |
+------ | ------ |
+`target` | `T` |
+`method` | `K` |
+`args` | any[] |
 
-**Returns:** `any`
+**Returns:** *any*
 
 ___
-<a id="clearautoloadcache"></a>
 
 ###  clearAutoloadCache
 
-▸ **clearAutoloadCache**(namespace?: *`undefined` \| `string`*, clearRequireCache?: *`undefined` \| `false` \| `true`*): `void`
+▸ **clearAutoloadCache**(`namespace?`: undefined | string, `clearRequireCache?`: undefined | false | true): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Optional` namespace | `undefined` \| `string` |
-| `Optional` clearRequireCache | `undefined` \| `false` \| `true` |
+Name | Type |
+------ | ------ |
+`namespace?` | undefined \| string |
+`clearRequireCache?` | undefined \| false \| true |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="fake"></a>
 
 ###  fake
 
-▸ **fake**(name: *`string`*, callback: *[BindCallback](../modules/_adonisjs_fold.md#bindcallback)*): `void`
+▸ **fake**(`name`: string, `callback`: [BindCallback](../modules/_adonisjs_fold.md#bindcallback)): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| callback | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
+Name | Type |
+------ | ------ |
+`name` | string |
+`callback` | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="getaliasnamespace"></a>
 
 ###  getAliasNamespace
 
-▸ **getAliasNamespace**(name: *`string`*): `string` \| `undefined`
+▸ **getAliasNamespace**(`name`: string): *string | undefined*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
+Name | Type |
+------ | ------ |
+`name` | string |
 
-**Returns:** `string` \| `undefined`
+**Returns:** *string | undefined*
 
 ___
-<a id="getautoloadbasenamespace"></a>
 
 ###  getAutoloadBaseNamespace
 
-▸ **getAutoloadBaseNamespace**(namespace: *`string`*): `string` \| `undefined`
+▸ **getAutoloadBaseNamespace**(`namespace`: string): *string | undefined*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| namespace | `string` |
+Name | Type |
+------ | ------ |
+`namespace` | string |
 
-**Returns:** `string` \| `undefined`
+**Returns:** *string | undefined*
 
 ___
-<a id="hasalias"></a>
 
 ###  hasAlias
 
-▸ **hasAlias**(name: *`string`*): `boolean`
+▸ **hasAlias**(`name`: string): *boolean*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
+Name | Type |
+------ | ------ |
+`name` | string |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="hasbinding"></a>
 
 ###  hasBinding
 
-▸ **hasBinding**(namespace: *`string`*, checkAliases?: *`undefined` \| `false` \| `true`*): `boolean`
+▸ **hasBinding**(`namespace`: string, `checkAliases?`: undefined | false | true): *boolean*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| namespace | `string` |
-| `Optional` checkAliases | `undefined` \| `false` \| `true` |
+Name | Type |
+------ | ------ |
+`namespace` | string |
+`checkAliases?` | undefined \| false \| true |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="hasfake"></a>
 
 ###  hasFake
 
-▸ **hasFake**(name: *`string`*): `boolean`
+▸ **hasFake**(`name`: string): *boolean*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
+Name | Type |
+------ | ------ |
+`name` | string |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="isautoloadnamespace"></a>
 
 ###  isAutoloadNamespace
 
-▸ **isAutoloadNamespace**(namespace: *`string`*): `boolean`
+▸ **isAutoloadNamespace**(`namespace`: string): *boolean*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| namespace | `string` |
+Name | Type |
+------ | ------ |
+`namespace` | string |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="make"></a>
 
 ###  make
 
-▸ **make**<`T`>(name: *`string`*, relativeFrom?: *`undefined` \| `string`*): `T`
+▸ **make**<**T**>(`name`: string, `args?`: string[]): *`T`*
 
 **Type parameters:**
 
-#### T :  `any`
+▪ **T**: *any*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| `Optional` relativeFrom | `undefined` \| `string` |
+Name | Type |
+------ | ------ |
+`name` | string |
+`args?` | string[] |
 
-**Returns:** `T`
+**Returns:** *`T`*
 
 ___
-<a id="restore"></a>
 
 ###  restore
 
-▸ **restore**(name: *`string`*): `void`
+▸ **restore**(`name`: string): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
+Name | Type |
+------ | ------ |
+`name` | string |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="singleton"></a>
 
 ###  singleton
 
-▸ **singleton**(name: *`string`*, callback: *[BindCallback](../modules/_adonisjs_fold.md#bindcallback)*): `void`
+▸ **singleton**(`name`: string, `callback`: [BindCallback](../modules/_adonisjs_fold.md#bindcallback)): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| callback | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
+Name | Type |
+------ | ------ |
+`name` | string |
+`callback` | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="use"></a>
 
 ###  use
 
-▸ **use**<`T`>(name: *`string`*, relativeFrom?: *`undefined` \| `string`*): `T`
+▸ **use**<**T**>(`name`: string): *`T`*
 
 **Type parameters:**
 
-#### T :  `any`
+▪ **T**: *any*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| `Optional` relativeFrom | `undefined` \| `string` |
+Name | Type |
+------ | ------ |
+`name` | string |
 
-**Returns:** `T`
+**Returns:** *`T`*
 
 ___
-<a id="useesm"></a>
 
 ###  useEsm
 
-▸ **useEsm**<`T`>(name: *`string`*, relativeFrom?: *`undefined` \| `string`*): `T`
+▸ **useEsm**<**T**>(`name`: string): *`T`*
 
 **Type parameters:**
 
-#### T :  `any`
+▪ **T**: *any*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
-| `Optional` relativeFrom | `undefined` \| `string` |
+Name | Type |
+------ | ------ |
+`name` | string |
 
-**Returns:** `T`
+**Returns:** *`T`*
 
 ___
-<a id="usefake"></a>
 
 ###  useFake
 
-▸ **useFake**<`T`>(name: *`string`*): `T`
+▸ **useFake**<**T**>(`name`: string): *`T`*
 
 **Type parameters:**
 
-#### T :  `any`
+▪ **T**: *any*
+
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| name | `string` |
+Name | Type |
+------ | ------ |
+`name` | string |
 
-**Returns:** `T`
+**Returns:** *`T`*
 
 ___
-<a id="useproxies"></a>
 
 ###  useProxies
 
-▸ **useProxies**(): `this`
+▸ **useProxies**(): *this*
 
-**Returns:** `this`
+**Returns:** *this*
 
 ___
-<a id="with"></a>
 
 ###  with
 
-▸ **with**(namespaces: *`string`[]*, cb: *`function`*): `void`
+▸ **with**(`namespaces`: string[], `cb`: function): *void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| namespaces | `string`[] |
-| cb | `function` |
+▪ **namespaces**: *string[]*
 
-**Returns:** `void`
+▪ **cb**: *function*
 
-___
+▸ (...`args`: any[]): *void*
 
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | any[] |
+
+**Returns:** *void*

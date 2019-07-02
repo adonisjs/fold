@@ -1198,7 +1198,7 @@ test.group('Ioc | inject decorator', () => {
 })
 
 test.group('Ioc | make', () => {
-  test('inject dependencies injected via decorator', (assert) => {
+  test('inject constructor dependencies injected via decorator', (assert) => {
     const ioc = new Ioc()
     class Bar {}
 
@@ -1208,6 +1208,20 @@ test.group('Ioc | make', () => {
     }
 
     assert.instanceOf(ioc.make(Foo).bar, Bar)
+  })
+
+  test('inject constructor dependencies with inline arguments', (assert) => {
+    const ioc = new Ioc()
+    class Bar {}
+
+    @inject()
+    class Foo {
+      constructor (public username: string, public bar: Bar) {}
+    }
+
+    const foo = ioc.make(Foo, ['virk'])
+    assert.instanceOf(foo.bar, Bar)
+    assert.equal(foo.username, 'virk')
   })
 
   test('raise error when class has primitive or object constructor injections', (assert) => {

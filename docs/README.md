@@ -1,11 +1,9 @@
+> **[@adonisjs/fold](README.md)**
 
-#  @adonisjs/fold
+[Globals](README.md) /
 
-## Index
+### Index
 
-### External modules
+#### External modules
 
 * [@adonisjs/fold](modules/_adonisjs_fold.md)
-
----
-

@@ -1,4 +1,6 @@
-[@adonisjs/fold](../README.md) > [@adonisjs/fold](../modules/_adonisjs_fold.md) > [IoCProxyObject](../classes/_adonisjs_fold.iocproxyobject.md)
+> **[@adonisjs/fold](../README.md)**
+
+[Globals](../README.md) / [@adonisjs/fold](../modules/_adonisjs_fold.md) / [IoCProxyObject](_adonisjs_fold.iocproxyobject.md) /
 
 # Class: IoCProxyObject
 
@@ -6,63 +8,50 @@ Proxies the objects to fallback to fake, when it exists.
 
 ## Hierarchy
 
-**IoCProxyObject**
+* **IoCProxyObject**
 
-## Index
+### Index
 
-### Constructors
+#### Constructors
 
 * [constructor](_adonisjs_fold.iocproxyobject.md#constructor)
 
-### Properties
+#### Properties
 
 * [actual](_adonisjs_fold.iocproxyobject.md#actual)
 * [binding](_adonisjs_fold.iocproxyobject.md#binding)
 * [container](_adonisjs_fold.iocproxyobject.md#container)
 
----
-
 ## Constructors
-
-<a id="constructor"></a>
 
 ###  constructor
 
-⊕ **new IoCProxyObject**(binding: *`string`*, actual: *`any`*, container: *[IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*): [IoCProxyObject](_adonisjs_fold.iocproxyobject.md)
+\+ **new IoCProxyObject**(`binding`: string, `actual`: any, `container`: [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)): *[IoCProxyObject](_adonisjs_fold.iocproxyobject.md)*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| binding | `string` |
-| actual | `any` |
-| container | [IocContract](../interfaces/_adonisjs_fold.ioccontract.md) |
+Name | Type |
+------ | ------ |
+`binding` | string |
+`actual` | any |
+`container` | [IocContract](../interfaces/_adonisjs_fold.ioccontract.md) |
 
-**Returns:** [IoCProxyObject](_adonisjs_fold.iocproxyobject.md)
-
-___
+**Returns:** *[IoCProxyObject](_adonisjs_fold.iocproxyobject.md)*
 
 ## Properties
 
-<a id="actual"></a>
-
 ###  actual
 
-**● actual**: *`any`*
+• **actual**: *any*
 
 ___
-<a id="binding"></a>
 
 ###  binding
 
-**● binding**: *`string`*
+• **binding**: *string*
 
 ___
-<a id="container"></a>
 
 ###  container
 
-**● container**: *[IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
-
-___
-
+• **container**: *[IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*

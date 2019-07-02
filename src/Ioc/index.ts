@@ -160,42 +160,69 @@ export class Ioc implements IocContract {
   }
 
   /**
+   * Returns an array of resolved dependencies, by giving preference
+   * to inline arguments
+   */
+  private _makeDependencies (targetName: string, injections: any[], args: any[]) {
+    /**
+     * If the inline arguments length is great or same as the length
+     * of injections, then we treat them as the source of truth
+     * and return them back as it is.
+     *
+     * The inline arguments are preferred over injections, since we trust the caller
+     * more than the user.
+     */
+    if (args.length >= injections.length) {
+      return args
+    }
+
+    /**
+     * Loop over all the injections and give preference to args for
+     * a given index, otherwise fallback to `this.make`.
+     */
+    return injections.map((injection: any, index: number) => {
+      if (args && args[index] !== undefined) {
+        return args[index]
+      }
+
+      /**
+       * Disallow object and primitive constructors
+       */
+      if (this._isConstructorObject(injection)) {
+        throw this._getConstructorInjectionException(injections[index], targetName, index)
+      }
+
+      return this.make(injection)
+    })
+  }
+
+  /**
    * Make instance of a class by auto-injecting it's defined
    * dependencies.
    */
-  private _makeInstanceOf (value: any, relativeFrom?: string) {
+  private _makeInstanceOf (value: any, args?: any[]) {
     if (!this._isClass(value) || value.makePlain === true) {
       return value
     }
 
-    let injections = []
-    if (value.hasOwnProperty('inject')) {
-      injections = value.inject.instance || []
-    }
-
-    /**
-     * Disallow object and primitive constructors
-     */
-    const index = injections.findIndex((injection: any) => this._isConstructorObject(injection))
-    if (index > -1) {
-      throw this._getConstructorInjectionException(injections[index], value.name, index)
-    }
-
-    return new value(...injections.map((injection: any) => this.make(injection, relativeFrom)))
+    const injections = value.hasOwnProperty('inject') ? (value.inject.instance || []) : []
+    return new value(...this._makeDependencies(value.name, injections, args || []))
   }
 
   /**
    * Require the module using Node.js `require` function.
    */
-  private _requireModule (modulePath: string, relativeFrom?: string) {
+  private _requireModule (modulePath: string) {
     if (modulePath.startsWith('./') || modulePath.startsWith('/')) {
-      relativeFrom = relativeFrom || module.parent!.filename
-      return require(resolve(dirname(relativeFrom), modulePath))
+      return require(resolve(dirname(module.parent!.filename), modulePath))
     }
-
     return require(modulePath)
   }
 
+  /**
+   * Converts the output value to a sythentic esm
+   * module.
+   */
   private _toEsm (value: any) {
     const esm = {
       default: value,
@@ -209,11 +236,15 @@ export class Ioc implements IocContract {
    * combinations of `bindings`, `aliases`, `autoloading`
    * and finally falling back to `nodejs require`.
    */
-  private _resolve (name: string, asEsm: boolean, relativeFrom?: string) {
+  private _resolve (name: string, asEsm: boolean) {
     if (this.hasBinding(name)) {
       return asEsm ? this._toEsm(this._resolveBinding(name)) : this._resolveBinding(name)
     }
 
+    /**
+     * Resolve the alias by fetching it's namespace first
+     * and then re-calling the `_resolve` method.
+     */
     if (this.hasAlias(name)) {
       return this._resolve(this.getAliasNamespace(name)!, asEsm)
     }
@@ -229,7 +260,10 @@ export class Ioc implements IocContract {
       return this._autoload(name)
     }
 
-    return this._requireModule(name, relativeFrom)
+    /**
+     * Require the npm module as a fallback
+     */
+    return this._requireModule(name)
   }
 
   /**
@@ -238,11 +272,15 @@ export class Ioc implements IocContract {
    * and finally falling back to `nodejs require` and then
    * make an instance of it and it's dependencies.
    */
-  private _resolveAndMake (name: string, relativeFrom?: string) {
+  private _resolveAndMake (name: string, args?: string[]) {
     if (typeof (name) !== 'string') {
-      return this._makeInstanceOf(name, relativeFrom)
+      return this._makeInstanceOf(name, args)
     }
 
+    /**
+     * IoC container bindings are returned as it is, since the binding
+     * factory function decided the return value
+     */
     if (this.hasBinding(name)) {
       return this._resolveBinding(name)
     }
@@ -264,10 +302,10 @@ export class Ioc implements IocContract {
        */
       const value = this._autoload(name)
       const normalizedValue = value && value.__esModule && value.default ? value.default : value
-      return this._makeInstanceOf(normalizedValue, relativeFrom)
+      return this._makeInstanceOf(normalizedValue, args)
     }
 
-    return this._requireModule(name, relativeFrom)
+    return this._requireModule(name)
   }
 
   /**
@@ -499,8 +537,8 @@ export class Ioc implements IocContract {
    * ioc.use('lodash')              // Fallback to Node.js require
    * ```
    */
-  public use<T extends any = any> (namespace: string, relativeFrom?: string): T {
-    const value = this._resolve(namespace, false, relativeFrom)
+  public use<T extends any = any> (namespace: string): T {
+    const value = this._resolve(namespace, false)
 
     if (!this._useProxies) {
       return value as T
@@ -521,11 +559,8 @@ export class Ioc implements IocContract {
    * Wraps the return value of `use` to an ESM module. This is used
    * by the AdonisJs typescript transformer.
    */
-  public useEsm<T extends any = any> (
-    namespace: string,
-    relativeFrom?: string,
-  ): T {
-    const value = this._resolve(namespace, true, relativeFrom)
+  public useEsm<T extends any = any> (namespace: string): T {
+    const value = this._resolve(namespace, true)
     if (!value.__esModule) {
       throw new Error(`${namespace} must be an ES module`)
     }
@@ -561,8 +596,8 @@ export class Ioc implements IocContract {
    * The bindings added via `ioc.bind` or `ioc.singleton` controls their state
    * by themselves.
    */
-  public make<T extends any = any> (namespace: any, relativeFrom?: string): T {
-    const value = this._resolveAndMake(namespace, relativeFrom)
+  public make<T extends any = any> (namespace: any, args?: string[]): T {
+    const value = this._resolveAndMake(namespace, args)
 
     if (!this._useProxies) {
       return value as T
@@ -727,40 +762,12 @@ export class Ioc implements IocContract {
     }
 
     const parentName = target.constructor.name
-
     if (typeof (target[method]) !== 'function') {
       throw new Error(`Missing method ${method} on ${parentName}`)
     }
 
-    /**
-     * When the list of supplied arguments is more than the detected
-     * injections, we simply pass the args to the method, since
-     * the supplied arguments has preference over detected
-     * injections
-     */
-    if (args && args.length > injections.length) {
-      return target[method as string](...args)
-    }
-
-    /**
-     * Otherwise, we loop over the injections and give priority to supplied arguments
-     * for a given index.
-     */
-    const finalArgs = injections.map((injection: any, index: number) => {
-      if (args && args[index] !== undefined) {
-        return args[index]
-      }
-
-      /**
-       * Disallow object and primitive constructors
-       */
-      if (this._isConstructorObject(injection)) {
-        throw this._getConstructorInjectionException(injection, `${parentName}.${method}`, index)
-      }
-
-      return this.make(injection)
-    })
-
-    return target[method as string](...finalArgs)
+    return target[method as string](
+      ...this._makeDependencies(`${parentName}.${method}`, injections, args || []),
+    )
   }
 }

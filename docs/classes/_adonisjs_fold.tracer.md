@@ -1,26 +1,30 @@
-[@adonisjs/fold](../README.md) > [@adonisjs/fold](../modules/_adonisjs_fold.md) > [Tracer](../classes/_adonisjs_fold.tracer.md)
+> **[@adonisjs/fold](../README.md)**
+
+[Globals](../README.md) / [@adonisjs/fold](../modules/_adonisjs_fold.md) / [Tracer](_adonisjs_fold.tracer.md) /
 
 # Class: Tracer
 
-Tracer is used to emit event from the IoC container at different steps. Read the guides to understand how tracer works
+Tracer is used to emit event from the IoC container
+at different steps. Read the guides to understand
+how tracer works
 
 ## Hierarchy
 
- `internal`
+* `internal`
 
-**↳ Tracer**
+  * **Tracer**
 
 ## Implements
 
 * [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)
 
-## Index
+### Index
 
-### Classes
+#### Classes
 
 * [EventEmitter](_adonisjs_fold.tracer.eventemitter.md)
 
-### Methods
+#### Methods
 
 * [addListener](_adonisjs_fold.tracer.md#addlistener)
 * [emit](_adonisjs_fold.tracer.md#emit)
@@ -39,272 +43,347 @@ Tracer is used to emit event from the IoC container at different steps. Read the
 * [removeAllListeners](_adonisjs_fold.tracer.md#removealllisteners)
 * [removeListener](_adonisjs_fold.tracer.md#removelistener)
 * [setMaxListeners](_adonisjs_fold.tracer.md#setmaxlisteners)
-* [once](_adonisjs_fold.tracer.md#once-1)
-
----
+* [once](_adonisjs_fold.tracer.md#static-once)
 
 ## Methods
 
-<a id="addlistener"></a>
-
 ###  addListener
 
-▸ **addListener**(event: *`string` \| `symbol`*, listener: *`function`*): `this`
+▸ **addListener**(`event`: string | symbol, `listener`: function): *this*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | `string` \| `symbol` |
-| listener | `function` |
+▪ **event**: *string | symbol*
 
-**Returns:** `this`
+▪ **listener**: *function*
+
+▸ (...`args`: any[]): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | any[] |
+
+**Returns:** *this*
 
 ___
-<a id="emit"></a>
 
 ###  emit
 
-▸ **emit**(event: *`string` \| `symbol`*, ...args: *`any`[]*): `boolean`
+▸ **emit**(`event`: string | symbol, ...`args`: any[]): *boolean*
+
+*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | `string` \| `symbol` |
-| `Rest` args | `any`[] |
+Name | Type |
+------ | ------ |
+`event` | string \| symbol |
+`...args` | any[] |
 
-**Returns:** `boolean`
+**Returns:** *boolean*
 
 ___
-<a id="eventnames"></a>
 
 ###  eventNames
 
-▸ **eventNames**(): `Array`<`string` \| `symbol`>
+▸ **eventNames**(): *`Array<string | symbol>`*
 
-**Returns:** `Array`<`string` \| `symbol`>
+*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+
+*Inherited from void*
+
+**Returns:** *`Array<string | symbol>`*
 
 ___
-<a id="getmaxlisteners"></a>
 
 ###  getMaxListeners
 
-▸ **getMaxListeners**(): `number`
+▸ **getMaxListeners**(): *number*
 
-**Returns:** `number`
+*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+
+*Inherited from void*
+
+**Returns:** *number*
 
 ___
-<a id="in"></a>
 
 ###  in
 
-▸ **in**(namespace: *`string`*, cached: *`boolean`*): `void`
+▸ **in**(`namespace`: string, `cached`: boolean): *void*
+
+*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| namespace | `string` |
-| cached | `boolean` |
+Name | Type |
+------ | ------ |
+`namespace` | string |
+`cached` | boolean |
 
-**Returns:** `void`
+**Returns:** *void*
 
 ___
-<a id="listenercount"></a>
 
 ###  listenerCount
 
-▸ **listenerCount**(type: *`string` \| `symbol`*): `number`
+▸ **listenerCount**(`type`: string | symbol): *number*
+
+*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| type | `string` \| `symbol` |
+Name | Type |
+------ | ------ |
+`type` | string \| symbol |
 
-**Returns:** `number`
+**Returns:** *number*
 
 ___
-<a id="listeners"></a>
 
 ###  listeners
 
-▸ **listeners**(event: *`string` \| `symbol`*): `Function`[]
+▸ **listeners**(`event`: string | symbol): *`Function`[]*
+
+*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | `string` \| `symbol` |
+Name | Type |
+------ | ------ |
+`event` | string \| symbol |
 
-**Returns:** `Function`[]
+**Returns:** *`Function`[]*
 
 ___
-<a id="off"></a>
 
 ###  off
 
-▸ **off**(event: *`string` \| `symbol`*, listener: *`function`*): `this`
+▸ **off**(`event`: string | symbol, `listener`: function): *this*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | `string` \| `symbol` |
-| listener | `function` |
+▪ **event**: *string | symbol*
 
-**Returns:** `this`
+▪ **listener**: *function*
+
+▸ (...`args`: any[]): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | any[] |
+
+**Returns:** *this*
 
 ___
-<a id="on"></a>
 
 ###  on
 
-▸ **on**(event: *`string` \| `symbol`*, listener: *`function`*): `this`
+▸ **on**(`event`: string | symbol, `listener`: function): *this*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | `string` \| `symbol` |
-| listener | `function` |
+▪ **event**: *string | symbol*
 
-**Returns:** `this`
+▪ **listener**: *function*
+
+▸ (...`args`: any[]): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | any[] |
+
+**Returns:** *this*
 
 ___
-<a id="once"></a>
 
 ###  once
 
-▸ **once**(event: *`string` \| `symbol`*, listener: *`function`*): `this`
+▸ **once**(`event`: string | symbol, `listener`: function): *this*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | `string` \| `symbol` |
-| listener | `function` |
+▪ **event**: *string | symbol*
 
-**Returns:** `this`
+▪ **listener**: *function*
+
+▸ (...`args`: any[]): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | any[] |
+
+**Returns:** *this*
 
 ___
-<a id="out"></a>
 
 ###  out
 
-▸ **out**(): `void`
+▸ **out**(): *void*
 
-**Returns:** `void`
+*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+
+**Returns:** *void*
 
 ___
-<a id="prependlistener"></a>
 
 ###  prependListener
 
-▸ **prependListener**(event: *`string` \| `symbol`*, listener: *`function`*): `this`
+▸ **prependListener**(`event`: string | symbol, `listener`: function): *this*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | `string` \| `symbol` |
-| listener | `function` |
+▪ **event**: *string | symbol*
 
-**Returns:** `this`
+▪ **listener**: *function*
+
+▸ (...`args`: any[]): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | any[] |
+
+**Returns:** *this*
 
 ___
-<a id="prependoncelistener"></a>
 
 ###  prependOnceListener
 
-▸ **prependOnceListener**(event: *`string` \| `symbol`*, listener: *`function`*): `this`
+▸ **prependOnceListener**(`event`: string | symbol, `listener`: function): *this*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | `string` \| `symbol` |
-| listener | `function` |
+▪ **event**: *string | symbol*
 
-**Returns:** `this`
+▪ **listener**: *function*
+
+▸ (...`args`: any[]): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | any[] |
+
+**Returns:** *this*
 
 ___
-<a id="rawlisteners"></a>
 
 ###  rawListeners
 
-▸ **rawListeners**(event: *`string` \| `symbol`*): `Function`[]
+▸ **rawListeners**(`event`: string | symbol): *`Function`[]*
+
+*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | `string` \| `symbol` |
+Name | Type |
+------ | ------ |
+`event` | string \| symbol |
 
-**Returns:** `Function`[]
+**Returns:** *`Function`[]*
 
 ___
-<a id="removealllisteners"></a>
 
 ###  removeAllListeners
 
-▸ **removeAllListeners**(event?: *`string` \| `symbol`*): `this`
+▸ **removeAllListeners**(`event?`: string | symbol): *this*
+
+*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| `Optional` event | `string` \| `symbol` |
+Name | Type |
+------ | ------ |
+`event?` | string \| symbol |
 
-**Returns:** `this`
+**Returns:** *this*
 
 ___
-<a id="removelistener"></a>
 
 ###  removeListener
 
-▸ **removeListener**(event: *`string` \| `symbol`*, listener: *`function`*): `this`
+▸ **removeListener**(`event`: string | symbol, `listener`: function): *this*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| event | `string` \| `symbol` |
-| listener | `function` |
+▪ **event**: *string | symbol*
 
-**Returns:** `this`
+▪ **listener**: *function*
+
+▸ (...`args`: any[]): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | any[] |
+
+**Returns:** *this*
 
 ___
-<a id="setmaxlisteners"></a>
 
 ###  setMaxListeners
 
-▸ **setMaxListeners**(n: *`number`*): `this`
+▸ **setMaxListeners**(`n`: number): *this*
+
+*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+
+*Inherited from void*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| n | `number` |
+Name | Type |
+------ | ------ |
+`n` | number |
 
-**Returns:** `this`
+**Returns:** *this*
 
 ___
-<a id="once-1"></a>
 
-### `<Static>` once
+### `Static` once
 
-▸ **once**(emitter: *`EventEmitter`*, event: *`string` \| `symbol`*): `Promise`<`any`[]>
+▸ **once**(`emitter`: `EventEmitter`, `event`: string | symbol): *`Promise<any[]>`*
 
 **Parameters:**
 
-| Name | Type |
-| ------ | ------ |
-| emitter | `EventEmitter` |
-| event | `string` \| `symbol` |
+Name | Type |
+------ | ------ |
+`emitter` | `EventEmitter` |
+`event` | string \| symbol |
 
-**Returns:** `Promise`<`any`[]>
-
-___
-
+**Returns:** *`Promise<any[]>`*
