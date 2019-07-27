@@ -35,12 +35,12 @@
   "devDependencies": {
     "@adonisjs/mrm-preset": "^2.0.3",
     "@poppinss/dev-utils": "^1.0.0",
-    "@types/node": "^12.0.10",
+    "@types/node": "^12.6.8",
     "commitizen": "^4.0.3",
-    "cz-conventional-changelog": "^3.0.1",
+    "cz-conventional-changelog": "^3.0.2",
     "del-cli": "^2.0.0",
     "doctoc": "^1.4.0",
-    "husky": "^3.0.0",
+    "husky": "^3.0.1",
     "japa": "^2.0.10",
     "mrm": "^1.2.2",
     "np": "^5.0.3",
@@ -48,10 +48,10 @@
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
     "tslint-eslint-rules": "^5.4.0",
-    "typedoc": "^0.14.2",
+    "typedoc": "^0.15.0",
     "typedoc-plugin-external-module-name": "^2.1.0",
-    "typedoc-plugin-markdown": "^2.0.8",
-    "typescript": "^3.5.2"
+    "typedoc-plugin-markdown": "^2.1.0",
+    "typescript": "^3.5.3"
   },
   "nyc": {
     "exclude": [
@@ -83,7 +83,7 @@
     "anyBranch": false
   },
   "dependencies": {
-    "@poppinss/utils": "^1.0.3"
+    "@poppinss/utils": "^1.0.4"
   },
   "publishConfig": {
     "access": "public",
