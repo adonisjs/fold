@@ -1,6 +1,6 @@
 > **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / [@adonisjs/fold](../modules/_adonisjs_fold.md) / [Ioc](_adonisjs_fold.ioc.md) /
+[Globals](../README.md) / ["Ioc/index"](../modules/_ioc_index_.md) / [Ioc](_ioc_index_.ioc.md) /
 
 # Class: Ioc
 
@@ -17,48 +17,48 @@ DI simpler.
 
 ## Implements
 
-* [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)
+* [IocContract](../interfaces/_contracts_index_.ioccontract.md)
 
-### Index
+## Index
 
-#### Constructors
+### Constructors
 
-* [constructor](_adonisjs_fold.ioc.md#constructor)
+* [constructor](_ioc_index_.ioc.md#constructor)
 
-#### Properties
+### Properties
 
-* [autoloadedAliases](_adonisjs_fold.ioc.md#autoloadedaliases)
-* [autoloads](_adonisjs_fold.ioc.md#autoloads)
-* [tracer](_adonisjs_fold.ioc.md#tracer)
+* [autoloadedAliases](_ioc_index_.ioc.md#autoloadedaliases)
+* [autoloads](_ioc_index_.ioc.md#autoloads)
+* [tracer](_ioc_index_.ioc.md#tracer)
 
-#### Methods
+### Methods
 
-* [alias](_adonisjs_fold.ioc.md#alias)
-* [autoload](_adonisjs_fold.ioc.md#autoload)
-* [bind](_adonisjs_fold.ioc.md#bind)
-* [call](_adonisjs_fold.ioc.md#call)
-* [clearAutoloadCache](_adonisjs_fold.ioc.md#clearautoloadcache)
-* [fake](_adonisjs_fold.ioc.md#fake)
-* [getAliasNamespace](_adonisjs_fold.ioc.md#getaliasnamespace)
-* [getAutoloadBaseNamespace](_adonisjs_fold.ioc.md#getautoloadbasenamespace)
-* [hasAlias](_adonisjs_fold.ioc.md#hasalias)
-* [hasBinding](_adonisjs_fold.ioc.md#hasbinding)
-* [hasFake](_adonisjs_fold.ioc.md#hasfake)
-* [isAutoloadNamespace](_adonisjs_fold.ioc.md#isautoloadnamespace)
-* [make](_adonisjs_fold.ioc.md#make)
-* [restore](_adonisjs_fold.ioc.md#restore)
-* [singleton](_adonisjs_fold.ioc.md#singleton)
-* [use](_adonisjs_fold.ioc.md#use)
-* [useEsm](_adonisjs_fold.ioc.md#useesm)
-* [useFake](_adonisjs_fold.ioc.md#usefake)
-* [useProxies](_adonisjs_fold.ioc.md#useproxies)
-* [with](_adonisjs_fold.ioc.md#with)
+* [alias](_ioc_index_.ioc.md#alias)
+* [autoload](_ioc_index_.ioc.md#autoload)
+* [bind](_ioc_index_.ioc.md#bind)
+* [call](_ioc_index_.ioc.md#call)
+* [clearAutoloadCache](_ioc_index_.ioc.md#clearautoloadcache)
+* [fake](_ioc_index_.ioc.md#fake)
+* [getAliasNamespace](_ioc_index_.ioc.md#getaliasnamespace)
+* [getAutoloadBaseNamespace](_ioc_index_.ioc.md#getautoloadbasenamespace)
+* [hasAlias](_ioc_index_.ioc.md#hasalias)
+* [hasBinding](_ioc_index_.ioc.md#hasbinding)
+* [hasFake](_ioc_index_.ioc.md#hasfake)
+* [isAutoloadNamespace](_ioc_index_.ioc.md#isautoloadnamespace)
+* [make](_ioc_index_.ioc.md#make)
+* [restore](_ioc_index_.ioc.md#restore)
+* [singleton](_ioc_index_.ioc.md#singleton)
+* [use](_ioc_index_.ioc.md#use)
+* [useEsm](_ioc_index_.ioc.md#useesm)
+* [useFake](_ioc_index_.ioc.md#usefake)
+* [useProxies](_ioc_index_.ioc.md#useproxies)
+* [with](_ioc_index_.ioc.md#with)
 
 ## Constructors
 
 ###  constructor
 
-\+ **new Ioc**(`_emitEvents`: boolean): *[Ioc](_adonisjs_fold.ioc.md)*
+\+ **new Ioc**(`_emitEvents`: boolean): *[Ioc](_ioc_index_.ioc.md)*
 
 **Parameters:**
 
@@ -66,7 +66,7 @@ Name | Type | Default |
 ------ | ------ | ------ |
 `_emitEvents` | boolean | false |
 
-**Returns:** *[Ioc](_adonisjs_fold.ioc.md)*
+**Returns:** *[Ioc](_ioc_index_.ioc.md)*
 
 ## Properties
 
@@ -74,7 +74,7 @@ Name | Type | Default |
 
 • **autoloadedAliases**: *string[]* =  []
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md).[autoloadedAliases](../interfaces/_adonisjs_fold.ioccontract.md#autoloadedaliases)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md).[autoloadedAliases](../interfaces/_contracts_index_.ioccontract.md#autoloadedaliases)*
 
 An array of autoloaded aliases, stored along side with
 `_autoloads` for a quick lookup on keys
@@ -85,7 +85,7 @@ ___
 
 • **autoloads**: *object*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md).[autoloads](../interfaces/_adonisjs_fold.ioccontract.md#autoloads)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md).[autoloads](../interfaces/_contracts_index_.ioccontract.md#autoloads)*
 
 Autoloaded directories under a namespace
 
@@ -97,9 +97,9 @@ ___
 
 ###  tracer
 
-• **tracer**: *[Tracer](_adonisjs_fold.tracer.md)* =  tracer(this._emitEvents)
+• **tracer**: *[Tracer](_ioc_tracer_.tracer.md)* =  tracer(this._emitEvents)
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md).[tracer](../interfaces/_adonisjs_fold.ioccontract.md#tracer)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md).[tracer](../interfaces/_contracts_index_.ioccontract.md#tracer)*
 
 ## Methods
 
@@ -107,13 +107,13 @@ ___
 
 ▸ **alias**(`namespace`: string, `alias`: string): *void*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Define alias for an existing binding. IoC container doesn't handle uniqueness
 conflicts for you and it's upto you to make sure that all aliases are
 unique.
 
-Use method [hasAlias](_adonisjs_fold.ioc.md#hasalias) to know, if an alias already exists.
+Use method [hasAlias](_ioc_index_.ioc.md#hasalias) to know, if an alias already exists.
 
 **Parameters:**
 
@@ -130,7 +130,7 @@ ___
 
 ▸ **autoload**(`directoryPath`: string, `namespace`: string): *void*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Define an alias for an existing directory and require
 files without fighting with relative paths.
@@ -175,9 +175,9 @@ ___
 
 ###  bind
 
-▸ **bind**(`namespace`: string, `callback`: [BindCallback](../modules/_adonisjs_fold.md#bindcallback)): *void*
+▸ **bind**(`namespace`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Add a new binding with a namespace. Keeping the namespace unique
 is the responsibility of the user. We do not restrict duplicate
@@ -196,7 +196,7 @@ ioc.bind('App/User', function () {
 Name | Type |
 ------ | ------ |
 `namespace` | string |
-`callback` | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
+`callback` | [BindCallback](../modules/_contracts_index_.md#bindcallback) |
 
 **Returns:** *void*
 
@@ -206,7 +206,7 @@ ___
 
 ▸ **call**<**T**, **K**>(`target`: `T`, `method`: `K`, `args?`: any[]): *any*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Call method on an object and inject dependencies to it automatically.
 
@@ -250,9 +250,9 @@ ___
 
 ###  fake
 
-▸ **fake**(`namespace`: string, `callback`: [BindCallback](../modules/_adonisjs_fold.md#bindcallback)): *void*
+▸ **fake**(`namespace`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Register a fake for an existing binding. The fakes only work when
 `ADONIS_IOC_PROXY` environment variable is set to `true`. AdonisJs
@@ -273,7 +273,7 @@ ioc.fake('App/User', function () {
 Name | Type |
 ------ | ------ |
 `namespace` | string |
-`callback` | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
+`callback` | [BindCallback](../modules/_contracts_index_.md#bindcallback) |
 
 **Returns:** *void*
 
@@ -283,7 +283,7 @@ ___
 
 ▸ **getAliasNamespace**(`name`: string): *string | undefined*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Returns the complete namespace for a given alias. To avoid
 `undefined` values, it is recommended to use `hasAlias`
@@ -303,7 +303,7 @@ ___
 
 ▸ **getAutoloadBaseNamespace**(`namespace`: string): *string | undefined*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Returns the base namespace for an autoloaded namespace.
 
@@ -328,7 +328,7 @@ ___
 
 ▸ **hasAlias**(`name`: string): *boolean*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Returns a boolean telling if an alias
 exists
@@ -371,7 +371,7 @@ ___
 
 ▸ **hasFake**(`name`: string): *boolean*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 A boolean telling if a fake exists for a binding or
 not.
@@ -390,10 +390,10 @@ ___
 
 ▸ **isAutoloadNamespace**(`namespace`: string): *boolean*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Returns a boolean telling if namespace is part of autoloads or not.
-This method results may vary from the [use](_adonisjs_fold.ioc.md#use) method, since
+This method results may vary from the [use](_ioc_index_.ioc.md#use) method, since
 the `use` method gives prefrence to the `bindings` first.
 
 ### NOTE:
@@ -454,7 +454,7 @@ ___
 
 ▸ **restore**(`name`: string): *void*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Restore the fake
 
@@ -470,12 +470,12 @@ ___
 
 ###  singleton
 
-▸ **singleton**(`namespace`: string, `callback`: [BindCallback](../modules/_adonisjs_fold.md#bindcallback)): *void*
+▸ **singleton**(`namespace`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Add a new binding as a singleton. This method behaves similar to
-[bind](_adonisjs_fold.ioc.md#bind), just the value is cached after the first use. The
+[bind](_ioc_index_.ioc.md#bind), just the value is cached after the first use. The
 `callback` will be invoked only once.
 
 **`example`** 
@@ -490,7 +490,7 @@ ioc.singleton('App/User', function () {
 Name | Type |
 ------ | ------ |
 `namespace` | string |
-`callback` | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
+`callback` | [BindCallback](../modules/_contracts_index_.md#bindcallback) |
 
 **Returns:** *void*
 
@@ -500,7 +500,7 @@ ___
 
 ▸ **use**<**T**>(`namespace`: string): *`T`*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Use the binding by resolving it from the container. The resolve method
 does some great work to resolve the value for you.
@@ -536,7 +536,7 @@ ___
 
 ▸ **useEsm**<**T**>(`namespace`: string): *`T`*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Wraps the return value of `use` to an ESM module. This is used
 by the AdonisJs typescript transformer.
@@ -559,7 +559,7 @@ ___
 
 ▸ **useFake**<**T**>(`namespace`: string): *`T`*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Use the fake for a given namespace. You don't have to manually
 read values from this method, unless you know what you are
@@ -586,7 +586,7 @@ ___
 
 ▸ **useProxies**(): *this*
 
-*Implementation of [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 Instruct IoC container to use proxies when returning
 bindings from `use` and `make` methods.

@@ -1,6 +1,6 @@
 > **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / [@adonisjs/fold](../modules/_adonisjs_fold.md) / [IocContract](_adonisjs_fold.ioccontract.md) /
+[Globals](../README.md) / ["Contracts/index"](../modules/_contracts_index_.md) / [IocContract](_contracts_index_.ioccontract.md) /
 
 # Interface: IocContract
 
@@ -12,38 +12,38 @@ Ioc container interface
 
 ## Implemented by
 
-* [Ioc](../classes/_adonisjs_fold.ioc.md)
+* [Ioc](../classes/_ioc_index_.ioc.md)
 
-### Index
+## Index
 
-#### Properties
+### Properties
 
-* [autoloadedAliases](_adonisjs_fold.ioccontract.md#autoloadedaliases)
-* [autoloads](_adonisjs_fold.ioccontract.md#autoloads)
-* [tracer](_adonisjs_fold.ioccontract.md#tracer)
+* [autoloadedAliases](_contracts_index_.ioccontract.md#autoloadedaliases)
+* [autoloads](_contracts_index_.ioccontract.md#autoloads)
+* [tracer](_contracts_index_.ioccontract.md#tracer)
 
-#### Methods
+### Methods
 
-* [alias](_adonisjs_fold.ioccontract.md#alias)
-* [autoload](_adonisjs_fold.ioccontract.md#autoload)
-* [bind](_adonisjs_fold.ioccontract.md#bind)
-* [call](_adonisjs_fold.ioccontract.md#call)
-* [clearAutoloadCache](_adonisjs_fold.ioccontract.md#clearautoloadcache)
-* [fake](_adonisjs_fold.ioccontract.md#fake)
-* [getAliasNamespace](_adonisjs_fold.ioccontract.md#getaliasnamespace)
-* [getAutoloadBaseNamespace](_adonisjs_fold.ioccontract.md#getautoloadbasenamespace)
-* [hasAlias](_adonisjs_fold.ioccontract.md#hasalias)
-* [hasBinding](_adonisjs_fold.ioccontract.md#hasbinding)
-* [hasFake](_adonisjs_fold.ioccontract.md#hasfake)
-* [isAutoloadNamespace](_adonisjs_fold.ioccontract.md#isautoloadnamespace)
-* [make](_adonisjs_fold.ioccontract.md#make)
-* [restore](_adonisjs_fold.ioccontract.md#restore)
-* [singleton](_adonisjs_fold.ioccontract.md#singleton)
-* [use](_adonisjs_fold.ioccontract.md#use)
-* [useEsm](_adonisjs_fold.ioccontract.md#useesm)
-* [useFake](_adonisjs_fold.ioccontract.md#usefake)
-* [useProxies](_adonisjs_fold.ioccontract.md#useproxies)
-* [with](_adonisjs_fold.ioccontract.md#with)
+* [alias](_contracts_index_.ioccontract.md#alias)
+* [autoload](_contracts_index_.ioccontract.md#autoload)
+* [bind](_contracts_index_.ioccontract.md#bind)
+* [call](_contracts_index_.ioccontract.md#call)
+* [clearAutoloadCache](_contracts_index_.ioccontract.md#clearautoloadcache)
+* [fake](_contracts_index_.ioccontract.md#fake)
+* [getAliasNamespace](_contracts_index_.ioccontract.md#getaliasnamespace)
+* [getAutoloadBaseNamespace](_contracts_index_.ioccontract.md#getautoloadbasenamespace)
+* [hasAlias](_contracts_index_.ioccontract.md#hasalias)
+* [hasBinding](_contracts_index_.ioccontract.md#hasbinding)
+* [hasFake](_contracts_index_.ioccontract.md#hasfake)
+* [isAutoloadNamespace](_contracts_index_.ioccontract.md#isautoloadnamespace)
+* [make](_contracts_index_.ioccontract.md#make)
+* [restore](_contracts_index_.ioccontract.md#restore)
+* [singleton](_contracts_index_.ioccontract.md#singleton)
+* [use](_contracts_index_.ioccontract.md#use)
+* [useEsm](_contracts_index_.ioccontract.md#useesm)
+* [useFake](_contracts_index_.ioccontract.md#usefake)
+* [useProxies](_contracts_index_.ioccontract.md#useproxies)
+* [with](_contracts_index_.ioccontract.md#with)
 
 ## Properties
 
@@ -65,7 +65,7 @@ ___
 
 ###  tracer
 
-• **tracer**: *[TracerContract](_adonisjs_fold.tracercontract.md)*
+• **tracer**: *[TracerContract](_contracts_index_.tracercontract.md)*
 
 ## Methods
 
@@ -101,14 +101,14 @@ ___
 
 ###  bind
 
-▸ **bind**(`name`: string, `callback`: [BindCallback](../modules/_adonisjs_fold.md#bindcallback)): *void*
+▸ **bind**(`name`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `name` | string |
-`callback` | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
+`callback` | [BindCallback](../modules/_contracts_index_.md#bindcallback) |
 
 **Returns:** *void*
 
@@ -153,14 +153,14 @@ ___
 
 ###  fake
 
-▸ **fake**(`name`: string, `callback`: [BindCallback](../modules/_adonisjs_fold.md#bindcallback)): *void*
+▸ **fake**(`name`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `name` | string |
-`callback` | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
+`callback` | [BindCallback](../modules/_contracts_index_.md#bindcallback) |
 
 **Returns:** *void*
 
@@ -286,14 +286,14 @@ ___
 
 ###  singleton
 
-▸ **singleton**(`name`: string, `callback`: [BindCallback](../modules/_adonisjs_fold.md#bindcallback)): *void*
+▸ **singleton**(`name`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `name` | string |
-`callback` | [BindCallback](../modules/_adonisjs_fold.md#bindcallback) |
+`callback` | [BindCallback](../modules/_contracts_index_.md#bindcallback) |
 
 **Returns:** *void*
 

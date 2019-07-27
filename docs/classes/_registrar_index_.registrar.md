@@ -1,6 +1,6 @@
 > **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / [@adonisjs/fold](../modules/_adonisjs_fold.md) / [Registrar](_adonisjs_fold.registrar.md) /
+[Globals](../README.md) / ["Registrar/index"](../modules/_registrar_index_.md) / [Registrar](_registrar_index_.registrar.md) /
 
 # Class: Registrar
 
@@ -8,42 +8,42 @@
 
 * **Registrar**
 
-### Index
+## Index
 
-#### Constructors
+### Constructors
 
-* [constructor](_adonisjs_fold.registrar.md#constructor)
+* [constructor](_registrar_index_.registrar.md#constructor)
 
-#### Properties
+### Properties
 
-* [ioc](_adonisjs_fold.registrar.md#ioc)
+* [ioc](_registrar_index_.registrar.md#ioc)
 
-#### Methods
+### Methods
 
-* [boot](_adonisjs_fold.registrar.md#boot)
-* [register](_adonisjs_fold.registrar.md#register)
-* [registerAndBoot](_adonisjs_fold.registrar.md#registerandboot)
-* [useProviders](_adonisjs_fold.registrar.md#useproviders)
+* [boot](_registrar_index_.registrar.md#boot)
+* [register](_registrar_index_.registrar.md#register)
+* [registerAndBoot](_registrar_index_.registrar.md#registerandboot)
+* [useProviders](_registrar_index_.registrar.md#useproviders)
 
 ## Constructors
 
 ###  constructor
 
-\+ **new Registrar**(`ioc`: [IocContract](../interfaces/_adonisjs_fold.ioccontract.md)): *[Registrar](_adonisjs_fold.registrar.md)*
+\+ **new Registrar**(`ioc`: [IocContract](../interfaces/_contracts_index_.ioccontract.md)): *[Registrar](_registrar_index_.registrar.md)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`ioc` | [IocContract](../interfaces/_adonisjs_fold.ioccontract.md) |
+`ioc` | [IocContract](../interfaces/_contracts_index_.ioccontract.md) |
 
-**Returns:** *[Registrar](_adonisjs_fold.registrar.md)*
+**Returns:** *[Registrar](_registrar_index_.registrar.md)*
 
 ## Properties
 
 ###  ioc
 
-• **ioc**: *[IocContract](../interfaces/_adonisjs_fold.ioccontract.md)*
+• **ioc**: *[IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
 ## Methods
 

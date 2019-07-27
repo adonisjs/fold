@@ -1,45 +1,37 @@
 > **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / [@adonisjs/fold](../modules/_adonisjs_fold.md) / [TracerContract](_adonisjs_fold.tracercontract.md) /
+[Globals](../README.md) / ["Ioc/Tracer"](../modules/_ioc_tracer_.md) / [Tracer](_ioc_tracer_.tracer.md) / [EventEmitter](_ioc_tracer_.tracer.eventemitter.md) /
 
-# Interface: TracerContract
+# Class: EventEmitter
 
 ## Hierarchy
 
-* `EventEmitter`
+* **EventEmitter**
 
-  * **TracerContract**
+## Index
 
-## Implemented by
+### Properties
 
-* [Tracer](../classes/_adonisjs_fold.tracer.md)
+* [defaultMaxListeners](_ioc_tracer_.tracer.eventemitter.md#static-defaultmaxlisteners)
 
-### Index
+### Methods
 
-#### Properties
-
-* [defaultMaxListeners](_adonisjs_fold.tracercontract.md#static-defaultmaxlisteners)
-
-#### Methods
-
-* [addListener](_adonisjs_fold.tracercontract.md#addlistener)
-* [emit](_adonisjs_fold.tracercontract.md#emit)
-* [eventNames](_adonisjs_fold.tracercontract.md#eventnames)
-* [getMaxListeners](_adonisjs_fold.tracercontract.md#getmaxlisteners)
-* [in](_adonisjs_fold.tracercontract.md#in)
-* [listenerCount](_adonisjs_fold.tracercontract.md#listenercount)
-* [listeners](_adonisjs_fold.tracercontract.md#listeners)
-* [off](_adonisjs_fold.tracercontract.md#off)
-* [on](_adonisjs_fold.tracercontract.md#on)
-* [once](_adonisjs_fold.tracercontract.md#once)
-* [out](_adonisjs_fold.tracercontract.md#out)
-* [prependListener](_adonisjs_fold.tracercontract.md#prependlistener)
-* [prependOnceListener](_adonisjs_fold.tracercontract.md#prependoncelistener)
-* [rawListeners](_adonisjs_fold.tracercontract.md#rawlisteners)
-* [removeAllListeners](_adonisjs_fold.tracercontract.md#removealllisteners)
-* [removeListener](_adonisjs_fold.tracercontract.md#removelistener)
-* [setMaxListeners](_adonisjs_fold.tracercontract.md#setmaxlisteners)
-* [listenerCount](_adonisjs_fold.tracercontract.md#static-listenercount)
+* [addListener](_ioc_tracer_.tracer.eventemitter.md#addlistener)
+* [emit](_ioc_tracer_.tracer.eventemitter.md#emit)
+* [eventNames](_ioc_tracer_.tracer.eventemitter.md#eventnames)
+* [getMaxListeners](_ioc_tracer_.tracer.eventemitter.md#getmaxlisteners)
+* [listenerCount](_ioc_tracer_.tracer.eventemitter.md#listenercount)
+* [listeners](_ioc_tracer_.tracer.eventemitter.md#listeners)
+* [off](_ioc_tracer_.tracer.eventemitter.md#off)
+* [on](_ioc_tracer_.tracer.eventemitter.md#on)
+* [once](_ioc_tracer_.tracer.eventemitter.md#once)
+* [prependListener](_ioc_tracer_.tracer.eventemitter.md#prependlistener)
+* [prependOnceListener](_ioc_tracer_.tracer.eventemitter.md#prependoncelistener)
+* [rawListeners](_ioc_tracer_.tracer.eventemitter.md#rawlisteners)
+* [removeAllListeners](_ioc_tracer_.tracer.eventemitter.md#removealllisteners)
+* [removeListener](_ioc_tracer_.tracer.eventemitter.md#removelistener)
+* [setMaxListeners](_ioc_tracer_.tracer.eventemitter.md#setmaxlisteners)
+* [listenerCount](_ioc_tracer_.tracer.eventemitter.md#static-listenercount)
 
 ## Properties
 
@@ -47,17 +39,11 @@
 
 ▪ **defaultMaxListeners**: *number*
 
-*Inherited from void*
-
 ## Methods
 
 ###  addListener
 
 ▸ **addListener**(`event`: string | symbol, `listener`: function): *this*
-
-*Inherited from void*
-
-*Overrides void*
 
 **Parameters:**
 
@@ -81,10 +67,6 @@ ___
 
 ▸ **emit**(`event`: string | symbol, ...`args`: any[]): *boolean*
 
-*Inherited from void*
-
-*Overrides void*
-
 **Parameters:**
 
 Name | Type |
@@ -100,10 +82,6 @@ ___
 
 ▸ **eventNames**(): *`Array<string | symbol>`*
 
-*Inherited from void*
-
-*Overrides void*
-
 **Returns:** *`Array<string | symbol>`*
 
 ___
@@ -112,36 +90,13 @@ ___
 
 ▸ **getMaxListeners**(): *number*
 
-*Inherited from void*
-
-*Overrides void*
-
 **Returns:** *number*
-
-___
-
-###  in
-
-▸ **in**(`namespace`: string, `cached`: boolean): *void*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`namespace` | string |
-`cached` | boolean |
-
-**Returns:** *void*
 
 ___
 
 ###  listenerCount
 
 ▸ **listenerCount**(`type`: string | symbol): *number*
-
-*Inherited from void*
-
-*Overrides void*
 
 **Parameters:**
 
@@ -157,10 +112,6 @@ ___
 
 ▸ **listeners**(`event`: string | symbol): *`Function`[]*
 
-*Inherited from void*
-
-*Overrides void*
-
 **Parameters:**
 
 Name | Type |
@@ -174,10 +125,6 @@ ___
 ###  off
 
 ▸ **off**(`event`: string | symbol, `listener`: function): *this*
-
-*Inherited from void*
-
-*Overrides void*
 
 **Parameters:**
 
@@ -201,10 +148,6 @@ ___
 
 ▸ **on**(`event`: string | symbol, `listener`: function): *this*
 
-*Inherited from void*
-
-*Overrides void*
-
 **Parameters:**
 
 ▪ **event**: *string | symbol*
@@ -227,10 +170,6 @@ ___
 
 ▸ **once**(`event`: string | symbol, `listener`: function): *this*
 
-*Inherited from void*
-
-*Overrides void*
-
 **Parameters:**
 
 ▪ **event**: *string | symbol*
@@ -249,21 +188,9 @@ Name | Type |
 
 ___
 
-###  out
-
-▸ **out**(): *void*
-
-**Returns:** *void*
-
-___
-
 ###  prependListener
 
 ▸ **prependListener**(`event`: string | symbol, `listener`: function): *this*
-
-*Inherited from void*
-
-*Overrides void*
 
 **Parameters:**
 
@@ -287,10 +214,6 @@ ___
 
 ▸ **prependOnceListener**(`event`: string | symbol, `listener`: function): *this*
 
-*Inherited from void*
-
-*Overrides void*
-
 **Parameters:**
 
 ▪ **event**: *string | symbol*
@@ -313,10 +236,6 @@ ___
 
 ▸ **rawListeners**(`event`: string | symbol): *`Function`[]*
 
-*Inherited from void*
-
-*Overrides void*
-
 **Parameters:**
 
 Name | Type |
@@ -331,10 +250,6 @@ ___
 
 ▸ **removeAllListeners**(`event?`: string | symbol): *this*
 
-*Inherited from void*
-
-*Overrides void*
-
 **Parameters:**
 
 Name | Type |
@@ -348,10 +263,6 @@ ___
 ###  removeListener
 
 ▸ **removeListener**(`event`: string | symbol, `listener`: function): *this*
-
-*Inherited from void*
-
-*Overrides void*
 
 **Parameters:**
 
@@ -375,10 +286,6 @@ ___
 
 ▸ **setMaxListeners**(`n`: number): *this*
 
-*Inherited from void*
-
-*Overrides void*
-
 **Parameters:**
 
 Name | Type |
@@ -392,8 +299,6 @@ ___
 ### `Static` listenerCount
 
 ▸ **listenerCount**(`emitter`: `EventEmitter`, `event`: string | symbol): *number*
-
-*Inherited from void*
 
 **`deprecated`** since v4.0.0
 

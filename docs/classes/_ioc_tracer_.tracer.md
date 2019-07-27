@@ -1,6 +1,6 @@
 > **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / [@adonisjs/fold](../modules/_adonisjs_fold.md) / [Tracer](_adonisjs_fold.tracer.md) /
+[Globals](../README.md) / ["Ioc/Tracer"](../modules/_ioc_tracer_.md) / [Tracer](_ioc_tracer_.tracer.md) /
 
 # Class: Tracer
 
@@ -16,34 +16,34 @@ how tracer works
 
 ## Implements
 
-* [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)
+* [TracerContract](../interfaces/_contracts_index_.tracercontract.md)
 
-### Index
+## Index
 
-#### Classes
+### Classes
 
-* [EventEmitter](_adonisjs_fold.tracer.eventemitter.md)
+* [EventEmitter](_ioc_tracer_.tracer.eventemitter.md)
 
-#### Methods
+### Methods
 
-* [addListener](_adonisjs_fold.tracer.md#addlistener)
-* [emit](_adonisjs_fold.tracer.md#emit)
-* [eventNames](_adonisjs_fold.tracer.md#eventnames)
-* [getMaxListeners](_adonisjs_fold.tracer.md#getmaxlisteners)
-* [in](_adonisjs_fold.tracer.md#in)
-* [listenerCount](_adonisjs_fold.tracer.md#listenercount)
-* [listeners](_adonisjs_fold.tracer.md#listeners)
-* [off](_adonisjs_fold.tracer.md#off)
-* [on](_adonisjs_fold.tracer.md#on)
-* [once](_adonisjs_fold.tracer.md#once)
-* [out](_adonisjs_fold.tracer.md#out)
-* [prependListener](_adonisjs_fold.tracer.md#prependlistener)
-* [prependOnceListener](_adonisjs_fold.tracer.md#prependoncelistener)
-* [rawListeners](_adonisjs_fold.tracer.md#rawlisteners)
-* [removeAllListeners](_adonisjs_fold.tracer.md#removealllisteners)
-* [removeListener](_adonisjs_fold.tracer.md#removelistener)
-* [setMaxListeners](_adonisjs_fold.tracer.md#setmaxlisteners)
-* [once](_adonisjs_fold.tracer.md#static-once)
+* [addListener](_ioc_tracer_.tracer.md#addlistener)
+* [emit](_ioc_tracer_.tracer.md#emit)
+* [eventNames](_ioc_tracer_.tracer.md#eventnames)
+* [getMaxListeners](_ioc_tracer_.tracer.md#getmaxlisteners)
+* [in](_ioc_tracer_.tracer.md#in)
+* [listenerCount](_ioc_tracer_.tracer.md#listenercount)
+* [listeners](_ioc_tracer_.tracer.md#listeners)
+* [off](_ioc_tracer_.tracer.md#off)
+* [on](_ioc_tracer_.tracer.md#on)
+* [once](_ioc_tracer_.tracer.md#once)
+* [out](_ioc_tracer_.tracer.md#out)
+* [prependListener](_ioc_tracer_.tracer.md#prependlistener)
+* [prependOnceListener](_ioc_tracer_.tracer.md#prependoncelistener)
+* [rawListeners](_ioc_tracer_.tracer.md#rawlisteners)
+* [removeAllListeners](_ioc_tracer_.tracer.md#removealllisteners)
+* [removeListener](_ioc_tracer_.tracer.md#removelistener)
+* [setMaxListeners](_ioc_tracer_.tracer.md#setmaxlisteners)
+* [once](_ioc_tracer_.tracer.md#static-once)
 
 ## Methods
 
@@ -75,7 +75,7 @@ ___
 
 ▸ **emit**(`event`: string | symbol, ...`args`: any[]): *boolean*
 
-*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+*Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 *Inherited from void*
 
@@ -94,7 +94,7 @@ ___
 
 ▸ **eventNames**(): *`Array<string | symbol>`*
 
-*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+*Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 *Inherited from void*
 
@@ -106,7 +106,7 @@ ___
 
 ▸ **getMaxListeners**(): *number*
 
-*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+*Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 *Inherited from void*
 
@@ -118,7 +118,7 @@ ___
 
 ▸ **in**(`namespace`: string, `cached`: boolean): *void*
 
-*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+*Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 **Parameters:**
 
@@ -135,7 +135,7 @@ ___
 
 ▸ **listenerCount**(`type`: string | symbol): *number*
 
-*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+*Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 *Inherited from void*
 
@@ -153,7 +153,7 @@ ___
 
 ▸ **listeners**(`event`: string | symbol): *`Function`[]*
 
-*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+*Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 *Inherited from void*
 
@@ -243,7 +243,7 @@ ___
 
 ▸ **out**(): *void*
 
-*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+*Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 **Returns:** *void*
 
@@ -301,7 +301,7 @@ ___
 
 ▸ **rawListeners**(`event`: string | symbol): *`Function`[]*
 
-*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+*Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 *Inherited from void*
 
@@ -319,7 +319,7 @@ ___
 
 ▸ **removeAllListeners**(`event?`: string | symbol): *this*
 
-*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+*Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 *Inherited from void*
 
@@ -361,7 +361,7 @@ ___
 
 ▸ **setMaxListeners**(`n`: number): *this*
 
-*Implementation of [TracerContract](../interfaces/_adonisjs_fold.tracercontract.md)*
+*Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 *Inherited from void*
 
