@@ -257,7 +257,9 @@ export class Ioc implements IocContract {
      * IoC container to return bindings as ESM.
      */
     if (this.isAutoloadNamespace(name)) {
-      return this._autoload(name)
+      const value = this._autoload(name)
+      const normalizedValue = !asEsm && value && value.__esModule && value.default ? value.default : value
+      return normalizedValue
     }
 
     /**
