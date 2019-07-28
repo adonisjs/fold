@@ -11,11 +11,12 @@
 * file that was distributed with this source code.
 */
 
+import { esmRequire } from '@poppinss/utils'
 import { normalize, resolve, dirname } from 'path'
 
 import tracer from './Tracer'
-import { IocContract, BindCallback, Binding, AutoloadCacheItem } from '../Contracts'
 import { IoCProxyObject, IocProxyClass } from './IoCProxy'
+import { IocContract, BindCallback, Binding, AutoloadCacheItem } from '../Contracts'
 
 const toString = Function.prototype.toString
 
@@ -125,7 +126,7 @@ export class Ioc implements IocContract {
    *
    * Make sure to call this method when [[isAutoloadNamespace]] returns true.
    */
-  private _autoload (namespace: string) {
+  private _autoload (namespace: string, normalizeEsm: boolean) {
     const baseNamespace = this.getAutoloadBaseNamespace(namespace)!
 
     const cacheEntry = this._autoloadsCache.get(namespace)
@@ -136,7 +137,7 @@ export class Ioc implements IocContract {
      */
     if (!cacheEntry) {
       const absPath = this._makeRequirePath(baseNamespace, namespace)
-      const importValue = require(absPath)
+      const importValue = normalizeEsm ? esmRequire(absPath) : require(absPath)
       this._autoloadsCache.set(namespace, { diskPath: absPath, cachedValue: importValue })
     }
 
@@ -257,9 +258,7 @@ export class Ioc implements IocContract {
      * IoC container to return bindings as ESM.
      */
     if (this.isAutoloadNamespace(name)) {
-      const value = this._autoload(name)
-      const normalizedValue = !asEsm && value && value.__esModule && value.default ? value.default : value
-      return normalizedValue
+      return this._autoload(name, !asEsm)
     }
 
     /**
@@ -298,13 +297,8 @@ export class Ioc implements IocContract {
     }
 
     if (this.isAutoloadNamespace(name)) {
-      /**
-       * Unwrapping the es module default value and making an instance of it. Making
-       * instances of named modules isn't possible at all.
-       */
-      const value = this._autoload(name)
-      const normalizedValue = value && value.__esModule && value.default ? value.default : value
-      return this._makeInstanceOf(normalizedValue, args)
+      const value = this._autoload(name, true)
+      return this._makeInstanceOf(value, args)
     }
 
     return this._requireModule(name)
