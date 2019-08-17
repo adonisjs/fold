@@ -59,7 +59,7 @@ ___
 
 #### Type declaration:
 
-● \[▪ **namespace**: *string*\]: string
+* \[ **namespace**: *string*\]: string
 
 ___
 

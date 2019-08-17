@@ -91,7 +91,7 @@ Autoloaded directories under a namespace
 
 #### Type declaration:
 
-● \[▪ **namespace**: *string*\]: string
+* \[ **namespace**: *string*\]: string
 
 ___
 
