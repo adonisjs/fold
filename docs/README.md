@@ -1,6 +1,6 @@
-> **[@adonisjs/fold](README.md)**
+**[@adonisjs/fold](README.md)**
 
-[Globals](README.md) /
+[Globals](README.md)
 
 ## Index
 

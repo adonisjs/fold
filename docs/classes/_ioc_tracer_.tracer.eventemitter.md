@@ -1,6 +1,6 @@
-> **[@adonisjs/fold](../README.md)**
+**[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / ["Ioc/Tracer"](../modules/_ioc_tracer_.md) / [Tracer](_ioc_tracer_.tracer.md) / [EventEmitter](_ioc_tracer_.tracer.eventemitter.md) /
+[Globals](../README.md) › ["Ioc/Tracer"](../modules/_ioc_tracer_.md) › [Tracer](_ioc_tracer_.tracer.md) › [EventEmitter](_ioc_tracer_.tracer.eventemitter.md)
 
 # Class: EventEmitter
 
@@ -80,9 +80,9 @@ ___
 
 ###  eventNames
 
-▸ **eventNames**(): *`Array<string | symbol>`*
+▸ **eventNames**(): *Array‹string | symbol›*
 
-**Returns:** *`Array<string | symbol>`*
+**Returns:** *Array‹string | symbol›*
 
 ___
 
@@ -110,7 +110,7 @@ ___
 
 ###  listeners
 
-▸ **listeners**(`event`: string | symbol): *`Function`[]*
+▸ **listeners**(`event`: string | symbol): *Function[]*
 
 **Parameters:**
 
@@ -118,7 +118,7 @@ Name | Type |
 ------ | ------ |
 `event` | string \| symbol |
 
-**Returns:** *`Function`[]*
+**Returns:** *Function[]*
 
 ___
 
@@ -234,7 +234,7 @@ ___
 
 ###  rawListeners
 
-▸ **rawListeners**(`event`: string | symbol): *`Function`[]*
+▸ **rawListeners**(`event`: string | symbol): *Function[]*
 
 **Parameters:**
 
@@ -242,7 +242,7 @@ Name | Type |
 ------ | ------ |
 `event` | string \| symbol |
 
-**Returns:** *`Function`[]*
+**Returns:** *Function[]*
 
 ___
 
@@ -298,7 +298,7 @@ ___
 
 ### `Static` listenerCount
 
-▸ **listenerCount**(`emitter`: `EventEmitter`, `event`: string | symbol): *number*
+▸ **listenerCount**(`emitter`: EventEmitter, `event`: string | symbol): *number*
 
 **`deprecated`** since v4.0.0
 
@@ -306,7 +306,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`emitter` | `EventEmitter` |
+`emitter` | EventEmitter |
 `event` | string \| symbol |
 
 **Returns:** *number*

@@ -1,6 +1,6 @@
-> **[@adonisjs/fold](../README.md)**
+**[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / ["Ioc/IoCProxy"](_ioc_iocproxy_.md) /
+[Globals](../README.md) › ["Ioc/IoCProxy"](_ioc_iocproxy_.md)
 
 # External module: "Ioc/IoCProxy"
 

@@ -1,6 +1,6 @@
-> **[@adonisjs/fold](../README.md)**
+**[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / ["Registrar/index"](_registrar_index_.md) /
+[Globals](../README.md) › ["Registrar/index"](_registrar_index_.md)
 
 # External module: "Registrar/index"
 

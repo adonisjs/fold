@@ -1,12 +1,12 @@
-> **[@adonisjs/fold](../README.md)**
+**[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / ["Contracts/index"](../modules/_contracts_index_.md) / [TracerContract](_contracts_index_.tracercontract.md) /
+[Globals](../README.md) › ["Contracts/index"](../modules/_contracts_index_.md) › [TracerContract](_contracts_index_.tracercontract.md)
 
 # Interface: TracerContract
 
 ## Hierarchy
 
-* `EventEmitter`
+* EventEmitter
 
   * **TracerContract**
 
@@ -98,13 +98,13 @@ ___
 
 ###  eventNames
 
-▸ **eventNames**(): *`Array<string | symbol>`*
+▸ **eventNames**(): *Array‹string | symbol›*
 
 *Inherited from void*
 
 *Overrides void*
 
-**Returns:** *`Array<string | symbol>`*
+**Returns:** *Array‹string | symbol›*
 
 ___
 
@@ -155,7 +155,7 @@ ___
 
 ###  listeners
 
-▸ **listeners**(`event`: string | symbol): *`Function`[]*
+▸ **listeners**(`event`: string | symbol): *Function[]*
 
 *Inherited from void*
 
@@ -167,7 +167,7 @@ Name | Type |
 ------ | ------ |
 `event` | string \| symbol |
 
-**Returns:** *`Function`[]*
+**Returns:** *Function[]*
 
 ___
 
@@ -311,7 +311,7 @@ ___
 
 ###  rawListeners
 
-▸ **rawListeners**(`event`: string | symbol): *`Function`[]*
+▸ **rawListeners**(`event`: string | symbol): *Function[]*
 
 *Inherited from void*
 
@@ -323,7 +323,7 @@ Name | Type |
 ------ | ------ |
 `event` | string \| symbol |
 
-**Returns:** *`Function`[]*
+**Returns:** *Function[]*
 
 ___
 
@@ -391,7 +391,7 @@ ___
 
 ### `Static` listenerCount
 
-▸ **listenerCount**(`emitter`: `EventEmitter`, `event`: string | symbol): *number*
+▸ **listenerCount**(`emitter`: EventEmitter, `event`: string | symbol): *number*
 
 *Inherited from void*
 
@@ -401,7 +401,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`emitter` | `EventEmitter` |
+`emitter` | EventEmitter |
 `event` | string \| symbol |
 
 **Returns:** *number*

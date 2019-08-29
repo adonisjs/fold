@@ -1,6 +1,6 @@
-> **[@adonisjs/fold](../README.md)**
+**[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / ["Ioc/index"](../modules/_ioc_index_.md) / [Ioc](_ioc_index_.ioc.md) /
+[Globals](../README.md) › ["Ioc/index"](../modules/_ioc_index_.md) › [Ioc](_ioc_index_.ioc.md)
 
 # Class: Ioc
 
@@ -204,7 +204,7 @@ ___
 
 ###  call
 
-▸ **call**<**T**, **K**>(`target`: `T`, `method`: `K`, `args?`: any[]): *any*
+▸ **call**<**T**, **K**>(`target`: T, `method`: K, `args?`: any[]): *any*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -220,8 +220,8 @@ Call method on an object and inject dependencies to it automatically.
 
 Name | Type |
 ------ | ------ |
-`target` | `T` |
-`method` | `K` |
+`target` | T |
+`method` | K |
 `args?` | any[] |
 
 **Returns:** *any*
@@ -426,7 +426,7 @@ ___
 
 ###  make
 
-▸ **make**<**T**>(`namespace`: any, `args?`: string[]): *`T`*
+▸ **make**<**T**>(`namespace`: any, `args?`: string[]): *T*
 
 Make an instance of class and auto inject it's dependencies. The instance
 is only created if `namespace` is part of an autoload or is an class
@@ -446,7 +446,7 @@ Name | Type |
 `namespace` | any |
 `args?` | string[] |
 
-**Returns:** *`T`*
+**Returns:** *T*
 
 ___
 
@@ -498,7 +498,7 @@ ___
 
 ###  use
 
-▸ **use**<**T**>(`namespace`: string): *`T`*
+▸ **use**<**T**>(`namespace`: string): *T*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -528,13 +528,13 @@ Name | Type |
 ------ | ------ |
 `namespace` | string |
 
-**Returns:** *`T`*
+**Returns:** *T*
 
 ___
 
 ###  useEsm
 
-▸ **useEsm**<**T**>(`namespace`: string): *`T`*
+▸ **useEsm**<**T**>(`namespace`: string): *T*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -551,13 +551,13 @@ Name | Type |
 ------ | ------ |
 `namespace` | string |
 
-**Returns:** *`T`*
+**Returns:** *T*
 
 ___
 
 ###  useFake
 
-▸ **useFake**<**T**>(`namespace`: string): *`T`*
+▸ **useFake**<**T**>(`namespace`: string): *T*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -578,7 +578,7 @@ Name | Type |
 ------ | ------ |
 `namespace` | string |
 
-**Returns:** *`T`*
+**Returns:** *T*
 
 ___
 

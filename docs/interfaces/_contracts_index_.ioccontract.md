@@ -1,6 +1,6 @@
-> **[@adonisjs/fold](../README.md)**
+**[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / ["Contracts/index"](../modules/_contracts_index_.md) / [IocContract](_contracts_index_.ioccontract.md) /
+[Globals](../README.md) › ["Contracts/index"](../modules/_contracts_index_.md) › [IocContract](_contracts_index_.ioccontract.md)
 
 # Interface: IocContract
 
@@ -116,7 +116,7 @@ ___
 
 ###  call
 
-▸ **call**<**T**, **K**>(`target`: `T`, `method`: `K`, `args`: any[]): *any*
+▸ **call**<**T**, **K**>(`target`: T, `method`: K, `args`: any[]): *any*
 
 **Type parameters:**
 
@@ -128,8 +128,8 @@ ___
 
 Name | Type |
 ------ | ------ |
-`target` | `T` |
-`method` | `K` |
+`target` | T |
+`method` | K |
 `args` | any[] |
 
 **Returns:** *any*
@@ -253,7 +253,7 @@ ___
 
 ###  make
 
-▸ **make**<**T**>(`name`: string, `args?`: string[]): *`T`*
+▸ **make**<**T**>(`name`: string, `args?`: string[]): *T*
 
 **Type parameters:**
 
@@ -266,7 +266,7 @@ Name | Type |
 `name` | string |
 `args?` | string[] |
 
-**Returns:** *`T`*
+**Returns:** *T*
 
 ___
 
@@ -301,7 +301,7 @@ ___
 
 ###  use
 
-▸ **use**<**T**>(`name`: string): *`T`*
+▸ **use**<**T**>(`name`: string): *T*
 
 **Type parameters:**
 
@@ -313,13 +313,13 @@ Name | Type |
 ------ | ------ |
 `name` | string |
 
-**Returns:** *`T`*
+**Returns:** *T*
 
 ___
 
 ###  useEsm
 
-▸ **useEsm**<**T**>(`name`: string): *`T`*
+▸ **useEsm**<**T**>(`name`: string): *T*
 
 **Type parameters:**
 
@@ -331,13 +331,13 @@ Name | Type |
 ------ | ------ |
 `name` | string |
 
-**Returns:** *`T`*
+**Returns:** *T*
 
 ___
 
 ###  useFake
 
-▸ **useFake**<**T**>(`name`: string): *`T`*
+▸ **useFake**<**T**>(`name`: string): *T*
 
 **Type parameters:**
 
@@ -349,7 +349,7 @@ Name | Type |
 ------ | ------ |
 `name` | string |
 
-**Returns:** *`T`*
+**Returns:** *T*
 
 ___
 

@@ -1,6 +1,6 @@
-> **[@adonisjs/fold](../README.md)**
+**[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / [@adonisjs/fold](_adonisjs_fold.md) /
+[Globals](../README.md) › [@adonisjs/fold](_adonisjs_fold.md)
 
 # External module: @adonisjs/fold
 
@@ -14,7 +14,7 @@
 
 ###  inject
 
-▸ **inject**(`value?`: any): *`decorator`*
+▸ **inject**(`value?`: any): *decorator*
 
 Injects bindings to the class constructor
 
@@ -24,4 +24,4 @@ Name | Type |
 ------ | ------ |
 `value?` | any |
 
-**Returns:** *`decorator`*
+**Returns:** *decorator*

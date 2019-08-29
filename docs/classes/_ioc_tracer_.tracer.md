@@ -1,6 +1,6 @@
-> **[@adonisjs/fold](../README.md)**
+**[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / ["Ioc/Tracer"](../modules/_ioc_tracer_.md) / [Tracer](_ioc_tracer_.tracer.md) /
+[Globals](../README.md) › ["Ioc/Tracer"](../modules/_ioc_tracer_.md) › [Tracer](_ioc_tracer_.tracer.md)
 
 # Class: Tracer
 
@@ -10,7 +10,7 @@ how tracer works
 
 ## Hierarchy
 
-* `internal`
+* internal
 
   * **Tracer**
 
@@ -92,13 +92,13 @@ ___
 
 ###  eventNames
 
-▸ **eventNames**(): *`Array<string | symbol>`*
+▸ **eventNames**(): *Array‹string | symbol›*
 
 *Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
 *Inherited from void*
 
-**Returns:** *`Array<string | symbol>`*
+**Returns:** *Array‹string | symbol›*
 
 ___
 
@@ -151,7 +151,7 @@ ___
 
 ###  listeners
 
-▸ **listeners**(`event`: string | symbol): *`Function`[]*
+▸ **listeners**(`event`: string | symbol): *Function[]*
 
 *Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
@@ -163,7 +163,7 @@ Name | Type |
 ------ | ------ |
 `event` | string \| symbol |
 
-**Returns:** *`Function`[]*
+**Returns:** *Function[]*
 
 ___
 
@@ -299,7 +299,7 @@ ___
 
 ###  rawListeners
 
-▸ **rawListeners**(`event`: string | symbol): *`Function`[]*
+▸ **rawListeners**(`event`: string | symbol): *Function[]*
 
 *Implementation of [TracerContract](../interfaces/_contracts_index_.tracercontract.md)*
 
@@ -311,7 +311,7 @@ Name | Type |
 ------ | ------ |
 `event` | string \| symbol |
 
-**Returns:** *`Function`[]*
+**Returns:** *Function[]*
 
 ___
 
@@ -377,13 +377,13 @@ ___
 
 ### `Static` once
 
-▸ **once**(`emitter`: `EventEmitter`, `event`: string | symbol): *`Promise<any[]>`*
+▸ **once**(`emitter`: EventEmitter, `event`: string | symbol): *Promise‹any[]›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`emitter` | `EventEmitter` |
+`emitter` | EventEmitter |
 `event` | string \| symbol |
 
-**Returns:** *`Promise<any[]>`*
+**Returns:** *Promise‹any[]›*

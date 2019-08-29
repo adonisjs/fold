@@ -1,6 +1,6 @@
-> **[@adonisjs/fold](../README.md)**
+**[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) / ["Ioc/index"](_ioc_index_.md) /
+[Globals](../README.md) › ["Ioc/index"](_ioc_index_.md)
 
 # External module: "Ioc/index"
 
