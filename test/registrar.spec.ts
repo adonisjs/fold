@@ -10,7 +10,7 @@
 import { Filesystem } from '@poppinss/dev-utils'
 import { join } from 'path'
 
-import * as test from 'japa'
+import test from 'japa'
 import { Registrar } from '../src/Registrar'
 import { Ioc } from '../src/Ioc'
 

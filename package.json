@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/poppinss/adonis-fold#readme",
   "devDependencies": {
-    "@adonisjs/mrm-preset": "^2.0.3",
+    "@adonisjs/mrm-preset": "^2.1.0",
     "@poppinss/dev-utils": "^1.0.0",
     "@types/node": "^12.7.2",
     "commitizen": "^4.0.3",

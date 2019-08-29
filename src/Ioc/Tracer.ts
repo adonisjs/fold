@@ -11,7 +11,7 @@
 * file that was distributed with this source code.
 */
 
-import * as Emitter from 'events'
+import Emitter from 'events'
 import { TracerContract } from '../Contracts'
 
 /**

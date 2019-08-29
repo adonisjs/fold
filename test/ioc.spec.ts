@@ -11,7 +11,7 @@ import 'reflect-metadata'
 import { Filesystem } from '@poppinss/dev-utils'
 import { join } from 'path'
 
-import * as test from 'japa'
+import test from 'japa'
 import { Ioc } from '../src/Ioc'
 import { inject } from '../src/decorators'
 
