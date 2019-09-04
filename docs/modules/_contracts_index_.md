@@ -16,6 +16,7 @@
 * [AutoloadCacheItem](_contracts_index_.md#autoloadcacheitem)
 * [BindCallback](_contracts_index_.md#bindcallback)
 * [Binding](_contracts_index_.md#binding)
+* [LookupNode](_contracts_index_.md#lookupnode)
 
 ## Type aliases
 
@@ -50,5 +51,17 @@ ___
 Ƭ **Binding**: *object*
 
 Shape of binding stored inside the IoC container
+
+#### Type declaration:
+
+___
+
+###  LookupNode
+
+Ƭ **LookupNode**: *object*
+
+Shape of lookup node pulled using `ioc.lookup` method. This node
+can be passed to `ioc.use`, or `ioc.make` or `ioc.useEsm` to
+skip many checks and resolve the right thing
 
 #### Type declaration:

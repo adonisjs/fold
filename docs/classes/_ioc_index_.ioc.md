@@ -45,6 +45,7 @@ DI simpler.
 * [hasBinding](_ioc_index_.ioc.md#hasbinding)
 * [hasFake](_ioc_index_.ioc.md#hasfake)
 * [isAutoloadNamespace](_ioc_index_.ioc.md#isautoloadnamespace)
+* [lookup](_ioc_index_.ioc.md#lookup)
 * [make](_ioc_index_.ioc.md#make)
 * [restore](_ioc_index_.ioc.md#restore)
 * [singleton](_ioc_index_.ioc.md#singleton)
@@ -281,7 +282,7 @@ ___
 
 ###  getAliasNamespace
 
-▸ **getAliasNamespace**(`name`: string): *string | undefined*
+▸ **getAliasNamespace**(`namespace`: string): *string | undefined*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -293,7 +294,7 @@ before using this method.
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 
 **Returns:** *string | undefined*
 
@@ -326,7 +327,7 @@ ___
 
 ###  hasAlias
 
-▸ **hasAlias**(`name`: string): *boolean*
+▸ **hasAlias**(`namespace`: string): *boolean*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -337,7 +338,7 @@ exists
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 
 **Returns:** *boolean*
 
@@ -369,7 +370,7 @@ ___
 
 ###  hasFake
 
-▸ **hasFake**(`name`: string): *boolean*
+▸ **hasFake**(`namespace`: string): *boolean*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -380,7 +381,7 @@ not.
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 
 **Returns:** *boolean*
 
@@ -424,9 +425,29 @@ Name | Type |
 
 ___
 
+###  lookup
+
+▸ **lookup**(`namespace`: string, `prefixNamespace?`: undefined | string): *null | [LookupNode](../modules/_contracts_index_.md#lookupnode)*
+
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
+
+Lookup a namespace and return it's lookup node. The lookup node can speed
+up resolving of namespaces via `use`, `useEsm` or `make` methods.
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`namespace` | string |
+`prefixNamespace?` | undefined \| string |
+
+**Returns:** *null | [LookupNode](../modules/_contracts_index_.md#lookupnode)*
+
+___
+
 ###  make
 
-▸ **make**<**T**>(`namespace`: any, `args?`: string[]): *T*
+▸ **make**<**T**>(`node`: any, `args?`: string[]): *T*
 
 Make an instance of class and auto inject it's dependencies. The instance
 is only created if `namespace` is part of an autoload or is an class
@@ -443,7 +464,7 @@ by themselves.
 
 Name | Type |
 ------ | ------ |
-`namespace` | any |
+`node` | any |
 `args?` | string[] |
 
 **Returns:** *T*
@@ -498,7 +519,7 @@ ___
 
 ###  use
 
-▸ **use**<**T**>(`namespace`: string): *T*
+▸ **use**<**T**>(`node`: string | [LookupNode](../modules/_contracts_index_.md#lookupnode)): *T*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -526,7 +547,7 @@ ioc.use('lodash')              // Fallback to Node.js require
 
 Name | Type |
 ------ | ------ |
-`namespace` | string |
+`node` | string \| [LookupNode](../modules/_contracts_index_.md#lookupnode) |
 
 **Returns:** *T*
 
@@ -534,7 +555,7 @@ ___
 
 ###  useEsm
 
-▸ **useEsm**<**T**>(`namespace`: string): *T*
+▸ **useEsm**<**T**>(`node`: string | [LookupNode](../modules/_contracts_index_.md#lookupnode)): *T*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -549,7 +570,7 @@ by the AdonisJs typescript transformer.
 
 Name | Type |
 ------ | ------ |
-`namespace` | string |
+`node` | string \| [LookupNode](../modules/_contracts_index_.md#lookupnode) |
 
 **Returns:** *T*
 

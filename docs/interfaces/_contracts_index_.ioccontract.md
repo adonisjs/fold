@@ -36,6 +36,7 @@ Ioc container interface
 * [hasBinding](_contracts_index_.ioccontract.md#hasbinding)
 * [hasFake](_contracts_index_.ioccontract.md#hasfake)
 * [isAutoloadNamespace](_contracts_index_.ioccontract.md#isautoloadnamespace)
+* [lookup](_contracts_index_.ioccontract.md#lookup)
 * [make](_contracts_index_.ioccontract.md#make)
 * [restore](_contracts_index_.ioccontract.md#restore)
 * [singleton](_contracts_index_.ioccontract.md#singleton)
@@ -101,13 +102,13 @@ ___
 
 ###  bind
 
-▸ **bind**(`name`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
+▸ **bind**(`namespace`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 `callback` | [BindCallback](../modules/_contracts_index_.md#bindcallback) |
 
 **Returns:** *void*
@@ -153,13 +154,13 @@ ___
 
 ###  fake
 
-▸ **fake**(`name`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
+▸ **fake**(`namespace`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 `callback` | [BindCallback](../modules/_contracts_index_.md#bindcallback) |
 
 **Returns:** *void*
@@ -168,13 +169,13 @@ ___
 
 ###  getAliasNamespace
 
-▸ **getAliasNamespace**(`name`: string): *string | undefined*
+▸ **getAliasNamespace**(`namespace`: string): *string | undefined*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 
 **Returns:** *string | undefined*
 
@@ -196,13 +197,13 @@ ___
 
 ###  hasAlias
 
-▸ **hasAlias**(`name`: string): *boolean*
+▸ **hasAlias**(`namespace`: string): *boolean*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 
 **Returns:** *boolean*
 
@@ -225,13 +226,13 @@ ___
 
 ###  hasFake
 
-▸ **hasFake**(`name`: string): *boolean*
+▸ **hasFake**(`namespace`: string): *boolean*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 
 **Returns:** *boolean*
 
@@ -251,9 +252,24 @@ Name | Type |
 
 ___
 
+###  lookup
+
+▸ **lookup**(`namespace`: string, `prefixNamespace?`: undefined | string): *[LookupNode](../modules/_contracts_index_.md#lookupnode) | null*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`namespace` | string |
+`prefixNamespace?` | undefined \| string |
+
+**Returns:** *[LookupNode](../modules/_contracts_index_.md#lookupnode) | null*
+
+___
+
 ###  make
 
-▸ **make**<**T**>(`name`: string, `args?`: string[]): *T*
+▸ **make**<**T**>(`namespace`: string | [LookupNode](../modules/_contracts_index_.md#lookupnode), `args?`: string[]): *T*
 
 **Type parameters:**
 
@@ -263,7 +279,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string \| [LookupNode](../modules/_contracts_index_.md#lookupnode) |
 `args?` | string[] |
 
 **Returns:** *T*
@@ -272,13 +288,13 @@ ___
 
 ###  restore
 
-▸ **restore**(`name`: string): *void*
+▸ **restore**(`namespace`: string): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 
 **Returns:** *void*
 
@@ -286,13 +302,13 @@ ___
 
 ###  singleton
 
-▸ **singleton**(`name`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
+▸ **singleton**(`namespace`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 `callback` | [BindCallback](../modules/_contracts_index_.md#bindcallback) |
 
 **Returns:** *void*
@@ -301,7 +317,7 @@ ___
 
 ###  use
 
-▸ **use**<**T**>(`name`: string): *T*
+▸ **use**<**T**>(`namespace`: string | [LookupNode](../modules/_contracts_index_.md#lookupnode)): *T*
 
 **Type parameters:**
 
@@ -311,7 +327,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string \| [LookupNode](../modules/_contracts_index_.md#lookupnode) |
 
 **Returns:** *T*
 
@@ -319,7 +335,7 @@ ___
 
 ###  useEsm
 
-▸ **useEsm**<**T**>(`name`: string): *T*
+▸ **useEsm**<**T**>(`namespace`: string | [LookupNode](../modules/_contracts_index_.md#lookupnode)): *T*
 
 **Type parameters:**
 
@@ -329,7 +345,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string \| [LookupNode](../modules/_contracts_index_.md#lookupnode) |
 
 **Returns:** *T*
 
@@ -337,7 +353,7 @@ ___
 
 ###  useFake
 
-▸ **useFake**<**T**>(`name`: string): *T*
+▸ **useFake**<**T**>(`namespace`: string): *T*
 
 **Type parameters:**
 
@@ -347,7 +363,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`name` | string |
+`namespace` | string |
 
 **Returns:** *T*
 
