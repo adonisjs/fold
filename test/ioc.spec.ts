@@ -510,6 +510,38 @@ test.group('Ioc', (group) => {
 
     assert.instanceOf(ioc.useEsm<{ default: Foo }>('App/Foo').default, Foo)
   })
+
+  test('wrap return value of autoloaded path to esm', async (assert) => {
+    await fs.add('Bar.ts', `export default class Bar {
+      public name = 'bar'
+    }`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    assert.equal(ioc.useEsm('App/Bar').default.name, 'Bar')
+  })
+
+  test('do not return value of named export from autoloaded path to esm', async (assert) => {
+    await fs.add('Bar.ts', `export class Bar {
+      public name = 'bar'
+    }`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    assert.isUndefined(ioc.useEsm('App/Bar').default)
+    assert.equal(ioc.useEsm('App/Bar').Bar.name, 'Bar')
+  })
+
+  test('manage autoload cache when use and useEsm are used together', async (assert) => {
+    await fs.add('Bar.ts', `export default class Bar {
+      public name = 'bar'
+    }`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    assert.equal(ioc.use('App/Bar').name, 'Bar')
+    assert.equal(ioc.useEsm('App/Bar').default.name, 'Bar')
+  })
 })
 
 test.group('Ioc | Proxy', (group) => {

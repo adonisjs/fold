@@ -11,7 +11,7 @@
 * file that was distributed with this source code.
 */
 
-import { esmRequire } from '@poppinss/utils'
+import { esmResolver } from '@poppinss/utils/build/src/esmResolver'
 import { normalize, resolve, dirname } from 'path'
 
 import tracer from './Tracer'
@@ -137,12 +137,17 @@ export class Ioc implements IocContract {
      */
     if (!cacheEntry) {
       const absPath = this._makeRequirePath(baseNamespace, namespace)
-      const importValue = normalizeEsm ? esmRequire(absPath) : require(absPath)
-      this._autoloadsCache.set(namespace, { diskPath: absPath, cachedValue: importValue })
+      this._autoloadsCache.set(namespace, { diskPath: absPath, cachedValue: require(absPath) })
     }
 
     this.tracer.out()
-    return this._autoloadsCache.get(namespace)!.cachedValue
+
+    /**
+     * Normalize esm on each return call, so that the cached value is
+     * normalized and not impacted by `normalizeEsm` flag.
+     */
+    const importValue = this._autoloadsCache.get(namespace)!.cachedValue
+    return normalizeEsm ? esmResolver(importValue) : importValue
   }
 
   /**
