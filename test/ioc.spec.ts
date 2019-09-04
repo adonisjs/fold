@@ -1350,3 +1350,108 @@ test.group('Ioc | make', () => {
     ioc.call(ioc.make(Foo), 'greet')
   })
 })
+
+test.group('Ioc | lookup', (group) => {
+  group.afterEach(async () => {
+    await fs.cleanup()
+  })
+
+  test('lookup binding from namespace', (assert) => {
+    const ioc = new Ioc()
+    ioc.bind('App/Foo', () => {
+      return 'foo'
+    })
+
+    assert.deepEqual(ioc.lookup('App/Foo'), {
+      namespace: 'App/Foo',
+      type: 'binding',
+    })
+  })
+})
+
+test.group('Ioc | lookup resolve', (group) => {
+  group.afterEach(async () => {
+    await fs.cleanup()
+  })
+
+  test('lookup binding from a lookup node', (assert) => {
+    const ioc = new Ioc()
+    ioc.bind('App/Foo', () => {
+      return 'foo'
+    })
+
+    assert.equal(ioc.use({ type: 'binding', namespace: 'App/Foo' }), 'foo')
+  })
+
+  test('lookup autoload value from a lookup node', async (assert) => {
+    await fs.add('Foo.js', `module.exports = 'bar'`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    assert.equal(ioc.use({ type: 'autoload', namespace: 'App/Foo' }), 'bar')
+  })
+
+  test('do not resolve autoloaded path for binding lookup node', async (assert) => {
+    await fs.add('Foo.js', `module.exports = 'bar'`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    const fn = () => ioc.use({ type: 'binding', namespace: 'App/Foo' })
+
+    assert.throw(fn, 'Cannot resolve App/Foo binding from IoC container')
+  })
+
+  test('do not resolve binding for autoload lookup node', async (assert) => {
+    await fs.add('Foo.js', `module.exports = 'bar'`)
+
+    const ioc = new Ioc()
+    ioc.bind('App/Foo', () => {
+      return 'foo'
+    })
+
+    const fn = () => ioc.use({ type: 'autoload', namespace: 'App/Foo' })
+    assert.throw(fn, /Cannot find module/)
+  })
+
+  test('make binding from binding lookup node', (assert) => {
+    const ioc = new Ioc()
+    class Bar {}
+
+    ioc.bind('App/Foo', () => {
+      return Bar
+    })
+
+    assert.equal(ioc.make({ type: 'binding', namespace: 'App/Foo' }), Bar)
+  })
+
+  test('make binding from autoloaded lookup node', async (assert) => {
+    await fs.add('Foo.js', `module.exports = class Bar {}`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+
+    assert.equal(ioc.make({ type: 'autoload', namespace: 'App/Foo' }).constructor.name, 'Bar')
+  })
+
+  test('do not make binding for autoload lookup node', async (assert) => {
+    await fs.add('Foo.js', `module.exports = 'bar'`)
+
+    const ioc = new Ioc()
+    ioc.bind('App/Foo', () => {
+      return 'foo'
+    })
+
+    const fn = () => ioc.make({ type: 'autoload', namespace: 'App/Foo' })
+    assert.throw(fn, /Cannot find module/)
+  })
+
+  test('do not make autoloaded path for binding lookup node', async (assert) => {
+    await fs.add('Foo.js', `module.exports = 'bar'`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    const fn = () => ioc.make({ type: 'binding', namespace: 'App/Foo' })
+
+    assert.throw(fn, 'Cannot resolve App/Foo binding from IoC container')
+  })
+})
