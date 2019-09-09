@@ -75,4 +75,66 @@ test.group('Registrar', (group) => {
     assert.isTrue((providers[0] as any).registered)
     assert.isTrue((providers[0] as any).booted)
   })
+
+  test('let providers define their own sub providers', async (assert) => {
+    await fs.add('providers/BazProvider.ts', `export default class MyProvider {
+      public registered = false
+      public booted = false
+
+      register () {
+        this.registered = true
+      }
+
+      async boot () {
+        this.booted = true
+      }
+    }`)
+
+    await fs.add('providers/BarProvider.ts', `export default class MyProvider {
+      public registered = false
+      public booted = false
+
+      public provides = ['${join(fs.basePath, 'providers', 'BazProvider')}']
+
+      register () {
+        this.registered = true
+      }
+
+      async boot () {
+        this.booted = true
+      }
+    }`)
+
+    const registrar = new Registrar(new Ioc(false))
+    registrar.useProviders([join(fs.basePath, 'providers', 'BarProvider')])
+
+    const providers = await registrar.registerAndBoot()
+    assert.isTrue((providers[0] as any).registered)
+    assert.isTrue((providers[0] as any).booted)
+
+    assert.isTrue((providers[1] as any).registered)
+    assert.isTrue((providers[1] as any).booted)
+  })
+
+  test('raise exception when provider is not exported as a default export', async (assert) => {
+
+    await fs.add('providers/BarProvider.ts', `export class MyProvider {
+      public registered = false
+      public booted = false
+
+      register () {
+        this.registered = true
+      }
+
+      async boot () {
+        this.booted = true
+      }
+    }`)
+
+    const registrar = new Registrar(new Ioc(false))
+    registrar.useProviders([join(fs.basePath, 'providers', 'BarProvider')])
+    const fn = () => registrar.register()
+
+    assert.throw(fn, /Make sure export default the provider/)
+  })
 })

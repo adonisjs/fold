@@ -15,7 +15,22 @@ import { esmRequire } from '@poppinss/utils'
 import { IocContract } from '../Contracts'
 
 export class Registrar {
+  /**
+   * The first level of provider paths provided to the registrar
+   */
   private _providersPaths: string[]
+
+  /**
+   * An array of loaded providers. Their can be more providers than the
+   * `_providersPaths` array, since each provider can provide it's
+   * own sub providers
+   */
+  private _providers: any[] = []
+
+  /**
+   * Whether or not the providers can be collected
+   */
+  private _collected: boolean = false
 
   constructor (public ioc: IocContract) {
   }
@@ -28,7 +43,27 @@ export class Registrar {
    */
   private _loadProvider (providerPath: string) {
     const provider = esmRequire(providerPath)
+    if (typeof (provider) !== 'function') {
+      throw new Error(`Make sure export default the provider from ${providerPath}`)
+    }
+
     return new provider(this.ioc)
+  }
+
+  /**
+   * Loop's over an array of provider paths and pushes them to the
+   * `providers` collection. This collection is later used to
+   * register and boot providers
+   */
+  private _collect (providerPaths) {
+    providerPaths.forEach((providerPath) => {
+      const provider = this._loadProvider(providerPath)
+      this._providers.push(provider)
+
+      if (provider.provides) {
+        this._collect(provider.provides)
+      }
+    })
   }
 
   /**
@@ -47,23 +82,32 @@ export class Registrar {
    * to boot them as well.
    */
   public register () {
-    return this._providersPaths.map((providerPath) => {
-      const provider = this._loadProvider(providerPath)
+    if (this._collected) {
+      return this._providers
+    }
 
-      /* istanbul ignore else */
+    this._collected = true
+    this._collect(this._providersPaths)
+
+    /**
+     * Register collected providers
+     */
+    this._providers.forEach((provider) => {
       if (typeof (provider.register) === 'function') {
         provider.register()
       }
-
-      return provider
     })
+
+    return this._providers
   }
 
   /**
    * Boot all the providers by calling the `boot` method.
    * Boot methods are called in series.
    */
-  public async boot (providers: any[]) {
+  public async boot () {
+    const providers = this.register()
+
     for (let provider of providers) {
       /* istanbul ignore else */
       if (typeof (provider.boot) === 'function') {
@@ -77,7 +121,7 @@ export class Registrar {
    */
   public async registerAndBoot () {
     const providers = this.register()
-    await this.boot(providers)
+    await this.boot()
     return providers
   }
 }
