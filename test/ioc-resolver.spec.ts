@@ -9,7 +9,6 @@
 
 import test from 'japa'
 import { Ioc } from '../src/Ioc'
-import { IocResolver } from '../src/Resolver'
 
 test.group('Ioc Resolver', () => {
   test('call namespace expression', (assert) => {
@@ -22,7 +21,7 @@ test.group('Ioc Resolver', () => {
     const ioc = new Ioc()
     ioc.bind('App/UserController', () => new UserController())
 
-    const resolver = new IocResolver(ioc)
+    const resolver = ioc.getResolver()
     assert.equal(resolver.call('App/UserController'), 'foo')
   })
 
@@ -36,7 +35,7 @@ test.group('Ioc Resolver', () => {
     const ioc = new Ioc()
     ioc.bind('App/UserController', () => new UserController())
 
-    const resolver = new IocResolver(ioc)
+    const resolver = ioc.getResolver()
     assert.equal(resolver.call('App/UserController.getUser'), 'foo')
   })
 
@@ -50,14 +49,14 @@ test.group('Ioc Resolver', () => {
     const ioc = new Ioc()
     ioc.bind('App/UserController', () => new UserController())
 
-    const resolver = new IocResolver(ioc)
+    const resolver = ioc.getResolver()
     const value = await resolver.call('App/UserController.getUser')
     assert.equal(value, 'foo')
   })
 
   test('raise exception when unable to lookup namespace', async (assert) => {
     const ioc = new Ioc()
-    const resolver = new IocResolver(ioc)
+    const resolver = ioc.getResolver()
 
     const fn = () => resolver.call('App/UserController.getUser')
     assert.throw(fn, 'Unable to resolve App/UserController namespace from IoC container')
@@ -73,7 +72,7 @@ test.group('Ioc Resolver', () => {
     const ioc = new Ioc()
     ioc.bind('App/UserController', () => new UserController())
 
-    const resolver = new IocResolver(ioc)
+    const resolver = ioc.getResolver()
     assert.equal(resolver.call('UserController', 'App'), 'foo')
   })
 
@@ -94,7 +93,7 @@ test.group('Ioc Resolver', () => {
     ioc.bind('App/UserController', () => new UserController())
     ioc.bind('Admin/UserController', () => new AdminController())
 
-    const resolver = new IocResolver(ioc)
+    const resolver = ioc.getResolver()
     assert.equal(resolver.call('UserController', 'App'), 'user')
     assert.equal(resolver.call('UserController', 'Admin'), 'admin')
   })
@@ -116,7 +115,7 @@ test.group('Ioc Resolver', () => {
     ioc.bind('App/UserController', () => new UserController())
     ioc.bind('Admin/UserController', () => new AdminController())
 
-    const resolver = new IocResolver(ioc, undefined, undefined, 'App')
+    const resolver = ioc.getResolver(undefined, undefined, 'App')
     assert.equal(resolver.call('UserController'), 'user')
     assert.equal(resolver.call('UserController', 'Admin'), 'admin')
   })
@@ -131,7 +130,7 @@ test.group('Ioc Resolver', () => {
     const ioc = new Ioc()
     ioc.bind('App/UserController', () => new UserController())
 
-    const resolver = new IocResolver(ioc)
+    const resolver = ioc.getResolver()
     const lookupNode = resolver.resolve('App/UserController.getUser')
     assert.equal(resolver.call(lookupNode), 'foo')
   })
