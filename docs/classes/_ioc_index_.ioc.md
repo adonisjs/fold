@@ -328,9 +328,7 @@ ___
 
 ###  getResolver
 
-▸ **getResolver**(`rcNamespaceKey?`: undefined | string, `fallbackNamespace?`: undefined | string): *[IocResolver](_resolver_index_.iocresolver.md)*
-
-*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
+▸ **getResolver**(`fallbackMethod?`: undefined | string, `rcNamespaceKey?`: undefined | string, `fallbackNamespace?`: undefined | string): *[IocResolver](_resolver_index_.iocresolver.md)*
 
 Returns the resolver instance to resolve Ioc container bindings with
 little ease. Since, the IoCResolver uses an in-memory cache to
@@ -341,6 +339,7 @@ the output of this method to leverage caching
 
 Name | Type |
 ------ | ------ |
+`fallbackMethod?` | undefined &#124; string |
 `rcNamespaceKey?` | undefined &#124; string |
 `fallbackNamespace?` | undefined &#124; string |
 
