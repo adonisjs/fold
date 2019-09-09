@@ -59,7 +59,11 @@ export interface IocContract {
   with (namespaces: string[], cb: (...args: any[]) => void): void
   call<T extends object, K extends keyof T = any> (target: T, method: K, args: any[]): any
   lookup (namespace: string, prefixNamespace?: string): LookupNode | null
-  getResolver (rcNamespaceKey?: string, fallbackNamespace?: string): IocResolverContract
+  getResolver (
+    fallbackMethod?: string,
+    rcNamespaceKey?: string,
+    fallbackNamespace?: string,
+  ): IocResolverContract
 }
 
 /**

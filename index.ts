@@ -13,5 +13,5 @@
 
 export { Ioc } from './src/Ioc'
 export { Registrar } from './src/Registrar'
-export { IocContract, TracerContract } from './src/Contracts'
+export { IocContract, TracerContract, IocResolverContract, IocResolverLookupNode } from './src/Contracts'
 export { inject } from './src/decorators'
