@@ -198,12 +198,13 @@ ___
 
 ###  getResolver
 
-▸ **getResolver**(`rcNamespaceKey?`: undefined | string, `fallbackNamespace?`: undefined | string): *[IocResolverContract](_contracts_index_.iocresolvercontract.md)*
+▸ **getResolver**(`fallbackMethod?`: undefined | string, `rcNamespaceKey?`: undefined | string, `fallbackNamespace?`: undefined | string): *[IocResolverContract](_contracts_index_.iocresolvercontract.md)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
+`fallbackMethod?` | undefined &#124; string |
 `rcNamespaceKey?` | undefined &#124; string |
 `fallbackNamespace?` | undefined &#124; string |
 

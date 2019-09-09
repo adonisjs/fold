@@ -330,6 +330,8 @@ ___
 
 ▸ **getResolver**(`fallbackMethod?`: undefined | string, `rcNamespaceKey?`: undefined | string, `fallbackNamespace?`: undefined | string): *[IocResolver](_resolver_index_.iocresolver.md)*
 
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
+
 Returns the resolver instance to resolve Ioc container bindings with
 little ease. Since, the IoCResolver uses an in-memory cache to
 improve the lookup speed, we suggest keeping a reference to
