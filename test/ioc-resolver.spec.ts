@@ -116,7 +116,7 @@ test.group('Ioc Resolver', () => {
     ioc.bind('App/UserController', () => new UserController())
     ioc.bind('Admin/UserController', () => new AdminController())
 
-    const resolver = new IocResolver(ioc, undefined, 'App')
+    const resolver = new IocResolver(ioc, undefined, undefined, 'App')
     assert.equal(resolver.call('UserController'), 'user')
     assert.equal(resolver.call('UserController', 'Admin'), 'admin')
   })
