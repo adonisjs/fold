@@ -1,6 +1,6 @@
 **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) › ["Ioc/index"](../modules/_ioc_index_.md) › [Ioc](_ioc_index_.ioc.md)
+[Globals](../README.md) › [&quot;Ioc/index&quot;](../modules/_ioc_index_.md) › [Ioc](_ioc_index_.ioc.md)
 
 # Class: Ioc
 
@@ -41,6 +41,7 @@ DI simpler.
 * [fake](_ioc_index_.ioc.md#fake)
 * [getAliasNamespace](_ioc_index_.ioc.md#getaliasnamespace)
 * [getAutoloadBaseNamespace](_ioc_index_.ioc.md#getautoloadbasenamespace)
+* [getResolver](_ioc_index_.ioc.md#getresolver)
 * [hasAlias](_ioc_index_.ioc.md#hasalias)
 * [hasBinding](_ioc_index_.ioc.md#hasbinding)
 * [hasFake](_ioc_index_.ioc.md#hasfake)
@@ -242,7 +243,7 @@ Optionally, you can remove it from `require` cache too.
 
 Name | Type | Default |
 ------ | ------ | ------ |
-`namespace?` | undefined \| string | - |
+`namespace?` | undefined &#124; string | - |
 `clearRequireCache` | boolean | false |
 
 **Returns:** *void*
@@ -322,6 +323,28 @@ Name | Type |
 `namespace` | string |
 
 **Returns:** *string | undefined*
+
+___
+
+###  getResolver
+
+▸ **getResolver**(`rcNamespaceKey?`: undefined | string, `fallbackNamespace?`: undefined | string): *[IocResolver](_resolver_index_.iocresolver.md)*
+
+*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
+
+Returns the resolver instance to resolve Ioc container bindings with
+little ease. Since, the IoCResolver uses an in-memory cache to
+improve the lookup speed, we suggest keeping a reference to
+the output of this method to leverage caching
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`rcNamespaceKey?` | undefined &#124; string |
+`fallbackNamespace?` | undefined &#124; string |
+
+**Returns:** *[IocResolver](_resolver_index_.iocresolver.md)*
 
 ___
 
@@ -439,7 +462,7 @@ up resolving of namespaces via `use`, `useEsm` or `make` methods.
 Name | Type |
 ------ | ------ |
 `namespace` | string |
-`prefixNamespace?` | undefined \| string |
+`prefixNamespace?` | undefined &#124; string |
 
 **Returns:** *null | [LookupNode](../modules/_contracts_index_.md#lookupnode)*
 
@@ -547,7 +570,7 @@ ioc.use('lodash')              // Fallback to Node.js require
 
 Name | Type |
 ------ | ------ |
-`node` | string \| [LookupNode](../modules/_contracts_index_.md#lookupnode) |
+`node` | string &#124; [LookupNode](../modules/_contracts_index_.md#lookupnode) |
 
 **Returns:** *T*
 
@@ -570,7 +593,7 @@ by the AdonisJs typescript transformer.
 
 Name | Type |
 ------ | ------ |
-`node` | string \| [LookupNode](../modules/_contracts_index_.md#lookupnode) |
+`node` | string &#124; [LookupNode](../modules/_contracts_index_.md#lookupnode) |
 
 **Returns:** *T*
 

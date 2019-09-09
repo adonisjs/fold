@@ -1,6 +1,6 @@
 **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) › ["Ioc/IoCProxy"](../modules/_ioc_iocproxy_.md) › [IoCProxyObject](_ioc_iocproxy_.iocproxyobject.md)
+[Globals](../README.md) › [&quot;Ioc/IoCProxy&quot;](../modules/_ioc_iocproxy_.md) › [IoCProxyObject](_ioc_iocproxy_.iocproxyobject.md)
 
 # Class: IoCProxyObject
 

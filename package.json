@@ -9,7 +9,7 @@
     "lint": "tslint --project tsconfig.json",
     "clean": "del build",
     "compile": "npm run lint && npm run clean && tsc",
-    "build": "npm run compile && typedoc --theme markdown --excludePrivate --mdHideSources && git add docs",
+    "build": "npm run compile && typedoc --theme markdown --excludePrivate --HideSources && git add docs",
     "commit": "git-cz",
     "release": "np",
     "version": "npm run build"
@@ -83,7 +83,7 @@
     "anyBranch": false
   },
   "dependencies": {
-    "@poppinss/utils": "^1.0.9"
+    "@poppinss/utils": "^2.0.0"
   },
   "publishConfig": {
     "access": "public",

@@ -1,6 +1,6 @@
 **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) › ["Contracts/index"](../modules/_contracts_index_.md) › [TracerContract](_contracts_index_.tracercontract.md)
+[Globals](../README.md) › [&quot;Contracts/index&quot;](../modules/_contracts_index_.md) › [TracerContract](_contracts_index_.tracercontract.md)
 
 # Interface: TracerContract
 
@@ -89,7 +89,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`event` | string \| symbol |
+`event` | string &#124; symbol |
 `...args` | any[] |
 
 **Returns:** *boolean*
@@ -147,7 +147,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`type` | string \| symbol |
+`type` | string &#124; symbol |
 
 **Returns:** *number*
 
@@ -165,7 +165,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`event` | string \| symbol |
+`event` | string &#124; symbol |
 
 **Returns:** *Function[]*
 
@@ -321,7 +321,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`event` | string \| symbol |
+`event` | string &#124; symbol |
 
 **Returns:** *Function[]*
 
@@ -339,7 +339,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`event?` | string \| symbol |
+`event?` | string &#124; symbol |
 
 **Returns:** *this*
 
@@ -402,6 +402,6 @@ ___
 Name | Type |
 ------ | ------ |
 `emitter` | EventEmitter |
-`event` | string \| symbol |
+`event` | string &#124; symbol |
 
 **Returns:** *number*

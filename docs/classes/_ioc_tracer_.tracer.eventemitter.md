@@ -1,6 +1,6 @@
 **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) › ["Ioc/Tracer"](../modules/_ioc_tracer_.md) › [Tracer](_ioc_tracer_.tracer.md) › [EventEmitter](_ioc_tracer_.tracer.eventemitter.md)
+[Globals](../README.md) › [&quot;Ioc/Tracer&quot;](../modules/_ioc_tracer_.md) › [Tracer](_ioc_tracer_.tracer.md) › [EventEmitter](_ioc_tracer_.tracer.eventemitter.md)
 
 # Class: EventEmitter
 
@@ -71,7 +71,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`event` | string \| symbol |
+`event` | string &#124; symbol |
 `...args` | any[] |
 
 **Returns:** *boolean*
@@ -102,7 +102,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`type` | string \| symbol |
+`type` | string &#124; symbol |
 
 **Returns:** *number*
 
@@ -116,7 +116,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`event` | string \| symbol |
+`event` | string &#124; symbol |
 
 **Returns:** *Function[]*
 
@@ -240,7 +240,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`event` | string \| symbol |
+`event` | string &#124; symbol |
 
 **Returns:** *Function[]*
 
@@ -254,7 +254,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`event?` | string \| symbol |
+`event?` | string &#124; symbol |
 
 **Returns:** *this*
 
@@ -307,6 +307,6 @@ ___
 Name | Type |
 ------ | ------ |
 `emitter` | EventEmitter |
-`event` | string \| symbol |
+`event` | string &#124; symbol |
 
 **Returns:** *number*

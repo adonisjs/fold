@@ -1,6 +1,6 @@
 **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) › ["Registrar/index"](../modules/_registrar_index_.md) › [Registrar](_registrar_index_.registrar.md)
+[Globals](../README.md) › [&quot;Registrar/index&quot;](../modules/_registrar_index_.md) › [Registrar](_registrar_index_.registrar.md)
 
 # Class: Registrar
 
@@ -49,16 +49,10 @@ Name | Type |
 
 ###  boot
 
-▸ **boot**(`providers`: any[]): *Promise‹void›*
+▸ **boot**(): *Promise‹void›*
 
 Boot all the providers by calling the `boot` method.
 Boot methods are called in series.
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`providers` | any[] |
 
 **Returns:** *Promise‹void›*
 

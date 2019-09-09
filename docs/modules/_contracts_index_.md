@@ -1,6 +1,6 @@
 **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) › ["Contracts/index"](_contracts_index_.md)
+[Globals](../README.md) › [&quot;Contracts/index&quot;](_contracts_index_.md)
 
 # External module: "Contracts/index"
 
@@ -9,6 +9,7 @@
 ### Interfaces
 
 * [IocContract](../interfaces/_contracts_index_.ioccontract.md)
+* [IocResolverContract](../interfaces/_contracts_index_.iocresolvercontract.md)
 * [TracerContract](../interfaces/_contracts_index_.tracercontract.md)
 
 ### Type aliases
@@ -16,6 +17,7 @@
 * [AutoloadCacheItem](_contracts_index_.md#autoloadcacheitem)
 * [BindCallback](_contracts_index_.md#bindcallback)
 * [Binding](_contracts_index_.md#binding)
+* [IocResolverLookupNode](_contracts_index_.md#iocresolverlookupnode)
 * [LookupNode](_contracts_index_.md#lookupnode)
 
 ## Type aliases
@@ -51,6 +53,14 @@ ___
 Ƭ **Binding**: *object*
 
 Shape of binding stored inside the IoC container
+
+#### Type declaration:
+
+___
+
+###  IocResolverLookupNode
+
+Ƭ **IocResolverLookupNode**: *object*
 
 #### Type declaration:
 

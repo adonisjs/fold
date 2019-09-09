@@ -1,6 +1,6 @@
 **[@adonisjs/fold](../README.md)**
 
-[Globals](../README.md) › ["Contracts/index"](../modules/_contracts_index_.md) › [IocContract](_contracts_index_.ioccontract.md)
+[Globals](../README.md) › [&quot;Contracts/index&quot;](../modules/_contracts_index_.md) › [IocContract](_contracts_index_.ioccontract.md)
 
 # Interface: IocContract
 
@@ -32,6 +32,7 @@ Ioc container interface
 * [fake](_contracts_index_.ioccontract.md#fake)
 * [getAliasNamespace](_contracts_index_.ioccontract.md#getaliasnamespace)
 * [getAutoloadBaseNamespace](_contracts_index_.ioccontract.md#getautoloadbasenamespace)
+* [getResolver](_contracts_index_.ioccontract.md#getresolver)
 * [hasAlias](_contracts_index_.ioccontract.md#hasalias)
 * [hasBinding](_contracts_index_.ioccontract.md#hasbinding)
 * [hasFake](_contracts_index_.ioccontract.md#hasfake)
@@ -145,8 +146,8 @@ ___
 
 Name | Type |
 ------ | ------ |
-`namespace?` | undefined \| string |
-`clearRequireCache?` | undefined \| false \| true |
+`namespace?` | undefined &#124; string |
+`clearRequireCache?` | undefined &#124; false &#124; true |
 
 **Returns:** *void*
 
@@ -195,6 +196,21 @@ Name | Type |
 
 ___
 
+###  getResolver
+
+▸ **getResolver**(`rcNamespaceKey?`: undefined | string, `fallbackNamespace?`: undefined | string): *[IocResolverContract](_contracts_index_.iocresolvercontract.md)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`rcNamespaceKey?` | undefined &#124; string |
+`fallbackNamespace?` | undefined &#124; string |
+
+**Returns:** *[IocResolverContract](_contracts_index_.iocresolvercontract.md)*
+
+___
+
 ###  hasAlias
 
 ▸ **hasAlias**(`namespace`: string): *boolean*
@@ -218,7 +234,7 @@ ___
 Name | Type |
 ------ | ------ |
 `namespace` | string |
-`checkAliases?` | undefined \| false \| true |
+`checkAliases?` | undefined &#124; false &#124; true |
 
 **Returns:** *boolean*
 
@@ -261,7 +277,7 @@ ___
 Name | Type |
 ------ | ------ |
 `namespace` | string |
-`prefixNamespace?` | undefined \| string |
+`prefixNamespace?` | undefined &#124; string |
 
 **Returns:** *[LookupNode](../modules/_contracts_index_.md#lookupnode) | null*
 
@@ -279,7 +295,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`namespace` | string \| [LookupNode](../modules/_contracts_index_.md#lookupnode) |
+`namespace` | string &#124; [LookupNode](../modules/_contracts_index_.md#lookupnode) |
 `args?` | string[] |
 
 **Returns:** *T*
@@ -327,7 +343,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`namespace` | string \| [LookupNode](../modules/_contracts_index_.md#lookupnode) |
+`namespace` | string &#124; [LookupNode](../modules/_contracts_index_.md#lookupnode) |
 
 **Returns:** *T*
 
@@ -345,7 +361,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`namespace` | string \| [LookupNode](../modules/_contracts_index_.md#lookupnode) |
+`namespace` | string &#124; [LookupNode](../modules/_contracts_index_.md#lookupnode) |
 
 **Returns:** *T*
 
