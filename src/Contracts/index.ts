@@ -17,6 +17,20 @@ export interface TracerContract extends EventEmitter {
   out (): void
 }
 
+export type IocResolverLookupNode = {
+  namespace: string,
+  type: 'binding' | 'autoload',
+  method: string,
+}
+
+/**
+ * Shape of the IocResolver class
+ */
+export interface IocResolverContract {
+  resolve (namespace: string, prefixNamespace?: string): IocResolverLookupNode
+  call<T extends any> (namespace: string | IocResolverLookupNode, prefixNamespace?: string, args?: any[]): T
+}
+
 /**
  * Ioc container interface
  */
@@ -45,6 +59,7 @@ export interface IocContract {
   with (namespaces: string[], cb: (...args: any[]) => void): void
   call<T extends object, K extends keyof T = any> (target: T, method: K, args: any[]): any
   lookup (namespace: string, prefixNamespace?: string): LookupNode | null
+  getResolver (rcNamespaceKey?: string, fallbackNamespace?: string): IocResolverContract
 }
 
 /**

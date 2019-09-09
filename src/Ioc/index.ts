@@ -18,6 +18,7 @@ import { esmResolver } from '@poppinss/utils/build/src/esmResolver'
 import tracer from './Tracer'
 import { IoCProxyObject, IocProxyClass } from './IoCProxy'
 import { IocContract, BindCallback, Binding, AutoloadCacheItem, LookupNode } from '../Contracts'
+import { IocResolver } from '../Resolver'
 
 const toString = Function.prototype.toString
 
@@ -890,5 +891,15 @@ export class Ioc implements IocContract {
     }
 
     return null
+  }
+
+  /**
+   * Returns the resolver instance to resolve Ioc container bindings with
+   * little ease. Since, the IoCResolver uses an in-memory cache to
+   * improve the lookup speed, we suggest keeping a reference to
+   * the output of this method to leverage caching
+   */
+  public getResolver (rcNamespaceKey?: string, fallbackNamespace?: string): IocResolver {
+    return new IocResolver(this, rcNamespaceKey, fallbackNamespace)
   }
 }
