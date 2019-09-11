@@ -25,7 +25,7 @@ function hasFake (target) {
  */
 function callTrap (target, trap, ...args) {
   if (hasFake(target)) {
-    return Reflect[trap](target.container.useFake(target.binding), ...args)
+    return Reflect[trap](target.container.useFake(target.binding, target.actual), ...args)
   } else {
     return Reflect[trap](target.actual, ...args)
   }
@@ -86,6 +86,10 @@ const objectHandler = {
 const classHandler = {
   construct (target, ...args) {
     return callTrap(target, 'construct', args)
+  },
+
+  get (target, ...args) {
+    return callTrap(target, 'get', ...args)
   },
 }
 

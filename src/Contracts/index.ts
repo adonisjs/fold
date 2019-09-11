@@ -44,11 +44,10 @@ export interface IocContract {
   alias (namespace: string, alias: string): void
   autoload (directoryPath: string, namespace: string): void
   clearAutoloadCache (namespace?: string, clearRequireCache?: boolean): void
-  fake (namespace: string, callback: BindCallback): void
+  fake (namespace: string, callback: BindFakeCallback): void
   use<T extends any = any> (namespace: string | LookupNode): T
-  useEsm<T extends any = any> (namespace: string | LookupNode): T
   make<T extends any = any> (namespace: string | LookupNode, args?: string[]): T
-  useFake<T extends any = any> (namespace: string): T
+  useFake<T extends any = any> (namespace: string, value?: any): T
   hasFake (namespace: string): boolean
   hasAlias (namespace: string): boolean
   hasBinding (namespace: string, checkAliases?: boolean): boolean
@@ -76,6 +75,14 @@ export type Binding = {
 }
 
 /**
+ * Shape of fakes binding stored inside the IoC container
+ */
+export type FakeBinding = {
+  callback: BindFakeCallback,
+  cachedValue?: unknown,
+}
+
+/**
  * Shape of lookup node pulled using `ioc.lookup` method. This node
  * can be passed to `ioc.use`, or `ioc.make` or `ioc.useEsm` to
  * skip many checks and resolve the right thing
@@ -94,3 +101,4 @@ export type AutoloadCacheItem = {
 }
 
 export type BindCallback = (app: IocContract) => unknown
+export type BindFakeCallback = (app: IocContract, value?: any) => unknown

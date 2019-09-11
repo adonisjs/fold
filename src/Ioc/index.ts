@@ -11,16 +11,32 @@
 * file that was distributed with this source code.
 */
 
+import { normalize } from 'path'
 import { Exception } from '@poppinss/utils'
-import { normalize, resolve, dirname } from 'path'
-import { esmResolver } from '@poppinss/utils/build/src/esmResolver'
 
 import tracer from './Tracer'
-import { IoCProxyObject, IocProxyClass } from './IoCProxy'
-import { IocContract, BindCallback, Binding, AutoloadCacheItem, LookupNode } from '../Contracts'
+import { Injector } from './Injector'
 import { IocResolver } from '../Resolver'
+import { IoCProxyObject, IocProxyClass } from './IoCProxy'
+import { IocLookupException } from '../Exceptions/IocLookupException'
 
-const toString = Function.prototype.toString
+import {
+  isEsm,
+  isClass,
+  isObject,
+  ensureIsFunction,
+  clearRequireCache,
+} from '../helpers'
+
+import {
+  IocContract,
+  BindCallback,
+  BindFakeCallback,
+  Binding,
+  AutoloadCacheItem,
+  LookupNode,
+  FakeBinding,
+} from '../Contracts'
 
 /**
  * Ioc container to manage and compose dependencies of your application
@@ -45,8 +61,7 @@ export class Ioc implements IocContract {
   public autoloadedAliases: string[] = []
 
   /**
-   * Autoloaded cache to improve the `require` speed, which is
-   * dog slow.
+   * Autoloaded cache to improve the `require` speed, which is dog slow.
    */
   private _autoloadsCache: Map<string, AutoloadCacheItem> = new Map()
 
@@ -64,13 +79,15 @@ export class Ioc implements IocContract {
    * Copy of fakes as a Map, since fakes are subjective to
    * mutations
    */
-  private _fakes: Map<string, Binding> = new Map()
+  private _fakes: Map<string, FakeBinding> = new Map()
 
   /**
    * Using proxies or not? Fakes only works when below one
    * is set to true.
    */
   private _useProxies = false
+
+  private _injector = new Injector(this)
 
   constructor (private _emitEvents = false) {
   }
@@ -79,10 +96,10 @@ export class Ioc implements IocContract {
    * Returns the binding return value. This method must be called when
    * [[hasBinding]] returns true.
    */
-  private _resolveBinding (namespace: string, asEsm: boolean) {
+  private _resolveBinding (namespace: string) {
     const binding = this._bindings[namespace]
     if (!binding) {
-      throw new Error(`Cannot resolve ${namespace} binding from IoC container`)
+      throw IocLookupException.missingBinding(namespace)
     }
 
     this.tracer.in(namespace, !!binding.cachedValue)
@@ -100,26 +117,7 @@ export class Ioc implements IocContract {
     }
 
     this.tracer.out()
-    return asEsm ? this._toEsm(value) : value
-  }
-
-  /**
-   * Raises error with a message when callback is not
-   * a function.
-   */
-  private _ensureCallback (callback: Function, message: string) {
-    if (typeof (callback) !== 'function') {
-      throw new Exception(message, 500, 'E_RUNTIME_EXCEPTION')
-    }
-  }
-
-  /**
-   * Makes the require path from the autoloaded alias. This path then is given to
-   * Node.js `require` function.
-   */
-  private _makeRequirePath (baseNamespace: string, namespace: string): string {
-    const diskPath = namespace.replace(baseNamespace, this.autoloads[baseNamespace])
-    return require.resolve(normalize(diskPath))
+    return value
   }
 
   /**
@@ -128,113 +126,25 @@ export class Ioc implements IocContract {
    *
    * Make sure to call this method when [[isAutoloadNamespace]] returns true.
    */
-  private _autoload (namespace: string, normalizeEsm: boolean) {
+  private _autoload (namespace: string) {
     const cacheEntry = this._autoloadsCache.get(namespace)
     this.tracer.in(namespace, !!cacheEntry)
 
     /**
      * Require the module and cache it to improve performance
      */
-    if (!cacheEntry) {
-      const baseNamespace = this.getAutoloadBaseNamespace(namespace)!
-      const absPath = this._makeRequirePath(baseNamespace, namespace)
-      this._autoloadsCache.set(namespace, { diskPath: absPath, cachedValue: require(absPath) })
+    if (cacheEntry) {
+      this.tracer.out()
+      return cacheEntry.cachedValue
     }
+
+    const baseNamespace = this.getAutoloadBaseNamespace(namespace)!
+    const diskPath = namespace.replace(baseNamespace, this.autoloads[baseNamespace])
+    const absPath = require.resolve(normalize(diskPath))
+    this._autoloadsCache.set(namespace, { diskPath: absPath, cachedValue: require(absPath) })
 
     this.tracer.out()
-
-    /**
-     * Normalize esm on each return call, so that the cached value is
-     * normalized and not impacted by `normalizeEsm` flag.
-     */
-    const importValue = this._autoloadsCache.get(namespace)!.cachedValue
-    return normalizeEsm ? esmResolver(importValue) : importValue
-  }
-
-  /**
-   * Returns a boolean telling if value is a primitive or object constructor.
-   */
-  private _isConstructorObject (value: any): boolean {
-    return [String, Function, Object, Date, Number, Boolean].indexOf(value) > -1
-  }
-
-  /**
-   * Returns exception for disallowing constructor injections.
-   */
-  private _getConstructorInjectionException (value: any, parentName: string, index: number) {
-    const primitiveName = `{${value.name} Constructor}`
-    return new Error(`Cannot inject ${primitiveName} to {${parentName}} at position ${index + 1}`)
-  }
-
-  /**
-   * Returns an array of resolved dependencies, by giving preference
-   * to inline arguments
-   */
-  private _makeDependencies (targetName: string, injections: any[], args: any[]) {
-    /**
-     * If the inline arguments length is great or same as the length
-     * of injections, then we treat them as the source of truth
-     * and return them back as it is.
-     *
-     * The inline arguments are preferred over injections, since we trust the caller
-     * more than the user.
-     */
-    if (args.length >= injections.length) {
-      return args
-    }
-
-    /**
-     * Loop over all the injections and give preference to args for
-     * a given index, otherwise fallback to `this.make`.
-     */
-    return injections.map((injection: any, index: number) => {
-      if (args && args[index] !== undefined) {
-        return args[index]
-      }
-
-      /**
-       * Disallow object and primitive constructors
-       */
-      if (this._isConstructorObject(injection)) {
-        throw this._getConstructorInjectionException(injections[index], targetName, index)
-      }
-
-      return this.make(injection)
-    })
-  }
-
-  /**
-   * Make instance of a class by auto-injecting it's defined dependencies.
-   */
-  private _makeInstanceOf (value: any, args?: any[]) {
-    if (!this._isClass(value) || value.makePlain === true) {
-      return value
-    }
-
-    const injections = value.hasOwnProperty('inject') ? (value.inject.instance || []) : []
-    return new value(...this._makeDependencies(value.name, injections, args || []))
-  }
-
-  /**
-   * Require the module using Node.js `require` function.
-   */
-  private _requireModule (modulePath: string) {
-    if (modulePath.startsWith('./') || modulePath.startsWith('/')) {
-      return require(resolve(dirname(module.parent!.filename), modulePath))
-    }
-    return require(modulePath)
-  }
-
-  /**
-   * Converts the output value to a sythentic esm
-   * module.
-   */
-  private _toEsm (value: any) {
-    const esm = {
-      default: value,
-    }
-    Object.defineProperty(esm, '__esModule', { value: true })
-    return esm
+    return this._autoloadsCache.get(namespace)!.cachedValue
   }
 
   /**
@@ -242,94 +152,30 @@ export class Ioc implements IocContract {
    * combinations of `bindings`, `aliases`, `autoloading`
    * and finally falling back to `nodejs require`.
    */
-  private _resolve (node: string | LookupNode, asEsm: boolean) {
-    /**
-     * Lookup nodes are not part of waterfall lookup process. We front we
-     * know about them and must resolve them
-     */
-    if (typeof (node) !== 'string') {
-      switch (node.type) {
-        case 'binding':
-          return this._resolveBinding(node.namespace, asEsm)
-        case 'autoload':
-          return this._autoload(node.namespace, !asEsm)
-      }
-      return
+  private _resolve (node: LookupNode) {
+    switch (node.type) {
+      case 'binding':
+        return this._resolveBinding(node.namespace)
+      case 'autoload':
+        return this._autoload(node.namespace)
     }
-
-    /**
-     * Require the npm module as a fallback when node is a string
-     */
-    return this._requireModule(node)
   }
 
   /**
-   * Returns a boolean telling if value is a valid lookup
-   * node or not
+   * Resolves a namespace and injects it's dependencies to it
    */
-  private _isLookUpNode (node: any): node is LookupNode {
-    return node && node.type && node.namespace
-  }
+  private _resolveAndMake (node: LookupNode, args?: string[]) {
+    switch (node.type) {
+      case 'binding':
+        return this._resolveBinding(node.namespace)
+      case 'autoload':
+        let value = this._autoload(node.namespace)
 
-  /**
-   * Resolve the value for a namespace by trying all possible
-   * combinations of `bindings`, `aliases`, `autoloading`
-   * and finally falling back to `nodejs require` and then
-   * make an instance of it and it's dependencies.
-   */
-  private _resolveAndMake (node: string | LookupNode, args?: string[]) {
-    if (this._isLookUpNode(node)) {
-      switch (node.type) {
-        case 'binding':
-          return this._resolveBinding(node.namespace, false)
-        case 'autoload':
-          const value = this._autoload(node.namespace, true)
-          return this._makeInstanceOf(value, args)
-      }
-      return
-    }
-
-    /**
-     * Attempt to make non-string values
-     */
-    if (typeof (node) !== 'string') {
-      return this._makeInstanceOf(node, args)
-    }
-
-    return this._requireModule(node)
-  }
-
-  /**
-   * Clear the module entry from the require cache. The `modulePath`
-   * must be an absolute path.
-   */
-  private _clearRequireCache (modulePath: string) {
-    const cacheItem = require.cache[modulePath]
-    /* istanbul ignore if */
-    if (!cacheItem) {
-      return
-    }
-
-    /**
-     * Just remove the module, when there is no
-     * parent
-     */
-    delete require.cache[modulePath]
-
-    /* istanbul ignore if */
-    if (!cacheItem.parent) {
-      return
-    }
-
-    let i = cacheItem.parent.children.length
-
-    /**
-     * Remove reference from the parent
-     */
-    while (i--) {
-      if (cacheItem.parent.children[i].id === modulePath) {
-        cacheItem.parent.children.splice(i, 1)
-      }
+        /**
+         * We return an instance of default export for esm modules
+         */
+        value = isEsm(value) && value.default ? value.default : value
+        return this._injector.injectDependencies(value, args || [])
     }
   }
 
@@ -337,48 +183,53 @@ export class Ioc implements IocContract {
    * Removes an autoload namespace from the cache. If the value doesn't
    * exists in the cache, then this method will be a noop.
    */
-  private _removeAutoloadFromCache (namespace: string, clearRequireCache: boolean) {
+  private _removeAutoloadFromCache (namespace: string, removeRequire: boolean) {
     const item = this._autoloadsCache.get(namespace)
     if (!item) {
       return
     }
 
-    /**
-     * Remove it from the object
-     */
     this._autoloadsCache.delete(namespace)
-
-    /**
-     * Clear the require cache if instructed for same
-     */
-    /* istanbul ignore else */
-    if (clearRequireCache) {
-      this._clearRequireCache(item.diskPath)
+    if (removeRequire) {
+      clearRequireCache(item.diskPath)
     }
   }
 
   /**
-   * Returns a boolean to differentiate between classes and plain
-   * functions
+   * Wraps object and class to a proxy for enabling the fakes
+   * API
    */
-  private _isClass (fn: any) {
-    return typeof (fn) === 'function' && /^class\s/.test(toString.call(fn))
+  private _wrapAsProxy<T extends any> (namespace: string, value: any): T {
+    /**
+     * Wrap objects inside proxy
+     */
+    if (isObject(value)) {
+      return (new IoCProxyObject(namespace, value, this) as unknown) as T
+    }
+
+    /**
+     * Wrap class inside proxy
+     */
+    if (isClass(value)) {
+      return (IocProxyClass(namespace, value, this) as unknown) as T
+    }
+
+    return value
   }
 
   /**
-   * Returns a boolean to differentiate between null and objects
-   * and arrays too
+   * Returns a boolean telling if value is a lookup node or not
    */
-  private _isObject (value: any): boolean {
-    return value && typeof (value) === 'object' && !Array.isArray(value)
+  private _isLookupNode (value: any): value is LookupNode {
+    return value && value.type && value.namespace
   }
 
   /**
    * Instruct IoC container to use proxies when returning
    * bindings from `use` and `make` methods.
    */
-  public useProxies (): this {
-    this._useProxies = true
+  public useProxies (enable: boolean = true): this {
+    this._useProxies = !!enable
     return this
   }
 
@@ -396,7 +247,7 @@ export class Ioc implements IocContract {
    * ```
    */
   public bind (namespace: string, callback: BindCallback): void {
-    this._ensureCallback(callback, 'ioc.bind expect 2nd argument to be a function')
+    ensureIsFunction(callback, 'ioc.bind expect 2nd argument to be a function')
     this.tracer.emit('bind', { namespace, singleton: false })
     this._bindings[namespace] = { callback, singleton: false }
   }
@@ -414,7 +265,7 @@ export class Ioc implements IocContract {
    * ```
    */
   public singleton (namespace: string, callback: BindCallback): void {
-    this._ensureCallback(callback, 'ioc.singleton expect 2nd argument to be a function')
+    ensureIsFunction(callback, 'ioc.singleton expect 2nd argument to be a function')
     this.tracer.emit('bind', { namespace, singleton: true })
     this._bindings[namespace] = { callback, singleton: true }
   }
@@ -505,10 +356,10 @@ export class Ioc implements IocContract {
    * })
    * ```
    */
-  public fake (namespace: string, callback: BindCallback): void {
-    this._ensureCallback(callback, 'ioc.fake expect 2nd argument to be a function')
+  public fake (namespace: string, callback: BindFakeCallback): void {
+    ensureIsFunction(callback, 'ioc.fake expect 2nd argument to be a function')
     this.tracer.emit('fake', { namespace })
-    this._fakes.set(namespace, { callback, singleton: true })
+    this._fakes.set(namespace, { callback })
   }
 
   /**
@@ -535,93 +386,37 @@ export class Ioc implements IocContract {
     const lookedupNode = typeof (node) === 'string' ? this.lookup(node) : node
 
     /**
-     * Attempt to resolve the module
+     * Do not proceed when unable to lookup Ioc container namespace
      */
-    const value = this._resolve(lookedupNode || node, false)
+    if (!lookedupNode || !lookedupNode.type) {
+      throw IocLookupException.lookupFailed(node as string)
+    }
 
     /**
-     * Return value as it is when we are not using proxies or lookup node wasn't
-     * found
+     * Attempt to resolve the module
      */
-    if (!this._useProxies || !lookedupNode) {
+    let value = this._resolve(lookedupNode)
+
+    /**
+     * When not using proxies, then we must return the value untouched
+     */
+    if (!this._useProxies) {
       return value as T
     }
 
     /**
-     * Wrap objects inside proxy
+     * Wrap and return `esm` module default exports to proxy
      */
-    if (this._isObject(value)) {
-      return (new IoCProxyObject(lookedupNode.namespace, value, this) as unknown) as T
+    if (isEsm(value)) {
+      if (value.default) {
+        value = Object.assign({}, value, {
+          default: this._wrapAsProxy(lookedupNode.namespace, value.default),
+        })
+      }
+      return value as T
     }
 
-    /**
-     * Wrap class inside proxy
-     */
-    if (this._isClass(value)) {
-      return (IocProxyClass(lookedupNode.namespace, value, this) as unknown) as T
-    }
-
-    /**
-     * Return other values as it is
-     */
-    return value as T
-  }
-
-  /**
-   * Wraps the return value of `use` to an ESM module. This is used
-   * by the AdonisJs typescript transformer.
-   */
-  public useEsm<T extends any = any> (node: string | LookupNode): T {
-    /**
-     * Get lookup node when node itself isn't a lookup node
-     */
-    const lookedupNode = typeof (node) === 'string' ? this.lookup(node) : node
-
-    /**
-     * Attempt to resolve the module
-     */
-    const value = this._resolve(lookedupNode || node, true)
-
-    /**
-     * `useEsm` will attempt to wrap values as `esm` modules whenever possible. Otherwise
-     * we must raise an exception.
-     *
-     * NOTE: `useEsm` must never be used with node modules
-     */
-    if (!value.__esModule) {
-      throw new Error(`${node} must be an ES module`)
-    }
-
-    /**
-     * Proxies are allowed only for ESM modules with default exports. Also we ignore
-     * proxies when value is not a lookup node
-     */
-    if (!this._useProxies || !value.default || !lookedupNode) {
-      return value
-    }
-
-    /**
-     * Wrap objects inside proxy
-     */
-    if (this._isObject(value.default)) {
-      return {
-        default: new IoCProxyObject(lookedupNode.namespace, value.default, this),
-      } as unknown as T
-    }
-
-    /**
-     * Wrap class inside proxy
-     */
-    if (this._isClass(value.default)) {
-      return {
-        default: IocProxyClass(lookedupNode.namespace, value.default, this),
-      } as unknown as T
-    }
-
-    /**
-     * Return value as it is
-     */
-    return value as T
+    return this._wrapAsProxy<T>(lookedupNode.namespace, value)
   }
 
   /**
@@ -634,9 +429,27 @@ export class Ioc implements IocContract {
    */
   public make<T extends any = any> (node: any, args?: string[]): T {
     /**
+     * If value is not a namespace string and not a lookup node,
+     * then we make the value as it is.
+     *
+     * Also we do not support fakes for raw values and hence there is
+     * no point in wrapping it to a proxy
+     */
+    if (typeof (node) !== 'string' && !this._isLookupNode(node)) {
+      return this._injector.injectDependencies(node, args || []) as T
+    }
+
+    /**
      * Get lookup node when node itself isn't a lookup node
      */
     const lookedupNode = typeof (node) === 'string' ? this.lookup(node) : node
+
+    /**
+     * Do not proceed when unable to lookup Ioc container namespace
+     */
+    if (!lookedupNode || !lookedupNode.type) {
+      throw IocLookupException.lookupFailed(node as string)
+    }
 
     /**
      * Attempt to make the lookedupNode.
@@ -644,34 +457,13 @@ export class Ioc implements IocContract {
     const value = this._resolveAndMake(lookedupNode || node, args)
 
     /**
-     * Return the value as it is when we are not using proxies or when `lookedupNode`
-     * is not a `lookup node`. (
-     *  WHAT?: Since in ternary operator we fallback to `node` for `lookedupNode`
-     *  it's possible that `lookedupNode` exists but not a lookup node really.
-     * )
+     * When not using proxies, then we must return the value untouched
      */
-    if (!this._useProxies || !this._isLookUpNode(lookedupNode)) {
+    if (!this._useProxies || isEsm(value)) {
       return value as T
     }
 
-    /**
-     * Wrap object inside proxy
-     */
-    if (this._isObject(value)) {
-      return (new IoCProxyObject(lookedupNode.namespace, value, this) as unknown) as T
-    }
-
-    /**
-     * Wrap class inside proxy
-     */
-    if (this._isClass(value)) {
-      return (IocProxyClass(lookedupNode.namespace, value, this) as unknown) as T
-    }
-
-    /**
-     * Return the value as it is
-     */
-    return value as T
+    return this._wrapAsProxy<T>(lookedupNode.namespace, value)
   }
 
   /**
@@ -682,17 +474,13 @@ export class Ioc implements IocContract {
    * This method is internally used by ioc container proxy objects to
    * point to a fake when `useProxies` is called and fake exists.
    */
-  public useFake<T extends any = any> (namespace: string): T {
+  public useFake<T extends any = any> (namespace: string, value?: any): T {
     const fake = this._fakes.get(namespace)
-
     if (!fake) {
       throw new Error(`Cannot find fake for ${namespace}`)
     }
 
-    if (!fake.cachedValue) {
-      fake.cachedValue = fake.callback(this)
-    }
-
+    fake.cachedValue = fake.cachedValue || fake.callback(this, value)
     return fake.cachedValue as T
   }
 
@@ -806,7 +594,7 @@ export class Ioc implements IocContract {
    * ```
    */
   public with (namespaces: string[], callback: (...args: any[]) => void): void {
-    this._ensureCallback(callback, 'ioc.with expect 2nd argument to be a function')
+    ensureIsFunction(callback, 'ioc.with expect 2nd argument to be a function')
     if (namespaces.every((namespace) => this.hasBinding(namespace, true))) {
       callback(...namespaces.map((namespace) => this.use(namespace)))
     }
@@ -816,19 +604,11 @@ export class Ioc implements IocContract {
    * Call method on an object and inject dependencies to it automatically.
    */
   public call<T extends object, K extends keyof T = any> (target: T, method: K, args?: any[]): any {
-    let injections = []
-    if (target.constructor.hasOwnProperty('inject')) {
-      injections = target.constructor['inject'][method] || []
-    }
-
-    const parentName = target.constructor.name
     if (typeof (target[method]) !== 'function') {
-      throw new Error(`Missing method ${method} on ${parentName}`)
+      throw new Error(`Missing method ${method} on ${target.constructor.name}`)
     }
 
-    return target[method as string](
-      ...this._makeDependencies(`${parentName}.${method}`, injections, args || []),
-    )
+    return this._injector.injectMethodDependencies(target, method as string, args || [])
   }
 
   /**

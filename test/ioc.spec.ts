@@ -22,7 +22,7 @@ test.group('Ioc', (group) => {
     await fs.cleanup()
   })
 
-  test('raise error when argument is not a function', (assert) => {
+  test('raise error when bind callback is not a function', (assert) => {
     const ioc = new Ioc()
     const fn = () => (ioc as any).bind('App/Foo', 'hello')
     assert.throw(fn, 'ioc.bind expect 2nd argument to be a function')
@@ -63,6 +63,112 @@ test.group('Ioc', (group) => {
 
     ioc.alias('App/Foo', 'foo')
     assert.strictEqual(ioc.use('foo'), 'foo')
+  })
+
+  test('return true from hasBinding when it exists', (assert) => {
+    const ioc = new Ioc()
+    ioc.bind('App/Foo', () => {
+      return { foo: true }
+    })
+
+    ioc.alias('App/Foo', 'Foo')
+
+    assert.isTrue(ioc.hasBinding('App/Foo'))
+    assert.isFalse(ioc.hasBinding('Foo'))
+    assert.isTrue(ioc.hasBinding('Foo', true))
+  })
+
+  test('return true from hasAlias when it exists', (assert) => {
+    const ioc = new Ioc()
+    ioc.bind('App/Foo', () => {
+      return { foo: true }
+    })
+
+    ioc.alias('App/Foo', 'Foo')
+    assert.isTrue(ioc.hasAlias('Foo'))
+  })
+
+  test('return alias namespace if exists', (assert) => {
+    const ioc = new Ioc()
+    ioc.bind('App/Foo', () => {
+      return { foo: true }
+    })
+
+    ioc.alias('App/Foo', 'Foo')
+
+    assert.isUndefined(ioc.getAliasNamespace('Bar'))
+    assert.equal(ioc.getAliasNamespace('Foo'), 'App/Foo')
+  })
+
+  test('wrap binding output object with a proxy when proxies are enabled', (assert) => {
+    const ioc = new Ioc()
+    ioc.bind('App/Foo', () => {
+      return { foo: true }
+    })
+
+    ioc.useProxies()
+    ioc.fake('App/Foo', () => {
+      return { foo: false }
+    })
+
+    assert.deepEqual(ioc.use('App/Foo'), { foo: false })
+  })
+
+  test('wrap binding output class with a proxy when proxies are enabled', (assert) => {
+    const ioc = new Ioc()
+    class User {}
+    class FakeUser {}
+
+    ioc.bind('App/Foo', () => {
+      return User
+    })
+
+    ioc.useProxies()
+    ioc.fake('App/Foo', () => {
+      return FakeUser
+    })
+
+    assert.instanceOf(new (ioc.use('App/Foo'))(), FakeUser)
+  })
+
+  test('proxy class static properties must point to fake class', (assert) => {
+    const ioc = new Ioc()
+    class User {
+      public static userName = 'virk'
+    }
+
+    class FakeUser {
+      public static userName = 'nikk'
+    }
+
+    ioc.bind('App/Foo', () => {
+      return User
+    })
+
+    ioc.useProxies()
+    ioc.fake('App/Foo', () => {
+      return FakeUser
+    })
+
+    assert.equal(ioc.use('App/Foo').userName, 'nikk')
+  })
+
+  test('do not proxy literal values', (assert) => {
+    const ioc = new Ioc()
+    class FakeUser {
+      public static userName = 'nikk'
+    }
+
+    ioc.bind('App/Foo', () => {
+      return 'foo'
+    })
+
+    ioc.useProxies()
+    ioc.fake('App/Foo', () => {
+      return FakeUser
+    })
+
+    assert.equal(ioc.use('App/Foo'), 'foo')
   })
 
   test('emit events in relationship when with use', (assert) => {
@@ -167,6 +273,12 @@ test.group('Ioc', (group) => {
       { namespace: 'App/Logger', parent: undefined, cached: true },
     ])
   })
+})
+
+test.group('Ioc | autoloads', (group) => {
+  group.afterEach(async () => {
+    await fs.cleanup()
+  })
 
   test('bind a directory to be autoloaded', async (assert) => {
     await fs.add('services/foo.js', `module.exports = { name: 'foo' }`)
@@ -184,7 +296,7 @@ test.group('Ioc', (group) => {
     ioc.autoload(fs.basePath, 'App')
 
     const fn = () => ioc.use('Apple/services/foo')
-    assert.throw(fn, 'Cannot find module \'Apple/services/foo\'')
+    assert.throw(fn, 'E_IOC_LOOKUP_FAILED: Cannot resolve Apple/services/foo namespace from the IoC Container')
   })
 
   test('cache require calls for autoloaded directories', async (assert) => {
@@ -215,7 +327,7 @@ test.group('Ioc', (group) => {
     ])
   })
 
-  test('track ioc calls inside autoloaded path', async (assert) => {
+  test('trace ioc calls inside autoloaded path', async (assert) => {
     await fs.add('services/foo.js', `
       const Foo = use('App/Foo')
       module.exports = { name: Foo.getName() }
@@ -261,51 +373,10 @@ test.group('Ioc', (group) => {
     ])
   })
 
-  test('return true from hasBinding when it exists', (assert) => {
+  test('raise error when lookup fails', (assert) => {
     const ioc = new Ioc()
-    ioc.bind('App/Foo', () => {
-      return { foo: true }
-    })
-
-    ioc.alias('App/Foo', 'Foo')
-
-    assert.isTrue(ioc.hasBinding('App/Foo'))
-    assert.isFalse(ioc.hasBinding('Foo'))
-    assert.isTrue(ioc.hasBinding('Foo', true))
-  })
-
-  test('return true from hasAlias when it exists', (assert) => {
-    const ioc = new Ioc()
-    ioc.bind('App/Foo', () => {
-      return { foo: true }
-    })
-
-    ioc.alias('App/Foo', 'Foo')
-
-    assert.isTrue(ioc.hasAlias('Foo'))
-  })
-
-  test('return alias namespace if exists', (assert) => {
-    const ioc = new Ioc()
-    ioc.bind('App/Foo', () => {
-      return { foo: true }
-    })
-
-    ioc.alias('App/Foo', 'Foo')
-
-    assert.isUndefined(ioc.getAliasNamespace('Bar'))
-    assert.equal(ioc.getAliasNamespace('Foo'), 'App/Foo')
-  })
-
-  test('fallback to require when namespace is not a binding, alias or autoload', (assert) => {
-    const ioc = new Ioc()
-    assert.deepEqual(ioc.use('japa'), test)
-  })
-
-  test('require relative files', async (assert) => {
-    await fs.add('foo.js', `module.exports = { name: 'foo' }`)
-    const ioc = new Ioc()
-    assert.deepEqual(ioc.use('./app/foo'), { name: 'foo' })
+    const fn = () => ioc.use('japa')
+    assert.throw(fn, 'E_IOC_LOOKUP_FAILED: Cannot resolve japa namespace from the IoC Container')
   })
 
   test('clear autoload cache for a given file', async (assert) => {
@@ -333,28 +404,72 @@ test.group('Ioc', (group) => {
     ioc.clearAutoloadCache('App/Foo')
   })
 
-  test('bind fake to ioc container', (assert) => {
-    const ioc = new Ioc()
-    ioc.fake('App/Foo', () => {
-      return 'Foo fake'
-    })
-    assert.equal(ioc.useFake('App/Foo'), 'Foo fake')
-  })
+  test('wrap autoloaded output object with a proxy when proxies are enabled', async (assert) => {
+    await fs.add('foo.js', `module.exports = { name: 'foo' }`)
 
-  test('attempt to use a non-existing fake must error', async (assert) => {
     const ioc = new Ioc()
-    const fn = () => ioc.useFake('App/Foo')
+    ioc.autoload(fs.basePath, 'App')
+    ioc.useProxies()
 
-    assert.throw(fn, 'Cannot find fake for App/Foo')
-  })
-
-  test('make sure fakes are always singleton', (assert) => {
-    const ioc = new Ioc()
-    ioc.fake('App/Foo', () => {
-      return Symbol('foo')
+    ioc.fake('App/foo', () => {
+      return { name: 'bar' }
     })
 
-    assert.strictEqual(ioc.useFake('App/Foo'), ioc.useFake('App/Foo'))
+    assert.deepEqual(ioc.use('App/foo'), { name: 'bar' })
+  })
+
+  test('wrap autoloaded output class with a proxy when proxies are enabled', async (assert) => {
+    await fs.add('foo.js', `module.exports = class User {}`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    ioc.useProxies()
+
+    class FakeUser {}
+
+    ioc.fake('App/foo', () => {
+      return FakeUser
+    })
+
+    assert.instanceOf(new (ioc.use('App/foo'))(), FakeUser)
+  })
+
+  test('wrap autoload esm default exports to proxy', async (assert) => {
+    await fs.add('bar.ts', `export default class User {}`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    ioc.useProxies()
+
+    class FakeUser {}
+
+    ioc.fake('App/bar', () => {
+      return FakeUser
+    })
+
+    assert.instanceOf(new (ioc.use('App/bar').default)(), FakeUser)
+  })
+
+  test('do not wrap esm named exports to proxy', async (assert) => {
+    await fs.add('bar.ts', `export class User {}`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    ioc.useProxies()
+
+    class FakeUser {}
+
+    ioc.fake('App/bar', () => {
+      return FakeUser
+    })
+
+    assert.notInstanceOf(new (ioc.use('App/bar').User)(), FakeUser)
+  })
+})
+
+test.group('Ioc | make', (group) => {
+  group.afterEach(async () => {
+    await fs.cleanup()
   })
 
   test('make instance of a class', (assert) => {
@@ -367,7 +482,7 @@ test.group('Ioc', (group) => {
   test('make instance of a class and inject dependencies', (assert) => {
     const ioc = new Ioc()
     class Foo {
-      constructor (public bar) {
+      constructor (public bar: Bar) {
       }
 
       static get inject () {
@@ -389,7 +504,7 @@ test.group('Ioc', (group) => {
   test('do not make instance when makePlain is set to true', (assert) => {
     const ioc = new Ioc()
     class Foo {
-      constructor (public bar) {
+      constructor (public bar: Bar) {
       }
 
       static get makePlain () {
@@ -430,7 +545,6 @@ test.group('Ioc', (group) => {
     })
 
     ioc.alias('App/Bar', 'Bar')
-
     assert.deepEqual(ioc.make('Bar'), Bar)
   })
 
@@ -444,11 +558,6 @@ test.group('Ioc', (group) => {
     const ioc = new Ioc()
     ioc.autoload(join(fs.basePath), 'Admin')
     assert.deepEqual(ioc.make<any>('Admin/Foo').name, 'foo')
-  })
-
-  test('do not make modules that fallback to node require', async (assert) => {
-    const ioc = new Ioc()
-    assert.deepEqual(ioc.make('japa'), test)
   })
 
   test('work fine with esm export default', async (assert) => {
@@ -471,6 +580,54 @@ test.group('Ioc', (group) => {
     assert.equal(ioc.make('App/Bar').Bar.name, 'Bar')
   })
 
+  test('wrap make output object to proxy', async (assert) => {
+    await fs.add('Bar.ts', `export default class Bar {
+      public name = 'bar'
+    }`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    ioc.useProxies()
+
+    class FakeBar {
+      public name: string
+      constructor (originalName: string) {
+        this.name = `fake${originalName}`
+      }
+    }
+
+    ioc.fake('App/Bar', (_container, user) => {
+      return new FakeBar(user.name)
+    })
+
+    assert.equal(ioc.make('App/Bar').name, 'fakebar')
+  })
+
+  test('do not wrap esm named modules to proxy', async (assert) => {
+    await fs.add('Bar.ts', `export class Bar {
+      public name = 'bar'
+    }`)
+
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+    ioc.useProxies()
+
+    class FakeBar {
+      public name: string
+      constructor (originalName: string) {
+        this.name = `fake${originalName}`
+      }
+    }
+
+    ioc.fake('App/Bar', (_container, user) => {
+      return new FakeBar(user.name)
+    })
+
+    assert.equal(ioc.make('App/Bar').Bar.name, 'Bar')
+  })
+})
+
+test.group('Ioc | with', () => {
   test('execute the callback when all bindings exists', async (assert) => {
     assert.plan(2)
 
@@ -498,49 +655,6 @@ test.group('Ioc', (group) => {
     ioc.with(['App/Foo', 'App/Bar'], () => {
       throw new Error('Never expected to be called')
     })
-  })
-
-  test('wrap return value to esm module', (assert) => {
-    const ioc = new Ioc()
-    class Foo {}
-
-    ioc.bind('App/Foo', () => {
-      return new Foo()
-    })
-
-    assert.instanceOf(ioc.useEsm<{ default: Foo }>('App/Foo').default, Foo)
-  })
-
-  test('wrap return value of autoloaded path to esm', async (assert) => {
-    await fs.add('Bar.ts', `export default class Bar {
-      public name = 'bar'
-    }`)
-
-    const ioc = new Ioc()
-    ioc.autoload(fs.basePath, 'App')
-    assert.equal(ioc.useEsm('App/Bar').default.name, 'Bar')
-  })
-
-  test('do not return value of named export from autoloaded path to esm', async (assert) => {
-    await fs.add('Bar.ts', `export class Bar {
-      public name = 'bar'
-    }`)
-
-    const ioc = new Ioc()
-    ioc.autoload(fs.basePath, 'App')
-    assert.isUndefined(ioc.useEsm('App/Bar').default)
-    assert.equal(ioc.useEsm('App/Bar').Bar.name, 'Bar')
-  })
-
-  test('manage autoload cache when use and useEsm are used together', async (assert) => {
-    await fs.add('Bar.ts', `export default class Bar {
-      public name = 'bar'
-    }`)
-
-    const ioc = new Ioc()
-    ioc.autoload(fs.basePath, 'App')
-    assert.equal(ioc.use('App/Bar').name, 'Bar')
-    assert.equal(ioc.useEsm('App/Bar').default.name, 'Bar')
   })
 })
 
@@ -935,92 +1049,6 @@ test.group('Ioc | Proxy', (group) => {
     assert.equal(value, 'foo')
   })
 
-  test('proxy autoloaded class using useEsm', async (assert) => {
-    await fs.add('Bar.ts', `export default class Bar {
-      public name = 'bar'
-    }`)
-
-    const ioc = new Ioc()
-    ioc.autoload(fs.basePath, 'App')
-
-    class BarFake {
-      public name = 'barfake'
-
-      public getName () {
-        return this.name
-      }
-    }
-
-    ioc.useProxies()
-
-    const value = ioc.useEsm('App/Bar')
-    assert.equal(new (value.default)().name, 'bar')
-
-    ioc.fake('App/Bar', () => {
-      return BarFake
-    })
-
-    assert.equal(new (value.default)().name, 'barfake')
-  })
-
-  test('do not proxy named modules', async (assert) => {
-    await fs.add('Bar.ts', `export class Bar {
-      public name = 'bar'
-    }`)
-
-    const ioc = new Ioc()
-    ioc.autoload(fs.basePath, 'App')
-
-    class BarFake {
-      public name = 'barfake'
-
-      public getName () {
-        return this.name
-      }
-    }
-
-    ioc.useProxies()
-
-    const value = ioc.useEsm('App/Bar')
-    assert.equal(new (value.Bar)().name, 'bar')
-
-    ioc.fake('App/Bar', () => {
-      return BarFake
-    })
-
-    assert.equal(new (value.Bar)().name, 'bar')
-  })
-
-  test('proxy bindings using useEsm', async (assert) => {
-    const ioc = new Ioc()
-    ioc.bind('App/Bar', () => {
-      class Bar {
-        public name = 'bar'
-      }
-
-      return Bar
-    })
-
-    class FooFake {
-      public name = 'foofake'
-
-      public getName () {
-        return this.name
-      }
-    }
-
-    ioc.useProxies()
-
-    const value = ioc.useEsm('App/Bar')
-    assert.equal(new (value.default)().name, 'bar')
-
-    ioc.fake('App/Bar', () => {
-      return FooFake
-    })
-
-    assert.equal(new (value.default)().name, 'foofake')
-  })
-
   test('proxy autoloaded class using use', async (assert) => {
     await fs.add('Bar.ts', `export = class Bar {
       public name = 'bar'
@@ -1227,9 +1255,7 @@ test.group('Ioc | inject decorator', () => {
 
     assert.deepEqual(Foo['inject'], { greet: [Bar, Object] })
   })
-})
 
-test.group('Ioc | make', () => {
   test('inject constructor dependencies injected via decorator', (assert) => {
     const ioc = new Ioc()
     class Bar {}
@@ -1367,6 +1393,16 @@ test.group('Ioc | lookup', (group) => {
       type: 'binding',
     })
   })
+
+  test('lookup autoload from namespace', (assert) => {
+    const ioc = new Ioc()
+    ioc.autoload(fs.basePath, 'App')
+
+    assert.deepEqual(ioc.lookup('App/Foo'), {
+      namespace: 'App/Foo',
+      type: 'autoload',
+    })
+  })
 })
 
 test.group('Ioc | lookup resolve', (group) => {
@@ -1391,14 +1427,14 @@ test.group('Ioc | lookup resolve', (group) => {
     assert.equal(ioc.use({ type: 'autoload', namespace: 'App/Foo' }), 'bar')
   })
 
-  test('do not resolve autoloaded path for binding lookup node', async (assert) => {
+  test('raise exception when unable to resolve lookup namespace', async (assert) => {
     await fs.add('Foo.js', `module.exports = 'bar'`)
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
     const fn = () => ioc.use({ type: 'binding', namespace: 'App/Foo' })
 
-    assert.throw(fn, 'Cannot resolve App/Foo binding from IoC container')
+    assert.throw(fn, 'E_IOC_BINDING_NOT_FOUND: Cannot resolve App/Foo binding from the IoC Container')
   })
 
   test('do not resolve binding for autoload lookup node', async (assert) => {
@@ -1445,13 +1481,13 @@ test.group('Ioc | lookup resolve', (group) => {
     assert.throw(fn, /Cannot find module/)
   })
 
-  test('do not make autoloaded path for binding lookup node', async (assert) => {
+  test('raise exception when unable to make lookup namespace', async (assert) => {
     await fs.add('Foo.js', `module.exports = 'bar'`)
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
     const fn = () => ioc.make({ type: 'binding', namespace: 'App/Foo' })
 
-    assert.throw(fn, 'Cannot resolve App/Foo binding from IoC container')
+    assert.throw(fn, 'E_IOC_BINDING_NOT_FOUND: Cannot resolve App/Foo binding from the IoC Container')
   })
 })
