@@ -16,7 +16,9 @@
 
 * [AutoloadCacheItem](_contracts_index_.md#autoloadcacheitem)
 * [BindCallback](_contracts_index_.md#bindcallback)
+* [BindFakeCallback](_contracts_index_.md#bindfakecallback)
 * [Binding](_contracts_index_.md#binding)
+* [FakeBinding](_contracts_index_.md#fakebinding)
 * [IocResolverLookupNode](_contracts_index_.md#iocresolverlookupnode)
 * [LookupNode](_contracts_index_.md#lookupnode)
 
@@ -48,11 +50,38 @@ Name | Type |
 
 ___
 
+###  BindFakeCallback
+
+Ƭ **BindFakeCallback**: *function*
+
+#### Type declaration:
+
+▸ (`app`: [IocContract](../interfaces/_contracts_index_.ioccontract.md), `value?`: any): *unknown*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`app` | [IocContract](../interfaces/_contracts_index_.ioccontract.md) |
+`value?` | any |
+
+___
+
 ###  Binding
 
 Ƭ **Binding**: *object*
 
 Shape of binding stored inside the IoC container
+
+#### Type declaration:
+
+___
+
+###  FakeBinding
+
+Ƭ **FakeBinding**: *object*
+
+Shape of fakes binding stored inside the IoC container
 
 #### Type declaration:
 

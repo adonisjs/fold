@@ -51,7 +51,6 @@ DI simpler.
 * [restore](_ioc_index_.ioc.md#restore)
 * [singleton](_ioc_index_.ioc.md#singleton)
 * [use](_ioc_index_.ioc.md#use)
-* [useEsm](_ioc_index_.ioc.md#useesm)
 * [useFake](_ioc_index_.ioc.md#usefake)
 * [useProxies](_ioc_index_.ioc.md#useproxies)
 * [with](_ioc_index_.ioc.md#with)
@@ -252,7 +251,7 @@ ___
 
 ###  fake
 
-▸ **fake**(`namespace`: string, `callback`: [BindCallback](../modules/_contracts_index_.md#bindcallback)): *void*
+▸ **fake**(`namespace`: string, `callback`: [BindFakeCallback](../modules/_contracts_index_.md#bindfakecallback)): *void*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -275,7 +274,7 @@ ioc.fake('App/User', function () {
 Name | Type |
 ------ | ------ |
 `namespace` | string |
-`callback` | [BindCallback](../modules/_contracts_index_.md#bindcallback) |
+`callback` | [BindFakeCallback](../modules/_contracts_index_.md#bindfakecallback) |
 
 **Returns:** *void*
 
@@ -577,32 +576,9 @@ Name | Type |
 
 ___
 
-###  useEsm
-
-▸ **useEsm**<**T**>(`node`: string | [LookupNode](../modules/_contracts_index_.md#lookupnode)): *T*
-
-*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
-
-Wraps the return value of `use` to an ESM module. This is used
-by the AdonisJs typescript transformer.
-
-**Type parameters:**
-
-▪ **T**: *any*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`node` | string &#124; [LookupNode](../modules/_contracts_index_.md#lookupnode) |
-
-**Returns:** *T*
-
-___
-
 ###  useFake
 
-▸ **useFake**<**T**>(`namespace`: string): *T*
+▸ **useFake**<**T**>(`namespace`: string, `value?`: any): *T*
 
 *Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
 
@@ -622,6 +598,7 @@ point to a fake when `useProxies` is called and fake exists.
 Name | Type |
 ------ | ------ |
 `namespace` | string |
+`value?` | any |
 
 **Returns:** *T*
 
@@ -629,12 +606,16 @@ ___
 
 ###  useProxies
 
-▸ **useProxies**(): *this*
-
-*Implementation of [IocContract](../interfaces/_contracts_index_.ioccontract.md)*
+▸ **useProxies**(`enable`: boolean): *this*
 
 Instruct IoC container to use proxies when returning
 bindings from `use` and `make` methods.
+
+**Parameters:**
+
+Name | Type | Default |
+------ | ------ | ------ |
+`enable` | boolean | true |
 
 **Returns:** *this*
 
