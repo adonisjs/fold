@@ -39,6 +39,10 @@ const objectHandler = {
     return callTrap(target, 'get', ...args)
   },
 
+  apply (target, ...args) {
+    return callTrap(target, 'apply', ...args)
+  },
+
   defineProperty (target, ...args) {
     return callTrap(target, 'defineProperty', ...args)
   },
@@ -83,15 +87,11 @@ const objectHandler = {
 /**
  * Proxy handler to handle classes and functions
  */
-const classHandler = {
+const classHandler = Object.assign({}, objectHandler, {
   construct (target, ...args) {
     return callTrap(target, 'construct', args)
   },
-
-  get (target, ...args) {
-    return callTrap(target, 'get', ...args)
-  },
-}
+})
 
 /**
  * Proxies the objects to fallback to fake, when it exists.

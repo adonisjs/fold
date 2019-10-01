@@ -153,6 +153,47 @@ test.group('Ioc', (group) => {
     assert.equal(ioc.use('App/Foo').userName, 'nikk')
   })
 
+  test('proxy class constructor must point to the right object', (assert) => {
+    const ioc = new Ioc()
+    class User {
+      public static userName = 'virk'
+    }
+
+    ioc.bind('App/Foo', () => {
+      return User
+    })
+    ioc.useProxies()
+
+    const Foo = ioc.use('App/Foo')
+    const foo = new Foo()
+
+    assert.equal(foo.constructor.userName, 'virk')
+  })
+
+  test('extending via the proxy class must work fine', (assert) => {
+    const ioc = new Ioc()
+    class User {
+      public static userName = 'virk'
+      public userName = 'virk'
+    }
+
+    ioc.bind('App/Foo', () => {
+      return User
+    })
+    ioc.useProxies()
+
+    class Bar extends ioc.use('App/Foo') {
+      public static username = 'nikk'
+      public username = 'nikk'
+    }
+
+    const bar = new Bar()
+    assert.equal(bar.constructor['userName'], 'virk')
+    assert.equal(bar.constructor['userName'], 'virk')
+    assert.equal(bar.username, 'nikk')
+    assert.equal(bar.username, 'nikk')
+  })
+
   test('do not proxy literal values', (assert) => {
     const ioc = new Ioc()
     class FakeUser {
