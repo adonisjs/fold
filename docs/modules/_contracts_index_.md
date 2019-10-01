@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Contracts/index&quot;](_contracts_index_.md)
+[@adonisjs/fold](../README.md) › ["Contracts/index"](_contracts_index_.md)
 
 # External module: "Contracts/index"
 

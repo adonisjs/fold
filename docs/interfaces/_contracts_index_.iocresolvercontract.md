@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Contracts/index&quot;](../modules/_contracts_index_.md) › [IocResolverContract](_contracts_index_.iocresolvercontract.md)
+[@adonisjs/fold](../README.md) › ["Contracts/index"](../modules/_contracts_index_.md) › [IocResolverContract](_contracts_index_.iocresolvercontract.md)
 
 # Interface: IocResolverContract
 

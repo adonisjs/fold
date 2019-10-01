@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Exceptions/IocLookupException&quot;](_exceptions_ioclookupexception_.md)
+[@adonisjs/fold](../README.md) › ["Exceptions/IocLookupException"](_exceptions_ioclookupexception_.md)
 
 # External module: "Exceptions/IocLookupException"
 

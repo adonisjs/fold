@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Resolver/index&quot;](../modules/_resolver_index_.md) › [IocResolver](_resolver_index_.iocresolver.md)
+[@adonisjs/fold](../README.md) › ["Resolver/index"](../modules/_resolver_index_.md) › [IocResolver](_resolver_index_.iocresolver.md)
 
 # Class: IocResolver
 

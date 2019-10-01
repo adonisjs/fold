@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Resolver/index&quot;](_resolver_index_.md)
+[@adonisjs/fold](../README.md) › ["Resolver/index"](_resolver_index_.md)
 
 # External module: "Resolver/index"
 

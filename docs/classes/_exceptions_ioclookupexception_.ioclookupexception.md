@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Exceptions/IocLookupException&quot;](../modules/_exceptions_ioclookupexception_.md) › [IocLookupException](_exceptions_ioclookupexception_.ioclookupexception.md)
+[@adonisjs/fold](../README.md) › ["Exceptions/IocLookupException"](../modules/_exceptions_ioclookupexception_.md) › [IocLookupException](_exceptions_ioclookupexception_.ioclookupexception.md)
 
 # Class: IocLookupException
 
@@ -8,7 +6,7 @@
 
 * Exception
 
-  * **IocLookupException**
+  ↳ **IocLookupException**
 
 ## Index
 

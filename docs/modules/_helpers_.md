@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;helpers&quot;](_helpers_.md)
+[@adonisjs/fold](../README.md) › ["helpers"](_helpers_.md)
 
 # External module: "helpers"
 

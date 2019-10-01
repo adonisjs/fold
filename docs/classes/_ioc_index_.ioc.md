@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Ioc/index&quot;](../modules/_ioc_index_.md) › [Ioc](_ioc_index_.ioc.md)
+[@adonisjs/fold](../README.md) › ["Ioc/index"](../modules/_ioc_index_.md) › [Ioc](_ioc_index_.ioc.md)
 
 # Class: Ioc
 

@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Ioc/Tracer&quot;](_ioc_tracer_.md)
+[@adonisjs/fold](../README.md) › ["Ioc/Tracer"](_ioc_tracer_.md)
 
 # External module: "Ioc/Tracer"
 

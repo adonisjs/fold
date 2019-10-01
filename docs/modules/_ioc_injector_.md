@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Ioc/Injector&quot;](_ioc_injector_.md)
+[@adonisjs/fold](../README.md) › ["Ioc/Injector"](_ioc_injector_.md)
 
 # External module: "Ioc/Injector"
 

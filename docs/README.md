@@ -1,6 +1,4 @@
-**[@adonisjs/fold](README.md)**
-
-[Globals](README.md)
+[@adonisjs/fold](README.md)
 
 # @adonisjs/fold
 

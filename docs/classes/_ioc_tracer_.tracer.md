@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Ioc/Tracer&quot;](../modules/_ioc_tracer_.md) › [Tracer](_ioc_tracer_.tracer.md)
+[@adonisjs/fold](../README.md) › ["Ioc/Tracer"](../modules/_ioc_tracer_.md) › [Tracer](_ioc_tracer_.tracer.md)
 
 # Class: Tracer
 
@@ -12,7 +10,7 @@ how tracer works
 
 * internal
 
-  * **Tracer**
+  ↳ **Tracer**
 
 ## Implements
 

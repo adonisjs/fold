@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Exceptions/InvalidInjectionException&quot;](../modules/_exceptions_invalidinjectionexception_.md) › [InvalidInjectionException](_exceptions_invalidinjectionexception_.invalidinjectionexception.md)
+[@adonisjs/fold](../README.md) › ["Exceptions/InvalidInjectionException"](../modules/_exceptions_invalidinjectionexception_.md) › [InvalidInjectionException](_exceptions_invalidinjectionexception_.invalidinjectionexception.md)
 
 # Class: InvalidInjectionException
 
@@ -8,7 +6,7 @@
 
 * Exception
 
-  * **InvalidInjectionException**
+  ↳ **InvalidInjectionException**
 
 ## Index
 

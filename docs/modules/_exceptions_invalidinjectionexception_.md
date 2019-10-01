@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Exceptions/InvalidInjectionException&quot;](_exceptions_invalidinjectionexception_.md)
+[@adonisjs/fold](../README.md) › ["Exceptions/InvalidInjectionException"](_exceptions_invalidinjectionexception_.md)
 
 # External module: "Exceptions/InvalidInjectionException"
 

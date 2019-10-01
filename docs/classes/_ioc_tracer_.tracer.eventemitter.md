@@ -1,6 +1,4 @@
-**[@adonisjs/fold](../README.md)**
-
-[Globals](../README.md) › [&quot;Ioc/Tracer&quot;](../modules/_ioc_tracer_.md) › [Tracer](_ioc_tracer_.tracer.md) › [EventEmitter](_ioc_tracer_.tracer.eventemitter.md)
+[@adonisjs/fold](../README.md) › ["Ioc/Tracer"](../modules/_ioc_tracer_.md) › [Tracer](_ioc_tracer_.tracer.md) › [EventEmitter](_ioc_tracer_.tracer.eventemitter.md)
 
 # Class: EventEmitter
 
