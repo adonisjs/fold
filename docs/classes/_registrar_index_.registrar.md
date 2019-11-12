@@ -27,13 +27,14 @@
 
 ###  constructor
 
-\+ **new Registrar**(`ioc`: [IocContract](../interfaces/_contracts_index_.ioccontract.md)): *[Registrar](_registrar_index_.registrar.md)*
+\+ **new Registrar**(`ioc`: [IocContract](../interfaces/_contracts_index_.ioccontract.md), `_basePath?`: undefined | string): *[Registrar](_registrar_index_.registrar.md)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `ioc` | [IocContract](../interfaces/_contracts_index_.ioccontract.md) |
+`_basePath?` | undefined &#124; string |
 
 **Returns:** *[Registrar](_registrar_index_.registrar.md)*
 

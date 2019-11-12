@@ -375,13 +375,24 @@ ___
 
 ### `Static` once
 
-▸ **once**(`emitter`: EventEmitter, `event`: string | symbol): *Promise‹any[]›*
+▸ **once**(`emitter`: NodeEventTarget, `event`: string | symbol): *Promise‹any[]›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`emitter` | EventEmitter |
+`emitter` | NodeEventTarget |
 `event` | string &#124; symbol |
+
+**Returns:** *Promise‹any[]›*
+
+▸ **once**(`emitter`: DOMEventTarget, `event`: string): *Promise‹any[]›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`emitter` | DOMEventTarget |
+`event` | string |
 
 **Returns:** *Promise‹any[]›*
