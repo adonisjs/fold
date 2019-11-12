@@ -117,7 +117,6 @@ test.group('Registrar', (group) => {
   })
 
   test('raise exception when provider is not exported as a default export', async (assert) => {
-
     await fs.add('providers/BarProvider.ts', `export class MyProvider {
       public registered = false
       public booted = false
@@ -136,5 +135,63 @@ test.group('Registrar', (group) => {
     const fn = () => registrar.register()
 
     assert.throw(fn, /Make sure export default the provider/)
+  })
+
+  test('resolve providers from relative path', async (assert) => {
+    await fs.add('providers/FooProvider.js', `module.exports = class MyProvider {
+      constructor () {
+        this.registered = false
+      }
+
+      register () {
+        this.registered = true
+      }
+    }`)
+
+    const registrar = new Registrar(new Ioc(), fs.basePath)
+    registrar.useProviders(['./providers/FooProvider.js'])
+
+    const providers = registrar.register()
+    assert.isTrue((providers[0] as any).registered)
+  })
+
+  test('resolve sub providers from relative path', async (assert) => {
+    await fs.add('providers/BazProvider.ts', `export default class MyProvider {
+      public registered = false
+      public booted = false
+
+      register () {
+        this.registered = true
+      }
+
+      async boot () {
+        this.booted = true
+      }
+    }`)
+
+    await fs.add('providers/BarProvider.ts', `export default class MyProvider {
+      public registered = false
+      public booted = false
+
+      public provides = ['./providers/BazProvider']
+
+      register () {
+        this.registered = true
+      }
+
+      async boot () {
+        this.booted = true
+      }
+    }`)
+
+    const registrar = new Registrar(new Ioc(false), fs.basePath)
+    registrar.useProviders(['./providers/BarProvider'])
+
+    const providers = await registrar.registerAndBoot()
+    assert.isTrue((providers[0] as any).registered)
+    assert.isTrue((providers[0] as any).booted)
+
+    assert.isTrue((providers[1] as any).registered)
+    assert.isTrue((providers[1] as any).booted)
   })
 })

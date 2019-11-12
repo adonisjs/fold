@@ -11,7 +11,7 @@
 * file that was distributed with this source code.
 */
 
-import { esmRequire } from '@poppinss/utils'
+import { esmRequire, resolveFrom } from '@poppinss/utils'
 import { IocContract } from '../Contracts'
 
 export class Registrar {
@@ -32,7 +32,7 @@ export class Registrar {
    */
   private _collected: boolean = false
 
-  constructor (public ioc: IocContract) {
+  constructor (public ioc: IocContract, private _basePath?: string) {
   }
 
   /**
@@ -42,7 +42,9 @@ export class Registrar {
    * automatically.
    */
   private _loadProvider (providerPath: string) {
+    providerPath = this._basePath ? resolveFrom(this._basePath, providerPath) : providerPath
     const provider = esmRequire(providerPath)
+
     if (typeof (provider) !== 'function') {
       throw new Error(`Make sure export default the provider from ${providerPath}`)
     }
