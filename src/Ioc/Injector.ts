@@ -12,14 +12,14 @@ import { isClass, isPrimtiveConstructor } from '../helpers'
 import { InvalidInjectionException } from '../Exceptions/InvalidInjectionException'
 
 export class Injector {
-  constructor (private _container: IocContract) {
+  constructor (private container: IocContract) {
   }
 
   /**
    * Resolves the injections to be injected to a method or the
    * class constructor
    */
-  private _resolveInjections (targetName: string, injections: any[], runtimeValues: any[]): any[] {
+  private resolveInjections (targetName: string, injections: any[], runtimeValues: any[]): any[] {
     /**
      * If the runtime values length is greater or same as the length
      * of injections, then we treat them as the source of truth
@@ -45,7 +45,7 @@ export class Injector {
         throw InvalidInjectionException.invoke(injections[index], targetName, index)
       }
 
-      return this._container['make'](injection)
+      return this.container['make'](injection)
     })
   }
 
@@ -58,7 +58,7 @@ export class Injector {
     }
 
     const injections = target.hasOwnProperty('inject') ? (target.inject.instance || []) : []
-    return new target(...this._resolveInjections(target.name, injections, runtimeValues))
+    return new target(...this.resolveInjections(target.name, injections, runtimeValues))
   }
 
   /**
@@ -71,6 +71,6 @@ export class Injector {
       ? (constructor.inject[method] || [])
       : []
 
-    return target[method](...this._resolveInjections(`${constructor.name}.${method}`, injections, runtimeValues))
+    return target[method](...this.resolveInjections(`${constructor.name}.${method}`, injections, runtimeValues))
   }
 }

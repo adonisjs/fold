@@ -24,35 +24,35 @@ export type IocResolverLookupNode = {
  * internally caches the IoC container lookup nodes to boost performance.
  */
 export class IocResolver {
-  private _lookupCache: { [key: string]: IocResolverLookupNode } = {}
+  private lookupCache: { [key: string]: IocResolverLookupNode } = {}
 
   /**
    * The namespace that will be used a prefix when resolving
    * bindings
    */
-  private _prefixNamespace = this._getPrefixNamespace()
+  private prefixNamespace = this.getPrefixNamespace()
 
   constructor (
-    private _container: IocContract,
-    private _fallbackMethod?: string,
-    private _rcNamespaceKey?: string,
-    private _fallbackNamespace?: string,
+    private container: IocContract,
+    private fallbackMethod?: string,
+    private rcNamespaceKey?: string,
+    private fallbackNamespace?: string,
   ) {}
 
   /**
    * Returns the prefix namespace by giving preference to the
    * `.adonisrc.json` file
    */
-  private _getPrefixNamespace (): string | undefined {
-    if (!this._rcNamespaceKey) {
-      return this._fallbackNamespace
+  private getPrefixNamespace (): string | undefined {
+    if (!this.rcNamespaceKey) {
+      return this.fallbackNamespace
     }
 
     try {
-      const application = this._container.use('Adonis/Core/Application')
-      return application.namespacesMap.get(this._rcNamespaceKey) || this._fallbackNamespace
+      const application = this.container.use('Adonis/Core/Application')
+      return application.namespacesMap.get(this.rcNamespaceKey) || this.fallbackNamespace
     } catch (error) {
-      return this._fallbackNamespace
+      return this.fallbackNamespace
     }
   }
 
@@ -61,19 +61,19 @@ export class IocResolver {
    */
   public resolve (
     namespace: string,
-    prefixNamespace: string | undefined = this._prefixNamespace,
+    prefixNamespace: string | undefined = this.prefixNamespace,
   ): IocResolverLookupNode {
     const cacheKey = prefixNamespace ? `${prefixNamespace}/${namespace}` : namespace
 
     /**
      * Return from cache, when the node exists
      */
-    const cacheNode = this._lookupCache[cacheKey]
+    const cacheNode = this.lookupCache[cacheKey]
     if (cacheNode) {
       return cacheNode
     }
 
-    let method = this._fallbackMethod || 'handle'
+    let method = this.fallbackMethod || 'handle'
 
     /**
      * Split the namespace to lookup the method on it. If method isn't
@@ -84,7 +84,7 @@ export class IocResolver {
       method = tokens.pop()!
     }
 
-    const lookupNode = this._container.lookup(tokens.join('.'), prefixNamespace)
+    const lookupNode = this.container.lookup(tokens.join('.'), prefixNamespace)
 
     /**
      * Raise exception when unable to resolve the binding from the container.
@@ -97,8 +97,8 @@ export class IocResolver {
       throw new Exception(`Unable to resolve ${tokens.join('.')} namespace from IoC container`)
     }
 
-    this._lookupCache[cacheKey] = { ...lookupNode, method }
-    return this._lookupCache[cacheKey]
+    this.lookupCache[cacheKey] = { ...lookupNode, method }
+    return this.lookupCache[cacheKey]
   }
 
   /**
@@ -114,6 +114,6 @@ export class IocResolver {
       ? this.resolve(namespace, prefixNamespace)
       : namespace
 
-    return this._container.call(this._container.make(lookupNode.namespace), lookupNode.method, args || [])
+    return this.container.call(this.container.make(lookupNode.namespace), lookupNode.method, args || [])
   }
 }

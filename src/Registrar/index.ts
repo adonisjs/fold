@@ -18,21 +18,21 @@ export class Registrar {
   /**
    * The first level of provider paths provided to the registrar
    */
-  private _providersPaths: string[]
+  private providersPaths: string[] = []
 
   /**
    * An array of loaded providers. Their can be more providers than the
    * `_providersPaths` array, since each provider can provide it's
    * own sub providers
    */
-  private _providers: any[] = []
+  private providers: any[] = []
 
   /**
    * Whether or not the providers can be collected
    */
-  private _collected: boolean = false
+  private collected: boolean = false
 
-  constructor (public ioc: IocContract, private _basePath?: string) {
+  constructor (public ioc: IocContract, private basePath?: string) {
   }
 
   /**
@@ -41,8 +41,8 @@ export class Registrar {
    * imports, then default exports are handled
    * automatically.
    */
-  private _loadProvider (providerPath: string) {
-    providerPath = this._basePath ? resolveFrom(this._basePath, providerPath) : providerPath
+  private loadProvider (providerPath: string) {
+    providerPath = this.basePath ? resolveFrom(this.basePath, providerPath) : providerPath
     const provider = esmRequire(providerPath)
 
     if (typeof (provider) !== 'function') {
@@ -57,13 +57,13 @@ export class Registrar {
    * `providers` collection. This collection is later used to
    * register and boot providers
    */
-  private _collect (providerPaths) {
+  private collect (providerPaths) {
     providerPaths.forEach((providerPath) => {
-      const provider = this._loadProvider(providerPath)
-      this._providers.push(provider)
+      const provider = this.loadProvider(providerPath)
+      this.providers.push(provider)
 
       if (provider.provides) {
-        this._collect(provider.provides)
+        this.collect(provider.provides)
       }
     })
   }
@@ -72,7 +72,7 @@ export class Registrar {
    * Register an array of provider paths
    */
   public useProviders (providersPaths: string[]): this {
-    this._providersPaths = providersPaths
+    this.providersPaths = providersPaths
     return this
   }
 
@@ -84,23 +84,23 @@ export class Registrar {
    * to boot them as well.
    */
   public register () {
-    if (this._collected) {
-      return this._providers
+    if (this.collected) {
+      return this.providers
     }
 
-    this._collected = true
-    this._collect(this._providersPaths)
+    this.collected = true
+    this.collect(this.providersPaths)
 
     /**
      * Register collected providers
      */
-    this._providers.forEach((provider) => {
+    this.providers.forEach((provider) => {
       if (typeof (provider.register) === 'function') {
         provider.register()
       }
     })
 
-    return this._providers
+    return this.providers
   }
 
   /**

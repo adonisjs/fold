@@ -29,13 +29,13 @@ import {
 } from '../helpers'
 
 import {
+  Binding,
+  LookupNode,
+  FakeBinding,
   IocContract,
   BindCallback,
   BindFakeCallback,
-  Binding,
   AutoloadCacheItem,
-  LookupNode,
-  FakeBinding,
 } from '../Contracts'
 
 /**
@@ -47,7 +47,7 @@ import {
  * DI simpler.
  */
 export class Ioc implements IocContract {
-  public tracer = tracer(this._emitEvents)
+  public tracer = tracer(this.emitEvents)
 
   /**
    * Autoloaded directories under a namespace
@@ -56,48 +56,48 @@ export class Ioc implements IocContract {
 
   /**
    * An array of autoloaded aliases, stored along side with
-   * `_autoloads` for a quick lookup on keys
+   * `autoloads` for a quick lookup on keys
    */
   public autoloadedAliases: string[] = []
 
   /**
    * Autoloaded cache to improve the `require` speed, which is dog slow.
    */
-  private _autoloadsCache: Map<string, AutoloadCacheItem> = new Map()
+  private autoloadsCache: Map<string, AutoloadCacheItem> = new Map()
 
   /**
    * Copy of aliases
    */
-  private _aliases: { [alias: string]: string } = {}
+  private aliases: { [alias: string]: string } = {}
 
   /**
    * Copy of actual bindings
    */
-  private _bindings: { [namespace: string]: Binding } = {}
+  private bindings: { [namespace: string]: Binding } = {}
 
   /**
    * Copy of fakes as a Map, since fakes are subjective to
    * mutations
    */
-  private _fakes: Map<string, FakeBinding> = new Map()
+  private fakes: Map<string, FakeBinding> = new Map()
 
   /**
    * Using proxies or not? Fakes only works when below one
    * is set to true.
    */
-  private _useProxies = false
+  private proxiesEnabled = false
 
-  private _injector = new Injector(this)
+  private injector = new Injector(this)
 
-  constructor (private _emitEvents = false) {
+  constructor (private emitEvents = false) {
   }
 
   /**
    * Returns the binding return value. This method must be called when
    * [[hasBinding]] returns true.
    */
-  private _resolveBinding (namespace: string) {
-    const binding = this._bindings[namespace]
+  private resolveBinding (namespace: string) {
+    const binding = this.bindings[namespace]
     if (!binding) {
       throw IocLookupException.missingBinding(namespace)
     }
@@ -126,8 +126,8 @@ export class Ioc implements IocContract {
    *
    * Make sure to call this method when [[isAutoloadNamespace]] returns true.
    */
-  private _autoload (namespace: string) {
-    const cacheEntry = this._autoloadsCache.get(namespace)
+  private resolveAutoload (namespace: string) {
+    const cacheEntry = this.autoloadsCache.get(namespace)
     this.tracer.in(namespace, !!cacheEntry)
 
     /**
@@ -141,10 +141,10 @@ export class Ioc implements IocContract {
     const baseNamespace = this.getAutoloadBaseNamespace(namespace)!
     const diskPath = namespace.replace(baseNamespace, this.autoloads[baseNamespace])
     const absPath = require.resolve(normalize(diskPath))
-    this._autoloadsCache.set(namespace, { diskPath: absPath, cachedValue: require(absPath) })
+    this.autoloadsCache.set(namespace, { diskPath: absPath, cachedValue: require(absPath) })
 
     this.tracer.out()
-    return this._autoloadsCache.get(namespace)!.cachedValue
+    return this.autoloadsCache.get(namespace)!.cachedValue
   }
 
   /**
@@ -152,30 +152,30 @@ export class Ioc implements IocContract {
    * combinations of `bindings`, `aliases`, `autoloading`
    * and finally falling back to `nodejs require`.
    */
-  private _resolve (node: LookupNode) {
+  private resolve (node: LookupNode) {
     switch (node.type) {
       case 'binding':
-        return this._resolveBinding(node.namespace)
+        return this.resolveBinding(node.namespace)
       case 'autoload':
-        return this._autoload(node.namespace)
+        return this.resolveAutoload(node.namespace)
     }
   }
 
   /**
    * Resolves a namespace and injects it's dependencies to it
    */
-  private _resolveAndMake (node: LookupNode, args?: string[]) {
+  private resolveAndMake (node: LookupNode, args?: string[]) {
     switch (node.type) {
       case 'binding':
-        return this._resolveBinding(node.namespace)
+        return this.resolveBinding(node.namespace)
       case 'autoload':
-        let value = this._autoload(node.namespace)
+        let value = this.resolveAutoload(node.namespace)
 
         /**
          * We return an instance of default export for esm modules
          */
         value = isEsm(value) && value.default ? value.default : value
-        return this._injector.injectDependencies(value, args || [])
+        return this.injector.injectDependencies(value, args || [])
     }
   }
 
@@ -183,13 +183,13 @@ export class Ioc implements IocContract {
    * Removes an autoload namespace from the cache. If the value doesn't
    * exists in the cache, then this method will be a noop.
    */
-  private _removeAutoloadFromCache (namespace: string, removeRequire: boolean) {
-    const item = this._autoloadsCache.get(namespace)
+  private removeAutoloadFromCache (namespace: string, removeRequire: boolean) {
+    const item = this.autoloadsCache.get(namespace)
     if (!item) {
       return
     }
 
-    this._autoloadsCache.delete(namespace)
+    this.autoloadsCache.delete(namespace)
     if (removeRequire) {
       clearRequireCache(item.diskPath)
     }
@@ -199,7 +199,7 @@ export class Ioc implements IocContract {
    * Wraps object and class to a proxy for enabling the fakes
    * API
    */
-  private _wrapAsProxy<T extends any> (namespace: string, value: any): T {
+  private wrapAsProxy<T extends any> (namespace: string, value: any): T {
     /**
      * Wrap objects inside proxy
      */
@@ -220,7 +220,7 @@ export class Ioc implements IocContract {
   /**
    * Returns a boolean telling if value is a lookup node or not
    */
-  private _isLookupNode (value: any): value is LookupNode {
+  private isLookupNode (value: any): value is LookupNode {
     return value && value.type && value.namespace
   }
 
@@ -229,7 +229,7 @@ export class Ioc implements IocContract {
    * bindings from `use` and `make` methods.
    */
   public useProxies (enable: boolean = true): this {
-    this._useProxies = !!enable
+    this.proxiesEnabled = !!enable
     return this
   }
 
@@ -249,7 +249,7 @@ export class Ioc implements IocContract {
   public bind (namespace: string, callback: BindCallback): void {
     ensureIsFunction(callback, 'ioc.bind expect 2nd argument to be a function')
     this.tracer.emit('bind', { namespace, singleton: false })
-    this._bindings[namespace] = { callback, singleton: false }
+    this.bindings[namespace] = { callback, singleton: false }
   }
 
   /**
@@ -267,7 +267,7 @@ export class Ioc implements IocContract {
   public singleton (namespace: string, callback: BindCallback): void {
     ensureIsFunction(callback, 'ioc.singleton expect 2nd argument to be a function')
     this.tracer.emit('bind', { namespace, singleton: true })
-    this._bindings[namespace] = { callback, singleton: true }
+    this.bindings[namespace] = { callback, singleton: true }
   }
 
   /**
@@ -279,7 +279,7 @@ export class Ioc implements IocContract {
    */
   public alias (namespace: string, alias: string): void {
     this.tracer.emit('alias', { alias, namespace })
-    this._aliases[alias] = namespace
+    this.aliases[alias] = namespace
   }
 
   /**
@@ -332,13 +332,13 @@ export class Ioc implements IocContract {
    */
   public clearAutoloadCache (namespace?: string, clearModulesCache = false): void {
     if (!namespace) {
-      Array.from(this._autoloadsCache.keys()).forEach((key) => {
-        this._removeAutoloadFromCache(key, clearModulesCache)
+      Array.from(this.autoloadsCache.keys()).forEach((key) => {
+        this.removeAutoloadFromCache(key, clearModulesCache)
       })
       return
     }
 
-    this._removeAutoloadFromCache(namespace, clearModulesCache)
+    this.removeAutoloadFromCache(namespace, clearModulesCache)
   }
 
   /**
@@ -359,7 +359,7 @@ export class Ioc implements IocContract {
   public fake (namespace: string, callback: BindFakeCallback): void {
     ensureIsFunction(callback, 'ioc.fake expect 2nd argument to be a function')
     this.tracer.emit('fake', { namespace })
-    this._fakes.set(namespace, { callback })
+    this.fakes.set(namespace, { callback })
   }
 
   /**
@@ -395,12 +395,12 @@ export class Ioc implements IocContract {
     /**
      * Attempt to resolve the module
      */
-    let value = this._resolve(lookedupNode)
+    let value = this.resolve(lookedupNode)
 
     /**
      * When not using proxies, then we must return the value untouched
      */
-    if (!this._useProxies) {
+    if (!this.proxiesEnabled) {
       return value as T
     }
 
@@ -410,13 +410,13 @@ export class Ioc implements IocContract {
     if (isEsm(value)) {
       if (value.default) {
         value = Object.assign({}, value, {
-          default: this._wrapAsProxy(lookedupNode.namespace, value.default),
+          default: this.wrapAsProxy(lookedupNode.namespace, value.default),
         })
       }
       return value as T
     }
 
-    return this._wrapAsProxy<T>(lookedupNode.namespace, value)
+    return this.wrapAsProxy<T>(lookedupNode.namespace, value)
   }
 
   /**
@@ -435,8 +435,8 @@ export class Ioc implements IocContract {
      * Also we do not support fakes for raw values and hence there is
      * no point in wrapping it to a proxy
      */
-    if (typeof (node) !== 'string' && !this._isLookupNode(node)) {
-      return this._injector.injectDependencies(node, args || []) as T
+    if (typeof (node) !== 'string' && !this.isLookupNode(node)) {
+      return this.injector.injectDependencies(node, args || []) as T
     }
 
     /**
@@ -454,16 +454,16 @@ export class Ioc implements IocContract {
     /**
      * Attempt to make the lookedupNode.
      */
-    const value = this._resolveAndMake(lookedupNode || node, args)
+    const value = this.resolveAndMake(lookedupNode || node, args)
 
     /**
      * When not using proxies, then we must return the value untouched
      */
-    if (!this._useProxies || isEsm(value)) {
+    if (!this.proxiesEnabled || isEsm(value)) {
       return value as T
     }
 
-    return this._wrapAsProxy<T>(lookedupNode.namespace, value)
+    return this.wrapAsProxy<T>(lookedupNode.namespace, value)
   }
 
   /**
@@ -475,7 +475,7 @@ export class Ioc implements IocContract {
    * point to a fake when `useProxies` is called and fake exists.
    */
   public useFake<T extends any = any> (namespace: string, value?: any): T {
-    const fake = this._fakes.get(namespace)
+    const fake = this.fakes.get(namespace)
     if (!fake) {
       throw new Error(`Cannot find fake for ${namespace}`)
     }
@@ -489,7 +489,7 @@ export class Ioc implements IocContract {
    * not.
    */
   public hasFake (namespace: string): boolean {
-    return this._fakes.has(namespace)
+    return this.fakes.has(namespace)
   }
 
   /**
@@ -497,7 +497,7 @@ export class Ioc implements IocContract {
    * exists
    */
   public hasAlias (namespace: string): boolean {
-    return !!this._aliases[namespace]
+    return !!this.aliases[namespace]
   }
 
   /**
@@ -511,9 +511,9 @@ export class Ioc implements IocContract {
    * ```
    */
   public hasBinding (namespace: string, checkAliases = false): boolean {
-    const binding = this._bindings[namespace]
+    const binding = this.bindings[namespace]
     if (!binding && checkAliases) {
-      return !!this._bindings[this.getAliasNamespace(namespace)!]
+      return !!this.bindings[this.getAliasNamespace(namespace)!]
     }
 
     return !!binding
@@ -525,7 +525,7 @@ export class Ioc implements IocContract {
    * before using this method.
    */
   public getAliasNamespace (namespace: string): string | undefined {
-    return this._aliases[namespace]
+    return this.aliases[namespace]
   }
 
   /**
@@ -573,7 +573,7 @@ export class Ioc implements IocContract {
    * Restore the fake
    */
   public restore (name: string): void {
-    this._fakes.delete(name)
+    this.fakes.delete(name)
   }
 
   /**
@@ -608,7 +608,7 @@ export class Ioc implements IocContract {
       throw new Error(`Missing method ${method} on ${target.constructor.name}`)
     }
 
-    return this._injector.injectMethodDependencies(target, method as string, args || [])
+    return this.injector.injectMethodDependencies(target, method as string, args || [])
   }
 
   /**

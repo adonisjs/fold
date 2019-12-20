@@ -20,16 +20,16 @@ import { TracerContract } from '../Contracts'
  * how tracer works
  */
 export class Tracer extends Emitter implements TracerContract {
-  private _namespaces: string[] = []
+  private namespaces: string[] = []
 
   public in (namespace: string, cached: boolean): void {
-    const parent = this._namespaces[this._namespaces.length - 1]
+    const parent = this.namespaces[this.namespaces.length - 1]
     this.emit('use', { namespace, cached, parent })
-    this._namespaces.push(namespace)
+    this.namespaces.push(namespace)
   }
 
   public out (): void {
-    this._namespaces.pop()
+    this.namespaces.pop()
   }
 }
 
