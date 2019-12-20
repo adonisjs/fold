@@ -2,6 +2,12 @@
   "name": "@adonisjs/fold",
   "version": "6.2.3",
   "description": "Dependency manager and ioc container for your next NodeJs application",
+  "main": "build/index.js",
+  "files": [
+    "build/src",
+    "build/index.d.ts",
+    "build/index.js"
+  ],
   "scripts": {
     "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
@@ -9,7 +15,7 @@
     "lint": "eslint . --ext=.ts",
     "clean": "del build",
     "compile": "npm run lint && npm run clean && tsc",
-    "build": "npm run compile && typedoc --theme markdown --excludePrivate --HideSources && git add docs",
+    "build": "npm run compile",
     "commit": "git-cz",
     "release": "np",
     "version": "npm run build"
@@ -48,9 +54,6 @@
     "np": "^5.2.1",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^8.5.4",
-    "typedoc": "^0.15.5",
-    "typedoc-plugin-external-module-name": "^2.1.0",
-    "typedoc-plugin-markdown": "^2.2.14",
     "typescript": "^3.7.3"
   },
   "nyc": {
@@ -61,12 +64,6 @@
       ".ts"
     ]
   },
-  "main": "build/index.js",
-  "files": [
-    "build/src",
-    "build/index.d.ts",
-    "build/index.js"
-  ],
   "husky": {
     "hooks": {
       "commit-msg": "node ./node_modules/@adonisjs/mrm-preset/validateCommit/conventional/validate.js"
