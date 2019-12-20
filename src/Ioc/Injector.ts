@@ -11,6 +11,9 @@ import { IocContract } from '../Contracts'
 import { isClass, isPrimtiveConstructor } from '../helpers'
 import { InvalidInjectionException } from '../Exceptions/InvalidInjectionException'
 
+/**
+ * Exposes the API to injecting dependencies to a class or a method
+ */
 export class Injector {
   constructor (private container: IocContract) {
   }

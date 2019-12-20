@@ -1,7 +1,3 @@
-/**
- * @module @adonisjs/fold
- */
-
 /*
 * @adonisjs/fold
 *
@@ -14,6 +10,9 @@
 import { esmRequire, resolveFrom } from '@poppinss/utils'
 import { IocContract } from '../Contracts'
 
+/**
+ * Registrar is used to register and boot the providers
+ */
 export class Registrar {
   /**
    * The first level of provider paths provided to the registrar

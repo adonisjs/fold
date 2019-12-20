@@ -1,7 +1,3 @@
-/**
- * @module @adonisjs/fold
- */
-
 /*
 * @adonisjs/fold
 *
@@ -34,8 +30,7 @@ export class Tracer extends Emitter implements TracerContract {
 }
 
 /**
- * Fake tracer that noops every operation. This is done
- * to keep code using tracer free of if/else
+ * Null object
  */
 class NoopTracer extends Emitter implements TracerContract {
   public in () {}

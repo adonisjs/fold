@@ -1,7 +1,3 @@
-/**
- * @module @adonisjs/fold
- */
-
 /*
 * @adonisjs/fold
 *

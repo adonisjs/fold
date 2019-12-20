@@ -1,5 +1,5 @@
 /*
-* @poppinss/utils
+* @adonisjs/fold
 *
 * (c) Harminder Virk <virk@adonisjs.com>
 *
@@ -7,17 +7,8 @@
 * file that was distributed with this source code.
 */
 
-import { IocContract } from '../Contracts'
 import { Exception } from '@poppinss/utils'
-
-/**
- * Shape of IoC resolver lookup node
- */
-export type IocResolverLookupNode = {
-  namespace: string,
-  type: 'binding' | 'autoload',
-  method: string,
-}
+import { IocContract, IocResolverLookupNode } from '../Contracts'
 
 /**
  * Exposes the API to resolve and call bindings from the IoC container. The resolver
@@ -48,12 +39,12 @@ export class IocResolver {
       return this.fallbackNamespace
     }
 
-    try {
-      const application = this.container.use('Adonis/Core/Application')
-      return application.namespacesMap.get(this.rcNamespaceKey) || this.fallbackNamespace
-    } catch (error) {
+    if (!this.container.hasBinding('Adonis/Core/Application')) {
       return this.fallbackNamespace
     }
+
+    const application = this.container.use('Adonis/Core/Application')
+    return application.namespacesMap.get(this.rcNamespaceKey) || this.fallbackNamespace
   }
 
   /**

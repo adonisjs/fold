@@ -1,7 +1,3 @@
-/**
- * @module @adonisjs/fold
- */
-
 /*
 * @adonisjs/fold
 *
@@ -12,11 +8,19 @@
 */
 
 import { EventEmitter } from 'events'
+
+/**
+ * Custom traces must implement this interface
+ */
 export interface TracerContract extends EventEmitter {
   in (namespace: string, cached: boolean): void
   out (): void
 }
 
+/**
+ * Shape of resolved lookup node, resolved using `getResolver().resolve()`
+ * method.
+ */
 export type IocResolverLookupNode = {
   namespace: string,
   type: 'binding' | 'autoload',
@@ -24,7 +28,10 @@ export type IocResolverLookupNode = {
 }
 
 /**
- * Shape of the IocResolver class
+ * The resolve is used to resolve and cache IoC container
+ * bindings that are meant to stay static through out
+ * the application and reduce the cost of lookup
+ * on each iteration.
  */
 export interface IocResolverContract {
   resolve (namespace: string, prefixNamespace?: string): IocResolverLookupNode
@@ -38,26 +45,33 @@ export interface IocContract {
   tracer: TracerContract,
   autoloads: { [namespace: string]: string },
   autoloadedAliases: string[],
+
   useProxies (): this,
   bind (namespace: string, callback: BindCallback): void
   singleton (namespace: string, callback: BindCallback): void
   alias (namespace: string, alias: string): void
-  autoload (directoryPath: string, namespace: string): void
-  clearAutoloadCache (namespace?: string, clearRequireCache?: boolean): void
   fake (namespace: string, callback: BindFakeCallback): void
+  autoload (directoryPath: string, namespace: string): void
+
   use<T extends any = any> (namespace: string | LookupNode): T
   make<T extends any = any> (namespace: string | LookupNode, args?: string[]): T
   useFake<T extends any = any> (namespace: string, value?: any): T
+
   hasFake (namespace: string): boolean
   hasAlias (namespace: string): boolean
   hasBinding (namespace: string, checkAliases?: boolean): boolean
+
   getAliasNamespace (namespace: string): string | undefined
   isAutoloadNamespace (namespace: string): boolean
   getAutoloadBaseNamespace (namespace: string): string | undefined
+
+  clearAutoloadCache (namespace?: string, clearRequireCache?: boolean): void
   restore (namespace: string): void
+
   with (namespaces: string[], cb: (...args: any[]) => void): void
   call<T extends object, K extends keyof T = any> (target: T, method: K, args: any[]): any
   lookup (namespace: string, prefixNamespace?: string): LookupNode | null
+
   getResolver (
     fallbackMethod?: string,
     rcNamespaceKey?: string,
@@ -85,7 +99,7 @@ export type FakeBinding = {
 /**
  * Shape of lookup node pulled using `ioc.lookup` method. This node
  * can be passed to `ioc.use`, or `ioc.make` or `ioc.useEsm` to
- * skip many checks and resolve the right thing
+ * skip many checks and resolve the binding right away.
  */
 export type LookupNode = {
   namespace: string,
