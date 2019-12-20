@@ -322,7 +322,7 @@ test.group('Ioc | autoloads', (group) => {
   })
 
   test('bind a directory to be autoloaded', async (assert) => {
-    await fs.add('services/foo.js', `module.exports = { name: 'foo' }`)
+    await fs.add('services/foo.js', 'module.exports = { name: \'foo\' }')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
@@ -331,7 +331,7 @@ test.group('Ioc | autoloads', (group) => {
   })
 
   test('do not autoload alias when namespace is similar but not same', async (assert) => {
-    await fs.add('services/foo.js', `module.exports = { name: 'foo' }`)
+    await fs.add('services/foo.js', 'module.exports = { name: \'foo\' }')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
@@ -341,7 +341,7 @@ test.group('Ioc | autoloads', (group) => {
   })
 
   test('cache require calls for autoloaded directories', async (assert) => {
-    await fs.add('services/foo.js', `module.exports = { name: 'foo' }`)
+    await fs.add('services/foo.js', 'module.exports = { name: \'foo\' }')
 
     const ioc = new Ioc(true)
     const stack: any[] = []
@@ -421,7 +421,7 @@ test.group('Ioc | autoloads', (group) => {
   })
 
   test('clear autoload cache for a given file', async (assert) => {
-    await fs.add('foo.js', `module.exports = { name: 'foo' }`)
+    await fs.add('foo.js', 'module.exports = { name: \'foo\' }')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
@@ -432,7 +432,7 @@ test.group('Ioc | autoloads', (group) => {
      * Changing file contents, however it's cached and returns
      * old value
      */
-    await fs.add('foo.js', `module.exports = { name: 'bar' }`)
+    await fs.add('foo.js', 'module.exports = { name: \'bar\' }')
     assert.deepEqual(ioc.use('App/foo'), { name: 'foo' })
 
     ioc.clearAutoloadCache('App/foo', true)
@@ -446,7 +446,7 @@ test.group('Ioc | autoloads', (group) => {
   })
 
   test('wrap autoloaded output object with a proxy when proxies are enabled', async (assert) => {
-    await fs.add('foo.js', `module.exports = { name: 'foo' }`)
+    await fs.add('foo.js', 'module.exports = { name: \'foo\' }')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
@@ -460,7 +460,7 @@ test.group('Ioc | autoloads', (group) => {
   })
 
   test('wrap autoloaded output class with a proxy when proxies are enabled', async (assert) => {
-    await fs.add('foo.js', `module.exports = class User {}`)
+    await fs.add('foo.js', 'module.exports = class User {}')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
@@ -476,7 +476,7 @@ test.group('Ioc | autoloads', (group) => {
   })
 
   test('wrap autoload esm default exports to proxy', async (assert) => {
-    await fs.add('bar.ts', `export default class User {}`)
+    await fs.add('bar.ts', 'export default class User {}')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
@@ -492,7 +492,7 @@ test.group('Ioc | autoloads', (group) => {
   })
 
   test('do not wrap esm named exports to proxy', async (assert) => {
-    await fs.add('bar.ts', `export class User {}`)
+    await fs.add('bar.ts', 'export class User {}')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
@@ -526,7 +526,7 @@ test.group('Ioc | make', (group) => {
       constructor (public bar: Bar) {
       }
 
-      static get inject () {
+      public static get inject () {
         return {
           instance: ['App/Bar'],
         }
@@ -548,11 +548,11 @@ test.group('Ioc | make', (group) => {
       constructor (public bar: Bar) {
       }
 
-      static get makePlain () {
+      public static get makePlain () {
         return true
       }
 
-      static get inject () {
+      public static get inject () {
         return ['App/Bar']
       }
     }
@@ -1332,7 +1332,7 @@ test.group('Ioc | inject decorator', () => {
     }
 
     const fn = () => ioc.make(Foo)
-    assert.throw(fn, `Cannot inject {String Constructor} to {Foo} at position 1`)
+    assert.throw(fn, 'Cannot inject {String Constructor} to {Foo} at position 1')
   })
 
   test('inject method dependencies injected via decorator', (assert) => {
@@ -1461,7 +1461,7 @@ test.group('Ioc | lookup resolve', (group) => {
   })
 
   test('lookup autoload value from a lookup node', async (assert) => {
-    await fs.add('Foo.js', `module.exports = 'bar'`)
+    await fs.add('Foo.js', 'module.exports = \'bar\'')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
@@ -1469,7 +1469,7 @@ test.group('Ioc | lookup resolve', (group) => {
   })
 
   test('raise exception when unable to resolve lookup namespace', async (assert) => {
-    await fs.add('Foo.js', `module.exports = 'bar'`)
+    await fs.add('Foo.js', 'module.exports = \'bar\'')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
@@ -1479,7 +1479,7 @@ test.group('Ioc | lookup resolve', (group) => {
   })
 
   test('do not resolve binding for autoload lookup node', async (assert) => {
-    await fs.add('Foo.js', `module.exports = 'bar'`)
+    await fs.add('Foo.js', 'module.exports = \'bar\'')
 
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
@@ -1502,7 +1502,7 @@ test.group('Ioc | lookup resolve', (group) => {
   })
 
   test('make binding from autoloaded lookup node', async (assert) => {
-    await fs.add('Foo.js', `module.exports = class Bar {}`)
+    await fs.add('Foo.js', 'module.exports = class Bar {}')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')
@@ -1511,7 +1511,7 @@ test.group('Ioc | lookup resolve', (group) => {
   })
 
   test('do not make binding for autoload lookup node', async (assert) => {
-    await fs.add('Foo.js', `module.exports = 'bar'`)
+    await fs.add('Foo.js', 'module.exports = \'bar\'')
 
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
@@ -1523,7 +1523,7 @@ test.group('Ioc | lookup resolve', (group) => {
   })
 
   test('raise exception when unable to make lookup namespace', async (assert) => {
-    await fs.add('Foo.js', `module.exports = 'bar'`)
+    await fs.add('Foo.js', 'module.exports = \'bar\'')
 
     const ioc = new Ioc()
     ioc.autoload(fs.basePath, 'App')

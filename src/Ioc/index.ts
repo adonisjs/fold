@@ -111,7 +111,7 @@ export class Ioc implements IocContract {
     if (binding.singleton && binding.cachedValue !== undefined) {
       value = binding.cachedValue // use cachedValue
     } else if (binding.singleton) {
-      value = binding.cachedValue = binding.callback(this)  // invoke callback and cache
+      value = binding.cachedValue = binding.callback(this) // invoke callback and cache
     } else {
       value = binding.callback(this) // invoke callback
     }
@@ -330,15 +330,15 @@ export class Ioc implements IocContract {
    *
    * Optionally, you can remove it from `require` cache too.
    */
-  public clearAutoloadCache (namespace?: string, clearRequireCache = false): void {
+  public clearAutoloadCache (namespace?: string, clearModulesCache = false): void {
     if (!namespace) {
       Array.from(this._autoloadsCache.keys()).forEach((key) => {
-        this._removeAutoloadFromCache(key, clearRequireCache)
+        this._removeAutoloadFromCache(key, clearModulesCache)
       })
       return
     }
 
-    this._removeAutoloadFromCache(namespace, clearRequireCache)
+    this._removeAutoloadFromCache(namespace, clearModulesCache)
   }
 
   /**
