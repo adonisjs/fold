@@ -41,20 +41,20 @@
   "devDependencies": {
     "@adonisjs/mrm-preset": "^2.2.3",
     "@poppinss/dev-utils": "^1.0.3",
-    "@types/node": "^12.12.21",
+    "@types/node": "^13.5.0",
     "commitizen": "^4.0.3",
     "cz-conventional-changelog": "^3.0.2",
     "del-cli": "^3.0.0",
     "doctoc": "^1.4.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-adonis": "^1.0.4",
-    "husky": "^3.1.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-adonis": "^1.0.5",
+    "husky": "^4.2.1",
     "japa": "^3.0.1",
     "mrm": "^2.0.2",
     "np": "^5.2.1",
     "reflect-metadata": "^0.1.13",
-    "ts-node": "^8.5.4",
-    "typescript": "^3.7.3"
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
   },
   "nyc": {
     "exclude": [

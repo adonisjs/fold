@@ -7,7 +7,7 @@
 * file that was distributed with this source code.
 */
 
-import Emitter from 'events'
+import { EventEmitter } from 'events'
 import { TracerContract } from '../Contracts'
 
 /**
@@ -15,7 +15,7 @@ import { TracerContract } from '../Contracts'
  * at different steps. Read the guides to understand
  * how tracer works
  */
-export class Tracer extends Emitter implements TracerContract {
+export class Tracer extends EventEmitter implements TracerContract {
   private namespaces: string[] = []
 
   public in (namespace: string, cached: boolean): void {
@@ -32,7 +32,7 @@ export class Tracer extends Emitter implements TracerContract {
 /**
  * Null object
  */
-class NoopTracer extends Emitter implements TracerContract {
+class NoopTracer extends EventEmitter implements TracerContract {
   public in () {}
   public out () {}
 }
