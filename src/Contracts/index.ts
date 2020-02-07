@@ -54,7 +54,7 @@ export interface IocContract {
   autoload (directoryPath: string, namespace: string): void
 
   use<T extends any = any> (namespace: string | LookupNode): T
-  make<T extends any = any> (namespace: string | LookupNode, args?: string[]): T
+  make<T extends any = any> (namespace: string | LookupNode, args?: any[]): T
   useFake<T extends any = any> (namespace: string, value?: any): T
 
   hasFake (namespace: string): boolean

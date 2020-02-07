@@ -423,7 +423,7 @@ export class Ioc implements IocContract {
    * The bindings added via `ioc.bind` or `ioc.singleton` controls their state
    * by themselves.
    */
-  public make<T extends any = any> (node: any, args?: string[]): T {
+  public make<T extends any = any> (node: any, args?: any[]): T {
     /**
      * If value is not a namespace string and not a lookup node,
      * then we make the value as it is.
