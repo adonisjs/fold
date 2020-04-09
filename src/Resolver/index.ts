@@ -35,14 +35,30 @@ export class IocResolver {
    * `.adonisrc.json` file
    */
   private getPrefixNamespace (): string | undefined {
+    /**
+     * Use fallback namespace, when lookup inside rcFile is not required
+     */
     if (!this.rcNamespaceKey) {
       return this.fallbackNamespace
     }
 
+    /**
+     * If container doesn't have `Application` binding, then there is no
+     * way for us to read rcFile namespaces and hence we use the fallback
+     * namespace
+     */
     if (!this.container.hasBinding('Adonis/Core/Application')) {
       return this.fallbackNamespace
     }
 
+    /**
+     * Attempt to resolve the rcNamespace key from the rcFile
+     * For example: The rc file has following namespaces
+     * {
+     *   "controllers": "App/Controllers/Http"
+     * }
+     * We will use the value next to the `controllers` key
+     */
     const application = this.container.use('Adonis/Core/Application')
     return application.namespacesMap.get(this.rcNamespaceKey) || this.fallbackNamespace
   }
@@ -79,10 +95,10 @@ export class IocResolver {
 
     /**
      * Raise exception when unable to resolve the binding from the container.
-     * NOTE: We are not making fetching the binding, we are just checking
-     * for it's existence. In case of autoloads, it's quite possible
-     * that the binding check passes and the actual file is missing
-     * on the disk
+     * NOTE: We are notfetching the binding, we are just checking for it's
+     * existence. In case of autoloads, it's quite possible that the
+     * binding check passes and the actual file is missing on the
+     * disk
      */
     if (!lookupNode) {
       throw new Exception(`Unable to resolve ${tokens.join('.')} namespace from IoC container`)

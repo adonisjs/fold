@@ -43,6 +43,9 @@ import {
  * DI simpler.
  */
 export class Ioc implements IocContract {
+  /**
+   * For emitting emits
+   */
   public tracer = tracer(this.emitEvents)
 
   /**
