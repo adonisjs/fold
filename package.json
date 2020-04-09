@@ -39,21 +39,21 @@
   },
   "homepage": "https://github.com/poppinss/adonis-fold#readme",
   "devDependencies": {
-    "@adonisjs/mrm-preset": "^2.2.4",
-    "@poppinss/dev-utils": "^1.0.4",
-    "@types/node": "^13.7.7",
-    "commitizen": "^4.0.3",
+    "@adonisjs/mrm-preset": "^2.3.0",
+    "@poppinss/dev-utils": "^1.0.5",
+    "@types/node": "^13.11.1",
+    "commitizen": "^4.0.4",
     "cz-conventional-changelog": "^3.1.0",
     "del-cli": "^3.0.0",
     "doctoc": "^1.4.0",
     "eslint": "^6.8.0",
-    "eslint-plugin-adonis": "^1.0.8",
+    "eslint-plugin-adonis": "^1.0.9",
     "husky": "^4.2.3",
     "japa": "^3.0.1",
-    "mrm": "^2.1.0",
+    "mrm": "^2.2.0",
     "np": "^5.2.1",
     "reflect-metadata": "^0.1.13",
-    "ts-node": "^8.6.2",
+    "ts-node": "^8.8.2",
     "typescript": "^3.8.3"
   },
   "nyc": {
@@ -79,8 +79,7 @@
     "anyBranch": false
   },
   "dependencies": {
-    "@poppinss/utils": "^2.1.2",
-    "resolve-from": "^5.0.0"
+    "@poppinss/utils": "^2.2.0"
   },
   "publishConfig": {
     "access": "public",
