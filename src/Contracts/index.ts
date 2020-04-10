@@ -10,6 +10,28 @@
 import { EventEmitter } from 'events'
 
 /**
+ * Shape of class constructor
+ */
+type Constructor<T> = new (...args: any[]) => T
+
+/**
+ * Shape of class constructor with `makePlain` property
+ */
+type PlainConstructor = {
+  new (...args: any[]): any,
+  makePlain: boolean,
+}
+
+/**
+ * The intefered type of the `make` function
+ */
+export type MakeInferedType<T extends any> = T extends string | LookupNode ? any : (
+  T extends PlainConstructor ? T : (
+    T extends Constructor<infer A> ? A : T
+  )
+)
+
+/**
  * Custom traces must implement this interface
  */
 export interface TracerContract extends EventEmitter {
@@ -28,10 +50,9 @@ export type IocResolverLookupNode = {
 }
 
 /**
- * The resolve is used to resolve and cache IoC container
- * bindings that are meant to stay static through out
- * the application and reduce the cost of lookup
- * on each iteration.
+ * The resolve is used to resolve and cache IoC container bindings that
+ * are meant to stay static through out the application and reduce
+ * the cost of lookup on each iteration.
  */
 export interface IocResolverContract {
   resolve (namespace: string, prefixNamespace?: string): IocResolverLookupNode
@@ -54,7 +75,7 @@ export interface IocContract {
   autoload (directoryPath: string, namespace: string): void
 
   use<T extends any = any> (namespace: string | LookupNode): T
-  make<T extends any = any> (namespace: string | LookupNode, args?: any[]): T
+  make<T extends any> (namespace: T, args?: any[]): MakeInferedType<T>
   useFake<T extends any = any> (namespace: string, value?: any): T
 
   hasFake (namespace: string): boolean
@@ -114,5 +135,12 @@ export type AutoloadCacheItem = {
   cachedValue: any,
 }
 
+/**
+ * Shape of the bind callback method
+ */
 export type BindCallback = (app: IocContract) => unknown
+
+/**
+ * Shape of the fake callback method
+ */
 export type BindFakeCallback = (app: IocContract, value?: any) => unknown

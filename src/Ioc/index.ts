@@ -30,6 +30,7 @@ import {
   FakeBinding,
   IocContract,
   BindCallback,
+  MakeInferedType,
   BindFakeCallback,
   AutoloadCacheItem,
 } from '../Contracts'
@@ -55,7 +56,8 @@ export class Ioc implements IocContract {
 
   /**
    * An array of autoloaded aliases, stored along side with
-   * `autoloads` for a quick lookup on keys
+   * `autoloads` for a quick lookup on keys vs doing
+   * `Object.keys` everytime
    */
   public autoloadedAliases: string[] = []
 
@@ -86,6 +88,10 @@ export class Ioc implements IocContract {
    */
   private proxiesEnabled = false
 
+  /**
+   * Injector is used for injecting dependencies to the class constructor
+   * and the methods
+   */
   private injector = new Injector(this)
 
   constructor (private emitEvents = false) {
@@ -426,7 +432,7 @@ export class Ioc implements IocContract {
    * The bindings added via `ioc.bind` or `ioc.singleton` controls their state
    * by themselves.
    */
-  public make<T extends any = any> (node: any, args?: any[]): T {
+  public make<T extends any> (node: T, args?: any[]): MakeInferedType<T> {
     /**
      * If value is not a namespace string and not a lookup node,
      * then we make the value as it is.
@@ -435,13 +441,13 @@ export class Ioc implements IocContract {
      * no point in wrapping it to a proxy
      */
     if (typeof (node) !== 'string' && !this.isLookupNode(node)) {
-      return this.injector.injectDependencies(node, args || []) as T
+      return this.injector.injectDependencies(node, args || [])
     }
 
     /**
      * Get lookup node when node itself isn't a lookup node
      */
-    const lookedupNode = typeof (node) === 'string' ? this.lookup(node) : node
+    const lookedupNode = typeof (node) === 'string' ? this.lookup(node as any) : node as LookupNode
 
     /**
      * Do not proceed when unable to lookup Ioc container namespace
@@ -459,10 +465,10 @@ export class Ioc implements IocContract {
      * When not using proxies, then we must return the value untouched
      */
     if (!this.proxiesEnabled || isEsm(value)) {
-      return value as T
+      return value
     }
 
-    return this.wrapAsProxy<T>(lookedupNode.namespace, value)
+    return this.wrapAsProxy(lookedupNode.namespace, value)
   }
 
   /**

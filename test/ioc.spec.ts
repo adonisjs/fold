@@ -539,7 +539,7 @@ test.group('Ioc | make', (group) => {
       return new Bar()
     })
 
-    assert.instanceOf(ioc.make<Foo>(Foo).bar, Bar)
+    assert.instanceOf(ioc.make(Foo).bar, Bar)
   })
 
   test('do not make instance when makePlain is set to true', (assert) => {
@@ -1021,10 +1021,6 @@ test.group('Ioc | Proxy', (group) => {
   })
 
   test('proxy class constructor via ioc.make', (assert) => {
-    interface FooConstructor {
-      new (): Foo
-    }
-
     class Foo {
       public name = 'foo'
 
@@ -1047,7 +1043,7 @@ test.group('Ioc | Proxy', (group) => {
       return Foo
     })
 
-    const value = ioc.make<FooConstructor>('App/Foo')
+    const value = ioc.make('App/Foo')
     assert.instanceOf(new value(), Foo)
 
     ioc.fake('App/Foo', () => {
@@ -1199,7 +1195,7 @@ test.group('Ioc | Proxy', (group) => {
       return new Foo()
     })
 
-    const value = ioc.make<Foo>('App/Foo')
+    const value = ioc.make('App/Foo') as Foo
     assert.equal(value.name, 'foo')
 
     ioc.fake('App/Foo', () => {
@@ -1400,7 +1396,7 @@ test.group('Ioc | inject decorator', () => {
       }
     }
 
-    const fn = () => ioc.call(ioc.make<Foo>(Foo), 'greet', [])
+    const fn = () => ioc.call(ioc.make(Foo), 'greet', [])
     assert.throw(fn, 'Cannot inject {String Constructor} to {Foo.greet} at position 1')
   })
 
@@ -1498,7 +1494,7 @@ test.group('Ioc | lookup resolve', (group) => {
       return Bar
     })
 
-    assert.equal(ioc.make({ type: 'binding', namespace: 'App/Foo' }), Bar)
+    assert.equal(ioc.make({ type: 'binding' as const, namespace: 'App/Foo' }), Bar)
   })
 
   test('make binding from autoloaded lookup node', async (assert) => {
