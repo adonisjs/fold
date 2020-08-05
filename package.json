@@ -39,22 +39,22 @@
   },
   "homepage": "https://github.com/poppinss/adonis-fold#readme",
   "devDependencies": {
-    "@adonisjs/mrm-preset": "^2.3.0",
-    "@poppinss/dev-utils": "^1.0.6",
-    "@types/node": "^13.11.1",
-    "commitizen": "^4.0.4",
-    "cz-conventional-changelog": "^3.1.0",
-    "del-cli": "^3.0.0",
+    "@adonisjs/mrm-preset": "^2.4.0",
+    "@poppinss/dev-utils": "^1.0.8",
+    "@types/node": "^14.0.27",
+    "commitizen": "^4.1.2",
+    "cz-conventional-changelog": "^3.2.0",
+    "del-cli": "^3.0.1",
     "doctoc": "^1.4.0",
-    "eslint": "^6.8.0",
-    "eslint-plugin-adonis": "^1.0.9",
-    "husky": "^4.2.3",
-    "japa": "^3.0.1",
-    "mrm": "^2.2.1",
-    "np": "^5.2.1",
+    "eslint": "^7.6.0",
+    "eslint-plugin-adonis": "^1.0.14",
+    "husky": "^4.2.5",
+    "japa": "^3.1.1",
+    "mrm": "^2.3.3",
+    "np": "^6.3.2",
     "reflect-metadata": "^0.1.13",
-    "ts-node": "^8.8.2",
-    "typescript": "^3.8.3"
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
   },
   "nyc": {
     "exclude": [
@@ -79,7 +79,7 @@
     "anyBranch": false
   },
   "dependencies": {
-    "@poppinss/utils": "^2.2.4"
+    "@poppinss/utils": "^2.5.2"
   },
   "publishConfig": {
     "access": "public",
