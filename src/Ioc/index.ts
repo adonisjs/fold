@@ -37,7 +37,7 @@ import {
  * in your application and provides all the neccessary tools to make
  * DI simpler.
  */
-export class Ioc implements IocContract {
+export class Ioc<ContainerBindings extends any> implements IocContract<ContainerBindings> {
 	/**
 	 * For emitting emits
 	 */
@@ -68,13 +68,13 @@ export class Ioc implements IocContract {
 	/**
 	 * Copy of actual bindings
 	 */
-	private bindings: { [namespace: string]: Binding } = {}
+	private bindings: { [namespace: string]: Binding<any, ContainerBindings> } = {}
 
 	/**
 	 * Copy of fakes as a Map, since fakes are subjective to
 	 * mutations
 	 */
-	private fakes: Map<string, FakeBinding> = new Map()
+	private fakes: Map<string, FakeBinding<any, ContainerBindings>> = new Map()
 
 	/**
 	 * Using proxies or not? Fakes only works when below one
@@ -244,7 +244,12 @@ export class Ioc implements IocContract {
 	 * })
 	 * ```
 	 */
-	public bind(namespace: string, callback: BindCallback): void {
+	public bind<Namespace extends keyof ContainerBindings>(
+		namespace: Namespace,
+		callback: BindCallback<ContainerBindings[Namespace], ContainerBindings>
+	): void
+	public bind(namespace: string, callback: BindCallback<unknown, ContainerBindings>): void
+	public bind(namespace: string, callback: BindCallback<unknown, ContainerBindings>): void {
 		ensureIsFunction(callback, 'ioc.bind expect 2nd argument to be a function')
 		this.tracer.emit('bind', { namespace, singleton: false })
 		this.bindings[namespace] = { callback, singleton: false }
@@ -262,7 +267,12 @@ export class Ioc implements IocContract {
 	 * })
 	 * ```
 	 */
-	public singleton(namespace: string, callback: BindCallback): void {
+	public singleton<Namespace extends keyof ContainerBindings>(
+		namespace: string,
+		callback: BindCallback<ContainerBindings[Namespace], ContainerBindings>
+	): void
+	public singleton(namespace: string, callback: BindCallback<unknown, ContainerBindings>): void
+	public singleton(namespace: string, callback: BindCallback<unknown, ContainerBindings>): void {
 		ensureIsFunction(callback, 'ioc.singleton expect 2nd argument to be a function')
 		this.tracer.emit('bind', { namespace, singleton: true })
 		this.bindings[namespace] = { callback, singleton: true }
@@ -275,6 +285,8 @@ export class Ioc implements IocContract {
 	 *
 	 * Use method [[hasAlias]] to know, if an alias already exists.
 	 */
+	public alias<Namespace extends keyof ContainerBindings>(namespace: Namespace, alias: string): void
+	public alias(namespace: string, alias: string): void
 	public alias(namespace: string, alias: string): void {
 		this.tracer.emit('alias', { alias, namespace })
 		this.aliases[alias] = namespace
@@ -284,7 +296,8 @@ export class Ioc implements IocContract {
 	 * Define an alias for an existing directory and require
 	 * files without fighting with relative paths.
 	 *
-	 * Giving the following directory structure
+	 * Given the following directory structure
+	 *
 	 * ```sh
 	 * .app/
 	 * ├── controllers
@@ -307,8 +320,8 @@ export class Ioc implements IocContract {
 	 * ```
 	 * ioc.autoload(join(__dirname, 'app'), 'App')
 	 *
-	 * use('App/services/foo')
-	 * use('App/mdoels/foo')
+	 * ioc.use('App/services/foo')
+	 * ioc.use('App/mdoels/foo')
 	 * ```
 	 */
 	public autoload(directoryPath: string, namespace: string): void {
@@ -341,8 +354,8 @@ export class Ioc implements IocContract {
 
 	/**
 	 * Register a fake for an existing binding. The fakes only work when
-	 * `ADONIS_IOC_PROXY` environment variable is set to `true`. AdonisJs
-	 * will set it to true automatically during testing.
+	 * [[this.useProxies]] is invoked. AdonisJs will set invoke it
+	 * automatically when running tests.
 	 *
 	 * NOTE: The return value of fakes is always cached, since multiple
 	 * calls to `use` after that should point to a same return value.
@@ -354,7 +367,12 @@ export class Ioc implements IocContract {
 	 * })
 	 * ```
 	 */
-	public fake(namespace: string, callback: BindFakeCallback): void {
+	public fake<Namespace extends keyof ContainerBindings>(
+		namespace: Namespace,
+		callback: BindFakeCallback<ContainerBindings[Namespace], ContainerBindings>
+	): void
+	public fake(namespace: string, callback: BindFakeCallback<unknown, ContainerBindings>): void
+	public fake(namespace: string, callback: BindFakeCallback<unknown, ContainerBindings>): void {
 		ensureIsFunction(callback, 'ioc.fake expect 2nd argument to be a function')
 		this.tracer.emit('fake', { namespace })
 		this.fakes.set(namespace, { callback })
@@ -362,7 +380,7 @@ export class Ioc implements IocContract {
 
 	/**
 	 * Use the binding by resolving it from the container. The resolve method
-	 * does some great work to resolve the value for you.
+	 * does some all the hard work to resolve the value for you.
 	 *
 	 * 1. The name will be searched for an existing binding.
 	 * 2. Checked against aliases.
@@ -377,6 +395,10 @@ export class Ioc implements IocContract {
 	 * ioc.use('lodash')              // Fallback to Node.js require
 	 * ```
 	 */
+	public use<Namespace extends keyof ContainerBindings>(
+		node: Namespace
+	): ContainerBindings[Namespace]
+	public use<T extends any = any>(node: string | LookupNode): T
 	public use<T extends any = any>(node: string | LookupNode): T {
 		/**
 		 * Get lookup node when node itself isn't a lookup node
@@ -419,12 +441,17 @@ export class Ioc implements IocContract {
 
 	/**
 	 * Make an instance of class and auto inject it's dependencies. The instance
-	 * is only created if `namespace` is part of an autoload or is an class
+	 * is only created if `namespace` is part of an autoload or is a class
 	 * constructor.
 	 *
-	 * The bindings added via `ioc.bind` or `ioc.singleton` controls their state
-	 * by themselves.
+	 * The bindings added via `ioc.bind` or `ioc.singleton` controls their return value
+	 * themselves using the factory function.
 	 */
+	public make<Namespace extends keyof ContainerBindings>(
+		node: Namespace,
+		args?: any[]
+	): ContainerBindings[Namespace]
+	public make<T extends any>(node: T, args?: any[]): MakeInferedType<T>
 	public make<T extends any>(node: T, args?: any[]): MakeInferedType<T> {
 		/**
 		 * If value is not a namespace string and not a lookup node,
@@ -472,6 +499,11 @@ export class Ioc implements IocContract {
 	 * This method is internally used by ioc container proxy objects to
 	 * point to a fake when `useProxies` is called and fake exists.
 	 */
+	public useFake<Namespace extends keyof ContainerBindings>(
+		namespace: Namespace,
+		value?: ContainerBindings[Namespace]
+	): ContainerBindings[Namespace]
+	public useFake<T extends any = any>(namespace: string, value?: any): T
 	public useFake<T extends any = any>(namespace: string, value?: any): T {
 		const fake = this.fakes.get(namespace)
 		if (!fake) {
@@ -486,6 +518,8 @@ export class Ioc implements IocContract {
 	 * A boolean telling if a fake exists for a binding or
 	 * not.
 	 */
+	public hasFake<Namespace extends keyof ContainerBindings>(namespace: Namespace): boolean
+	public hasFake(namespace: string): boolean
 	public hasFake(namespace: string): boolean {
 		return this.fakes.has(namespace)
 	}
@@ -494,6 +528,8 @@ export class Ioc implements IocContract {
 	 * Returns a boolean telling if an alias
 	 * exists
 	 */
+	public hasAlias<Namespace extends keyof ContainerBindings>(namespace: Namespace): boolean
+	public hasAlias(namespace: string): boolean
 	public hasAlias(namespace: string): boolean {
 		return !!this.aliases[namespace]
 	}
@@ -505,10 +541,15 @@ export class Ioc implements IocContract {
 	 * @example
 	 * ```js
 	 * ioc.hasBinding('Adonis/Src/View')    // namespace
-	 * ioc.hasBinding('View')               // alias
+	 * ioc.hasBinding('View', true)         // alias
 	 * ```
 	 */
-	public hasBinding(namespace: string, checkAliases = false): boolean {
+	public hasBinding<Namespace extends keyof ContainerBindings>(
+		namespace: Namespace,
+		checkAliases?: boolean
+	): boolean
+	public hasBinding(namespace: string, checkAliases?: boolean): boolean
+	public hasBinding(namespace: string, checkAliases: boolean = false): boolean {
 		const binding = this.bindings[namespace]
 		if (!binding && checkAliases) {
 			return !!this.bindings[this.getAliasNamespace(namespace)!]
@@ -529,7 +570,7 @@ export class Ioc implements IocContract {
 	/**
 	 * Returns a boolean telling if namespace is part of autoloads or not.
 	 * This method results may vary from the [[use]] method, since
-	 * the `use` method gives prefrence to the `bindings` first.
+	 * the `use` method gives preference to the `bindings` first.
 	 *
 	 * ### NOTE:
 	 * Check the following example carefully.
@@ -546,7 +587,7 @@ export class Ioc implements IocContract {
 	 * ioc.isAutoloadNamespace('App/Services/Foo')
 	 *
 	 * // Returns value from `bind` and not disk
-	 * ioc.use('isAutoloadNamespace')
+	 * ioc.use('App/Services/Foo')
 	 * ```
 	 */
 	public isAutoloadNamespace(namespace: string): boolean {
@@ -570,8 +611,10 @@ export class Ioc implements IocContract {
 	/**
 	 * Restore the fake
 	 */
-	public restore(name: string): void {
-		this.fakes.delete(name)
+	public restore<Namespace extends keyof ContainerBindings>(namespace: Namespace): void
+	public restore(namespace: string): void
+	public restore(namespace: string): void {
+		this.fakes.delete(namespace)
 	}
 
 	/**
