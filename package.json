@@ -1,7 +1,7 @@
 {
   "name": "@adonisjs/fold",
   "version": "6.3.5",
-  "description": "Dependency manager and ioc container for your next NodeJs application",
+  "description": "Dependency manager and IoC container for your next NodeJs application",
   "main": "build/index.js",
   "files": [
     "build/src",
@@ -18,7 +18,9 @@
     "build": "npm run compile",
     "commit": "git-cz",
     "release": "np",
-    "version": "npm run build"
+    "version": "npm run build",
+    "sync-labels": "github-label-sync --labels ./node_modules/@adonisjs/mrm-preset/gh-labels.json adonisjs/fold",
+    "format": "prettier --write ."
   },
   "author": "adonisjs,virk",
   "license": "MIT",
@@ -47,11 +49,16 @@
     "del-cli": "^3.0.1",
     "doctoc": "^1.4.0",
     "eslint": "^7.6.0",
+    "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-adonis": "^1.0.14",
+    "eslint-plugin-prettier": "^3.1.4",
+    "github-label-sync": "^2.0.0",
     "husky": "^4.2.5",
     "japa": "^3.1.1",
     "mrm": "^2.3.3",
     "np": "^6.3.2",
+    "npm-audit-html": "^1.4.1",
+    "prettier": "^2.0.5",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
@@ -66,7 +73,8 @@
   },
   "husky": {
     "hooks": {
-      "commit-msg": "node ./node_modules/@adonisjs/mrm-preset/validateCommit/conventional/validate.js"
+      "commit-msg": "node ./node_modules/@adonisjs/mrm-preset/validateCommit/conventional/validate.js",
+      "pre-commit": "npm audit --production --json | ./node_modules/.bin/npm-audit-html && git add npm-audit.html"
     }
   },
   "config": {

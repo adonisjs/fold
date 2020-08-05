@@ -1,11 +1,11 @@
 /*
-* @adonisjs/fold
-*
-* (c) Harminder Virk <virk@adonisjs.com>
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ * @adonisjs/fold
+ *
+ * (c) Harminder Virk <virk@adonisjs.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 import { EventEmitter } from 'events'
 import { TracerContract } from '../Contracts'
@@ -16,27 +16,27 @@ import { TracerContract } from '../Contracts'
  * how tracer works
  */
 export class Tracer extends EventEmitter implements TracerContract {
-  private namespaces: string[] = []
+	private namespaces: string[] = []
 
-  public in (namespace: string, cached: boolean): void {
-    const parent = this.namespaces[this.namespaces.length - 1]
-    this.emit('use', { namespace, cached, parent })
-    this.namespaces.push(namespace)
-  }
+	public in(namespace: string, cached: boolean): void {
+		const parent = this.namespaces[this.namespaces.length - 1]
+		this.emit('use', { namespace, cached, parent })
+		this.namespaces.push(namespace)
+	}
 
-  public out (): void {
-    this.namespaces.pop()
-  }
+	public out(): void {
+		this.namespaces.pop()
+	}
 }
 
 /**
  * Null object
  */
 class NoopTracer extends EventEmitter implements TracerContract {
-  public in () {}
-  public out () {}
+	public in() {}
+	public out() {}
 }
 
-export default function tracer (enabled: boolean) {
-  return enabled ? new Tracer() : (new NoopTracer() as unknown) as Tracer
+export default function tracer(enabled: boolean) {
+	return enabled ? new Tracer() : ((new NoopTracer() as unknown) as Tracer)
 }

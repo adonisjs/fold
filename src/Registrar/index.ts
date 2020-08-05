@@ -1,11 +1,11 @@
 /*
-* @adonisjs/fold
-*
-* (c) Harminder Virk <virk@adonisjs.com>
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ * @adonisjs/fold
+ *
+ * (c) Harminder Virk <virk@adonisjs.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 import { esmRequire, resolveFrom } from '@poppinss/utils'
 import { IocContract } from '../Contracts'
@@ -14,115 +14,114 @@ import { IocContract } from '../Contracts'
  * Registrar is used to register and boot the providers
  */
 export class Registrar {
-  /**
-   * The first level of provider paths provided to the registrar
-   */
-  private providersPaths: string[] = []
+	/**
+	 * The first level of provider paths provided to the registrar
+	 */
+	private providersPaths: string[] = []
 
-  /**
-   * An array of loaded providers. Their can be more providers than the
-   * `_providersPaths` array, since each provider can provide it's
-   * own sub providers
-   */
-  private providers: any[] = []
+	/**
+	 * An array of loaded providers. Their can be more providers than the
+	 * `_providersPaths` array, since each provider can provide it's
+	 * own sub providers
+	 */
+	private providers: any[] = []
 
-  /**
-   * Whether or not the providers can be collected
-   */
-  private collected: boolean = false
+	/**
+	 * Whether or not the providers can be collected
+	 */
+	private collected: boolean = false
 
-  constructor (public ioc: IocContract, private basePath?: string) {
-  }
+	constructor(public ioc: IocContract, private basePath?: string) {}
 
-  /**
-   * Load the provider by requiring the file from the disk
-   * and instantiate it. If ioc container is using ES6
-   * imports, then default exports are handled
-   * automatically.
-   */
-  private loadProvider (providerPath: string) {
-    providerPath = this.basePath ? resolveFrom(this.basePath, providerPath) : providerPath
-    const provider = esmRequire(providerPath)
+	/**
+	 * Load the provider by requiring the file from the disk
+	 * and instantiate it. If ioc container is using ES6
+	 * imports, then default exports are handled
+	 * automatically.
+	 */
+	private loadProvider(providerPath: string) {
+		providerPath = this.basePath ? resolveFrom(this.basePath, providerPath) : providerPath
+		const provider = esmRequire(providerPath)
 
-    if (typeof (provider) !== 'function') {
-      throw new Error(`Make sure export default the provider from ${providerPath}`)
-    }
+		if (typeof provider !== 'function') {
+			throw new Error(`Make sure export default the provider from ${providerPath}`)
+		}
 
-    return new provider(this.ioc)
-  }
+		return new provider(this.ioc)
+	}
 
-  /**
-   * Loop's over an array of provider paths and pushes them to the
-   * `providers` collection. This collection is later used to
-   * register and boot providers
-   */
-  private collect (providerPaths) {
-    providerPaths.forEach((providerPath) => {
-      const provider = this.loadProvider(providerPath)
-      this.providers.push(provider)
+	/**
+	 * Loop's over an array of provider paths and pushes them to the
+	 * `providers` collection. This collection is later used to
+	 * register and boot providers
+	 */
+	private collect(providerPaths) {
+		providerPaths.forEach((providerPath) => {
+			const provider = this.loadProvider(providerPath)
+			this.providers.push(provider)
 
-      if (provider.provides) {
-        this.collect(provider.provides)
-      }
-    })
-  }
+			if (provider.provides) {
+				this.collect(provider.provides)
+			}
+		})
+	}
 
-  /**
-   * Register an array of provider paths
-   */
-  public useProviders (providersPaths: string[]): this {
-    this.providersPaths = providersPaths
-    return this
-  }
+	/**
+	 * Register an array of provider paths
+	 */
+	public useProviders(providersPaths: string[]): this {
+		this.providersPaths = providersPaths
+		return this
+	}
 
-  /**
-   * Register all the providers by instantiating them and
-   * calling the `register` method.
-   *
-   * The provider instance will be returned, which can be used
-   * to boot them as well.
-   */
-  public register () {
-    if (this.collected) {
-      return this.providers
-    }
+	/**
+	 * Register all the providers by instantiating them and
+	 * calling the `register` method.
+	 *
+	 * The provider instance will be returned, which can be used
+	 * to boot them as well.
+	 */
+	public register() {
+		if (this.collected) {
+			return this.providers
+		}
 
-    this.collected = true
-    this.collect(this.providersPaths)
+		this.collected = true
+		this.collect(this.providersPaths)
 
-    /**
-     * Register collected providers
-     */
-    this.providers.forEach((provider) => {
-      if (typeof (provider.register) === 'function') {
-        provider.register()
-      }
-    })
+		/**
+		 * Register collected providers
+		 */
+		this.providers.forEach((provider) => {
+			if (typeof provider.register === 'function') {
+				provider.register()
+			}
+		})
 
-    return this.providers
-  }
+		return this.providers
+	}
 
-  /**
-   * Boot all the providers by calling the `boot` method.
-   * Boot methods are called in series.
-   */
-  public async boot () {
-    const providers = this.register()
+	/**
+	 * Boot all the providers by calling the `boot` method.
+	 * Boot methods are called in series.
+	 */
+	public async boot() {
+		const providers = this.register()
 
-    for (let provider of providers) {
-      /* istanbul ignore else */
-      if (typeof (provider.boot) === 'function') {
-        await provider.boot()
-      }
-    }
-  }
+		for (let provider of providers) {
+			/* istanbul ignore else */
+			if (typeof provider.boot === 'function') {
+				await provider.boot()
+			}
+		}
+	}
 
-  /**
-   * Register an boot providers together.
-   */
-  public async registerAndBoot () {
-    const providers = this.register()
-    await this.boot()
-    return providers
-  }
+	/**
+	 * Register an boot providers together.
+	 */
+	public async registerAndBoot() {
+		const providers = this.register()
+		await this.boot()
+		return providers
+	}
 }
