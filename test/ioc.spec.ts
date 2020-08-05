@@ -339,7 +339,7 @@ test.group('Ioc | autoloads', (group) => {
 		const fn = () => ioc.use('Apple/services/foo')
 		assert.throw(
 			fn,
-			'E_IOC_LOOKUP_FAILED: Cannot resolve Apple/services/foo namespace from the IoC Container'
+			'E_IOC_LOOKUP_FAILED: Cannot resolve "Apple/services/foo" namespace from the IoC Container'
 		)
 	})
 
@@ -423,7 +423,7 @@ test.group('Ioc | autoloads', (group) => {
 	test('raise error when lookup fails', (assert) => {
 		const ioc = new Ioc()
 		const fn = () => ioc.use('japa')
-		assert.throw(fn, 'E_IOC_LOOKUP_FAILED: Cannot resolve japa namespace from the IoC Container')
+		assert.throw(fn, 'E_IOC_LOOKUP_FAILED: Cannot resolve "japa" namespace from the IoC Container')
 	})
 
 	test('clear autoload cache for a given file', async (assert) => {
@@ -1347,7 +1347,7 @@ test.group('Ioc | inject decorator', () => {
 		}
 
 		const fn = () => ioc.make(Foo)
-		assert.throw(fn, 'Cannot inject {String Constructor} to {Foo} at position 1')
+		assert.throw(fn, 'Cannot inject "{String Constructor}" to "Foo" at position "1"')
 	})
 
 	test('inject method dependencies injected via decorator', (assert) => {
@@ -1415,7 +1415,7 @@ test.group('Ioc | inject decorator', () => {
 		}
 
 		const fn = () => ioc.call(ioc.make(Foo), 'greet', [])
-		assert.throw(fn, 'Cannot inject {String Constructor} to {Foo.greet} at position 1')
+		assert.throw(fn, 'Cannot inject "{String Constructor}" to "Foo.greet" at position "1"')
 	})
 
 	test('call object method even when it has zero injections', (assert) => {
@@ -1491,7 +1491,7 @@ test.group('Ioc | lookup resolve', (group) => {
 
 		assert.throw(
 			fn,
-			'E_IOC_BINDING_NOT_FOUND: Cannot resolve App/Foo binding from the IoC Container'
+			'E_IOC_BINDING_NOT_FOUND: Cannot resolve "App/Foo" binding from the IoC Container'
 		)
 	})
 
@@ -1548,7 +1548,7 @@ test.group('Ioc | lookup resolve', (group) => {
 
 		assert.throw(
 			fn,
-			'E_IOC_BINDING_NOT_FOUND: Cannot resolve App/Foo binding from the IoC Container'
+			'E_IOC_BINDING_NOT_FOUND: Cannot resolve "App/Foo" binding from the IoC Container'
 		)
 	})
 })

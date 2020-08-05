@@ -101,7 +101,7 @@ export class IocResolver {
 		 * disk
 		 */
 		if (!lookupNode) {
-			throw new Exception(`Unable to resolve ${tokens.join('.')} namespace from IoC container`)
+			throw new Exception(`Unable to resolve "${tokens.join('.')}" namespace from IoC container`)
 		}
 
 		this.lookupCache[cacheKey] = { ...lookupNode, method }

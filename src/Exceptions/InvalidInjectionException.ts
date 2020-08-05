@@ -12,6 +12,8 @@ import { Exception } from '@poppinss/utils'
 export class InvalidInjectionException extends Exception {
 	public static invoke(value: any, parentName: string, index: number) {
 		const primitiveName = `{${value.name} Constructor}`
-		return new this(`Cannot inject ${primitiveName} to {${parentName}} at position ${index + 1}`)
+		return new this(
+			`Cannot inject "${primitiveName}" to "${parentName}" at position "${index + 1}"`
+		)
 	}
 }

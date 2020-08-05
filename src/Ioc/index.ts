@@ -507,7 +507,7 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 	public useFake<T extends any = any>(namespace: string, value?: any): T {
 		const fake = this.fakes.get(namespace)
 		if (!fake) {
-			throw new Error(`Cannot find fake for ${namespace}`)
+			throw new Exception(`Cannot find fake for "${namespace}"`)
 		}
 
 		fake.cachedValue = fake.cachedValue || fake.callback(this, value)
@@ -646,7 +646,7 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 	 */
 	public call<T extends object, K extends keyof T = any>(target: T, method: K, args?: any[]): any {
 		if (typeof target[method] !== 'function') {
-			throw new Error(`Missing method ${method} on ${target.constructor.name}`)
+			throw new Exception(`Missing method "${method}" on "${target.constructor.name}"`)
 		}
 
 		return this.injector.injectMethodDependencies(target, method as string, args || [])

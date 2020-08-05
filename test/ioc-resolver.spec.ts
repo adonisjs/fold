@@ -59,7 +59,7 @@ test.group('Ioc Resolver', () => {
 		const resolver = ioc.getResolver()
 
 		const fn = () => resolver.call('App/UserController.getUser')
-		assert.throw(fn, 'Unable to resolve App/UserController namespace from IoC container')
+		assert.throw(fn, 'Unable to resolve "App/UserController" namespace from IoC container')
 	})
 
 	test('allow runtime prefix namespace', (assert) => {

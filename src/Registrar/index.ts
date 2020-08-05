@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { esmRequire, resolveFrom } from '@poppinss/utils'
+import { esmRequire, resolveFrom, Exception } from '@poppinss/utils'
 import { IocContract } from '../Contracts'
 
 /**
@@ -44,7 +44,7 @@ export class Registrar {
 		const provider = esmRequire(providerPath)
 
 		if (typeof provider !== 'function') {
-			throw new Error(`Make sure export default the provider from ${providerPath}`)
+			throw new Exception(`Make sure export default the provider from "${providerPath}"`)
 		}
 
 		return new provider(this.ioc)
@@ -55,8 +55,8 @@ export class Registrar {
 	 * `providers` collection. This collection is later used to
 	 * register and boot providers
 	 */
-	private collect(providerPaths) {
-		providerPaths.forEach((providerPath) => {
+	private collect(providerPaths: string[]) {
+		providerPaths.forEach((providerPath: string) => {
 			const provider = this.loadProvider(providerPath)
 			this.providers.push(provider)
 

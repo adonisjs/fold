@@ -12,14 +12,14 @@ import { IocContract } from '../Contracts'
 /**
  * Checks for the existence of fake on the target
  */
-function hasFake(target) {
+function hasFake(target: any) {
 	return target.container.hasFake(target.binding)
 }
 
 /**
  * Calls the trap on the target
  */
-function callTrap(target, trap, ...args) {
+function callTrap(target: any, trap: any, ...args: any[]) {
 	if (hasFake(target)) {
 		return Reflect[trap](target.container.useFake(target.binding, target.actual), ...args)
 	} else {
@@ -31,39 +31,39 @@ function callTrap(target, trap, ...args) {
  * Proxy handler to handle objects
  */
 const objectHandler = {
-	get(target, ...args) {
+	get(target: any, ...args: any[]) {
 		return callTrap(target, 'get', ...args)
 	},
 
-	apply(target, ...args) {
+	apply(target: any, ...args: any[]) {
 		return callTrap(target, 'apply', ...args)
 	},
 
-	defineProperty(target, ...args) {
+	defineProperty(target: any, ...args: any[]) {
 		return callTrap(target, 'defineProperty', ...args)
 	},
 
-	deleteProperty(target, ...args) {
+	deleteProperty(target: any, ...args: any[]) {
 		return callTrap(target, 'deleteProperty', ...args)
 	},
 
-	getOwnPropertyDescriptor(target, ...args) {
+	getOwnPropertyDescriptor(target: any, ...args: any[]) {
 		return callTrap(target, 'getOwnPropertyDescriptor', ...args)
 	},
 
-	getPrototypeOf(target, ...args) {
+	getPrototypeOf(target: any, ...args: any[]) {
 		return callTrap(target, 'getPrototypeOf', ...args)
 	},
 
-	has(target, ...args) {
+	has(target: any, ...args: any[]) {
 		return callTrap(target, 'has', ...args)
 	},
 
-	isExtensible(target, ...args) {
+	isExtensible(target: any, ...args: any[]) {
 		return callTrap(target, 'isExtensible', ...args)
 	},
 
-	ownKeys(target, ...args) {
+	ownKeys(target: any, ...args: any[]) {
 		return callTrap(target, 'ownKeys', ...args)
 	},
 
@@ -71,11 +71,11 @@ const objectHandler = {
 		throw new Error('Cannot prevent extensions during a fake')
 	},
 
-	set(target, ...args) {
+	set(target: any, ...args: any[]) {
 		return callTrap(target, 'set', ...args)
 	},
 
-	setPrototypeOf(target, ...args) {
+	setPrototypeOf(target: any, ...args: any[]) {
 		return callTrap(target, 'setPrototypeOf', ...args)
 	},
 }
@@ -84,7 +84,7 @@ const objectHandler = {
  * Proxy handler to handle classes and functions
  */
 const classHandler = Object.assign({}, objectHandler, {
-	construct(target, ...args) {
+	construct(target: any, ...args: any[]) {
 		return callTrap(target, 'construct', args)
 	},
 })
