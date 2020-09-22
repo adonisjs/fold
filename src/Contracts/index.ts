@@ -23,7 +23,7 @@ type PlainConstructor = {
 }
 
 /**
- * The intefered type of the `make` function
+ * The inferred type of the `make` function
  */
 export type MakeInferedType<T extends any> = T extends string | LookupNode
 	? any
