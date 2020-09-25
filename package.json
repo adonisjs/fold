@@ -56,7 +56,7 @@
     "github-label-sync": "^2.0.0",
     "husky": "^4.3.0",
     "japa": "^3.1.1",
-    "mrm": "^2.5.0",
+    "mrm": "^2.5.1",
     "np": "^6.5.0",
     "npm-audit-html": "^1.4.3",
     "prettier": "^2.1.2",
