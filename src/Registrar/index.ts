@@ -8,7 +8,6 @@
  */
 
 import { esmRequire, resolveFrom, Exception } from '@poppinss/utils'
-import { IocContract } from '../Contracts'
 
 /**
  * Registrar is used to register and boot the providers
@@ -31,7 +30,7 @@ export class Registrar {
 	 */
 	private collected: boolean = false
 
-	constructor(public ioc: IocContract, private basePath?: string) {}
+	constructor(private providerConstructorParams: any[], private basePath?: string) {}
 
 	/**
 	 * Load the provider by requiring the file from the disk
@@ -47,7 +46,7 @@ export class Registrar {
 			throw new Exception(`Make sure export default the provider from "${providerPath}"`)
 		}
 
-		return new provider(this.ioc)
+		return new provider(...this.providerConstructorParams)
 	}
 
 	/**
@@ -109,7 +108,6 @@ export class Registrar {
 		const providers = this.register()
 
 		for (let provider of providers) {
-			/* istanbul ignore else */
 			if (typeof provider.boot === 'function') {
 				await provider.boot()
 			}

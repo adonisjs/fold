@@ -11,7 +11,7 @@ import test from 'japa'
 import { Ioc } from '../src/Ioc'
 
 test.group('Ioc Resolver', () => {
-	test('call namespace expression', (assert) => {
+	test('call handle method when no explicit method is defined', (assert) => {
 		class UserController {
 			public handle() {
 				return 'foo'

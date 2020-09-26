@@ -35,7 +35,7 @@ test.group('Registrar', (group) => {
     }`
 		)
 
-		const registrar = new Registrar(new Ioc())
+		const registrar = new Registrar([[new Ioc()]])
 		registrar.useProviders([join(fs.basePath, 'providers', 'FooProvider')])
 
 		const providers = registrar.register()
@@ -53,7 +53,7 @@ test.group('Registrar', (group) => {
     }`
 		)
 
-		const registrar = new Registrar(new Ioc(false))
+		const registrar = new Registrar([new Ioc()])
 		registrar.useProviders([join(fs.basePath, 'providers', 'BarProvider')])
 
 		const providers = registrar.register()
@@ -77,7 +77,7 @@ test.group('Registrar', (group) => {
     }`
 		)
 
-		const registrar = new Registrar(new Ioc(false))
+		const registrar = new Registrar([new Ioc()])
 		registrar.useProviders([join(fs.basePath, 'providers', 'BarProvider')])
 
 		const providers = await registrar.registerAndBoot()
@@ -120,7 +120,7 @@ test.group('Registrar', (group) => {
     }`
 		)
 
-		const registrar = new Registrar(new Ioc(false))
+		const registrar = new Registrar([new Ioc()])
 		registrar.useProviders([join(fs.basePath, 'providers', 'BarProvider')])
 
 		const providers = await registrar.registerAndBoot()
@@ -148,7 +148,7 @@ test.group('Registrar', (group) => {
     }`
 		)
 
-		const registrar = new Registrar(new Ioc(false))
+		const registrar = new Registrar([new Ioc()])
 		registrar.useProviders([join(fs.basePath, 'providers', 'BarProvider')])
 		const fn = () => registrar.register()
 
@@ -169,7 +169,7 @@ test.group('Registrar', (group) => {
     }`
 		)
 
-		const registrar = new Registrar(new Ioc(), fs.basePath)
+		const registrar = new Registrar([new Ioc()], fs.basePath)
 		registrar.useProviders(['./providers/FooProvider.js'])
 
 		const providers = registrar.register()
@@ -211,7 +211,7 @@ test.group('Registrar', (group) => {
     }`
 		)
 
-		const registrar = new Registrar(new Ioc(false), fs.basePath)
+		const registrar = new Registrar([[new Ioc()]], fs.basePath)
 		registrar.useProviders(['./providers/BarProvider'])
 
 		const providers = await registrar.registerAndBoot()

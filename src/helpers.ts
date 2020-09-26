@@ -55,7 +55,6 @@ export function ensureIsFunction(callback: Function, message: string) {
  */
 export function clearRequireCache(modulePath: string) {
 	const cacheItem = require.cache[modulePath]
-	/* istanbul ignore if */
 	if (!cacheItem) {
 		return
 	}
@@ -65,8 +64,6 @@ export function clearRequireCache(modulePath: string) {
 	 * parent
 	 */
 	delete require.cache[modulePath]
-
-	/* istanbul ignore if */
 	if (!cacheItem.parent) {
 		return
 	}

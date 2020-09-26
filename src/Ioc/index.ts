@@ -10,77 +10,29 @@
 import { normalize } from 'path'
 import { Exception } from '@poppinss/utils'
 
-import tracer from './Tracer'
-import { Injector } from './Injector'
-import { IocResolver } from '../Resolver'
-import { IoCProxyObject, IocProxyClass } from './IoCProxy'
-import { IocLookupException } from '../Exceptions/IocLookupException'
-
-import { isEsm, isClass, isObject, ensureIsFunction, clearRequireCache } from '../helpers'
-
 import {
 	Binding,
 	LookupNode,
-	FakeBinding,
 	IocContract,
+	FakeBinding,
 	BindCallback,
-	MakeInferedType,
+	InferMakeType,
+	AliasCacheItem,
 	BindFakeCallback,
-	AutoloadCacheItem,
+	ExtractFunctions,
 } from '../Contracts'
 
-/**
- * Ioc container to manage and compose dependencies of your application
- * with ease.
- *
- * The container follows and encourages the use of dependency injection
- * in your application and provides all the neccessary tools to make
- * DI simpler.
- */
-export class Ioc<ContainerBindings extends any> implements IocContract<ContainerBindings> {
-	/**
-	 * For emitting emits
-	 */
-	public tracer = tracer(this.emitEvents)
+import { Injector } from './Injector'
+import { IocResolver } from '../Resolver'
+import { IocProxyObject, IocProxyClass } from './IoCProxy'
+import { IocLookupException } from '../Exceptions/IocLookupException'
+import { isEsm, isClass, isObject, ensureIsFunction, clearRequireCache } from '../helpers'
 
+export class Ioc implements IocContract {
 	/**
-	 * Autoloaded directories under a namespace
+	 * Find if proxies are enabled or not
 	 */
-	public autoloads: { [namespace: string]: string } = {}
-
-	/**
-	 * An array of autoloaded aliases, stored along side with
-	 * `autoloads` for a quick lookup on keys vs doing
-	 * `Object.keys` everytime
-	 */
-	public autoloadedAliases: string[] = []
-
-	/**
-	 * Autoloaded cache to improve the `require` speed, which is dog slow.
-	 */
-	private autoloadsCache: Map<string, AutoloadCacheItem> = new Map()
-
-	/**
-	 * Copy of aliases
-	 */
-	private aliases: { [alias: string]: string } = {}
-
-	/**
-	 * Copy of actual bindings
-	 */
-	private bindings: { [namespace: string]: Binding<any, ContainerBindings> } = {}
-
-	/**
-	 * Copy of fakes as a Map, since fakes are subjective to
-	 * mutations
-	 */
-	private fakes: Map<string, FakeBinding<any, ContainerBindings>> = new Map()
-
-	/**
-	 * Using proxies or not? Fakes only works when below one
-	 * is set to true.
-	 */
-	private proxiesEnabled = false
+	private proxiesEnabled: boolean = false
 
 	/**
 	 * Injector is used for injecting dependencies to the class constructor
@@ -88,7 +40,37 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 	 */
 	private injector = new Injector(this)
 
-	constructor(private emitEvents = false) {}
+	/**
+	 * Options passed to the proxy handlers for resolving fakes
+	 */
+	private proxyOptions = {
+		hasFake: ($namespace: string) => this.fakes.has($namespace),
+		useFake: ($namespace: string, $value: any) => {
+			const fake = this.fakes.get($namespace)!
+			fake.cachedValue = fake.cachedValue || fake.callback(this, $value)
+			return fake.cachedValue as any
+		},
+	}
+
+	/**
+	 * An object of registered bindings
+	 */
+	private bindings: { [namespace: string]: Binding<any, Ioc> } = {}
+
+	/**
+	 * A Map of registered fakes
+	 */
+	private fakes: Map<string, FakeBinding<any, Ioc>> = new Map()
+
+	/**
+	 * Aliases cache improves the `require` speed, which is dog slow otherwise.
+	 */
+	private aliasesImportCache: Map<string, AliasCacheItem> = new Map()
+
+	/**
+	 * Directories registered with an alias
+	 */
+	public directoryAliases: { [alias: string]: string } = {}
 
 	/**
 	 * Returns the binding return value. This method must be called when
@@ -100,10 +82,8 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 			throw IocLookupException.missingBinding(namespace)
 		}
 
-		this.tracer.in(namespace, !!binding.cachedValue)
-
 		/**
-		 * Return the cached value for singletons or invoke callback
+		 * Return the cached value for singletons or invokes the callback
 		 */
 		let value: any
 		if (binding.singleton && binding.cachedValue !== undefined) {
@@ -114,81 +94,62 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 			value = binding.callback(this) // invoke callback
 		}
 
-		this.tracer.out()
 		return value
 	}
 
 	/**
 	 * Load a file from the disk using Node.js require method. The output of
-	 * require is further cached to improve peformance.
+	 * require is further cached to improve the peformance.
 	 *
-	 * Make sure to call this method when [[isAutoloadNamespace]] returns true.
+	 * Make sure to call this method when [[isAliasPath]] returns true.
 	 */
-	private resolveAutoload(namespace: string) {
-		const cacheEntry = this.autoloadsCache.get(namespace)
-		this.tracer.in(namespace, !!cacheEntry)
+	private resolveAlias(namespace: string) {
+		const cacheEntry = this.aliasesImportCache.get(namespace)
 
 		/**
 		 * Require the module and cache it to improve performance
 		 */
 		if (cacheEntry) {
-			this.tracer.out()
 			return cacheEntry.cachedValue
 		}
 
-		const baseNamespace = this.getAutoloadBaseNamespace(namespace)!
-		const diskPath = namespace.replace(baseNamespace, this.autoloads[baseNamespace])
+		/**
+		 * Get alias for the given namespace
+		 */
+		const alias = this.getPathAlias(namespace)
+		if (!alias) {
+			throw IocLookupException.lookupFailed(namespace)
+		}
+
+		/**
+		 * Build path from the namespace and the alias
+		 */
+		const diskPath = namespace.replace(alias, this.directoryAliases[alias])
 		const absPath = require.resolve(normalize(diskPath))
-		this.autoloadsCache.set(namespace, { diskPath: absPath, cachedValue: require(absPath) })
 
-		this.tracer.out()
-		return this.autoloadsCache.get(namespace)!.cachedValue
+		/**
+		 * Require and cache value
+		 */
+		this.aliasesImportCache.set(namespace, { diskPath: absPath, cachedValue: require(absPath) })
+
+		/**
+		 * Return cached value
+		 */
+		return this.aliasesImportCache.get(namespace)!.cachedValue
 	}
 
 	/**
-	 * Resolve the value for a namespace by trying all possible
-	 * combinations of `bindings`, `aliases`, `autoloading`
-	 * and finally falling back to `nodejs require`.
+	 * Removes the cache for an alias path. Optionally you can remove
+	 * the require cache as well
 	 */
-	private resolve(node: LookupNode) {
-		switch (node.type) {
-			case 'binding':
-				return this.resolveBinding(node.namespace)
-			case 'autoload':
-				return this.resolveAutoload(node.namespace)
-		}
-	}
-
-	/**
-	 * Resolves a namespace and injects it's dependencies to it
-	 */
-	private resolveAndMake(node: LookupNode, args?: string[]) {
-		switch (node.type) {
-			case 'binding':
-				return this.resolveBinding(node.namespace)
-			case 'autoload':
-				let value = this.resolveAutoload(node.namespace)
-
-				/**
-				 * We return an instance of default export for esm modules
-				 */
-				value = isEsm(value) && value.default ? value.default : value
-				return this.injector.injectDependencies(value, args || [])
-		}
-	}
-
-	/**
-	 * Removes an autoload namespace from the cache. If the value doesn't
-	 * exists in the cache, then this method will be a noop.
-	 */
-	private removeAutoloadFromCache(namespace: string, removeRequire: boolean) {
-		const item = this.autoloadsCache.get(namespace)
+	private removeAliasImportCache(namespace: string, removeFromRequireCache: boolean) {
+		const item = this.aliasesImportCache.get(namespace)
 		if (!item) {
 			return
 		}
 
-		this.autoloadsCache.delete(namespace)
-		if (removeRequire) {
+		this.aliasesImportCache.delete(namespace)
+		if (removeFromRequireCache) {
 			clearRequireCache(item.diskPath)
 		}
 	}
@@ -197,19 +158,19 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 	 * Wraps object and class to a proxy for enabling the fakes
 	 * API
 	 */
-	private wrapAsProxy<T extends any>(namespace: string, value: any): T {
+	private wrapAsProxy(namespace: string, value: any) {
 		/**
 		 * Wrap objects inside proxy
 		 */
 		if (isObject(value)) {
-			return (new IoCProxyObject(namespace, value, this) as unknown) as T
+			return new IocProxyObject(namespace, value, this.proxyOptions)
 		}
 
 		/**
 		 * Wrap class inside proxy
 		 */
 		if (isClass(value)) {
-			return (IocProxyClass(namespace, value, this) as unknown) as T
+			return IocProxyClass(namespace, value, this.proxyOptions)
 		}
 
 		return value
@@ -218,7 +179,7 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 	/**
 	 * Returns a boolean telling if value is a lookup node or not
 	 */
-	private isLookupNode(value: any): value is LookupNode {
+	private isLookupNode(value: any): value is LookupNode<string> {
 		return value && value.type && value.namespace
 	}
 
@@ -235,7 +196,7 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 	 * Add a new binding with a namespace. Keeping the namespace unique
 	 * is the responsibility of the user. We do not restrict duplicate
 	 * namespaces, since it's perfectly acceptable to provide new
-	 * values for existing bindings.
+	 * implementation for an existing binding.
 	 *
 	 * @example
 	 * ```js
@@ -244,15 +205,10 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 	 * })
 	 * ```
 	 */
-	public bind<Namespace extends keyof ContainerBindings>(
-		namespace: Namespace,
-		callback: BindCallback<ContainerBindings[Namespace], ContainerBindings>
-	): void
-	public bind(namespace: string, callback: BindCallback<unknown, ContainerBindings>): void
-	public bind(namespace: string, callback: BindCallback<unknown, ContainerBindings>): void {
-		ensureIsFunction(callback, 'ioc.bind expect 2nd argument to be a function')
-		this.tracer.emit('bind', { namespace, singleton: false })
+	public bind(namespace: string, callback: BindCallback<unknown, this>): this {
+		ensureIsFunction(callback, '"ioc.bind" expect 2nd argument to be a function')
 		this.bindings[namespace] = { callback, singleton: false }
+		return this
 	}
 
 	/**
@@ -267,29 +223,31 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 	 * })
 	 * ```
 	 */
-	public singleton<Namespace extends keyof ContainerBindings>(
-		namespace: string,
-		callback: BindCallback<ContainerBindings[Namespace], ContainerBindings>
-	): void
-	public singleton(namespace: string, callback: BindCallback<unknown, ContainerBindings>): void
-	public singleton(namespace: string, callback: BindCallback<unknown, ContainerBindings>): void {
-		ensureIsFunction(callback, 'ioc.singleton expect 2nd argument to be a function')
-		this.tracer.emit('bind', { namespace, singleton: true })
+	public singleton(namespace: string, callback: BindCallback<unknown, this>): this {
+		ensureIsFunction(callback, '"ioc.singleton" expect 2nd argument to be a function')
 		this.bindings[namespace] = { callback, singleton: true }
+		return this
 	}
 
 	/**
-	 * Define alias for an existing binding. IoC container doesn't handle uniqueness
-	 * conflicts for you and it's upto you to make sure that all aliases are
-	 * unique.
+	 * Register a fake for an existing binding. The fakes only work when
+	 * [[this.useProxies]] is invoked. AdonisJS will invoke it
+	 * automatically when running tests.
 	 *
-	 * Use method [[hasAlias]] to know, if an alias already exists.
+	 * NOTE: The return value of fakes is always cached, since multiple
+	 * calls to `use` after that should points to a same return value.
+	 *
+	 * @example
+	 * ```js
+	 * ioc.fake('App/User', function () {
+	 *  return new FakeUser()
+	 * })
+	 * ```
 	 */
-	public alias<Namespace extends keyof ContainerBindings>(namespace: Namespace, alias: string): void
-	public alias(namespace: string, alias: string): void
-	public alias(namespace: string, alias: string): void {
-		this.tracer.emit('alias', { alias, namespace })
-		this.aliases[alias] = namespace
+	public fake(namespace: string, callback: BindFakeCallback<unknown, this>): this {
+		ensureIsFunction(callback, 'ioc.fake expect 2nd argument to be a function')
+		this.fakes.set(namespace, { callback })
+		return this
 	}
 
 	/**
@@ -310,353 +268,107 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 	 *
 	 * You are in file `controllers/foo.js`
 	 *
-	 * ### Without autoload
+	 * ### Without alias
 	 * ```js
 	 * require('../services/foo')
 	 * require('../models/foo')
 	 * ```
 	 *
-	 * ### With outoload
+	 * ### With alias
 	 * ```
-	 * ioc.autoload(join(__dirname, 'app'), 'App')
+	 * ioc.alias(join(__dirname, 'app'), 'App')
 	 *
 	 * ioc.use('App/services/foo')
 	 * ioc.use('App/mdoels/foo')
 	 * ```
 	 */
-	public autoload(directoryPath: string, namespace: string): void {
-		this.tracer.emit('autoload', { directoryPath, namespace })
-
-		/**
-		 * Store namespaces in an array for faster lookup
-		 * during resolve phase
-		 */
-		this.autoloadedAliases.push(namespace)
-		this.autoloads[namespace] = directoryPath
-	}
-
-	/**
-	 * Clear the autoload cache for all the cached files or for a
-	 * single namespace.
-	 *
-	 * Optionally, you can remove it from `require` cache too.
-	 */
-	public clearAutoloadCache(namespace?: string, clearModulesCache = false): void {
-		if (!namespace) {
-			Array.from(this.autoloadsCache.keys()).forEach((key) => {
-				this.removeAutoloadFromCache(key, clearModulesCache)
-			})
-			return
-		}
-
-		this.removeAutoloadFromCache(namespace, clearModulesCache)
-	}
-
-	/**
-	 * Register a fake for an existing binding. The fakes only work when
-	 * [[this.useProxies]] is invoked. AdonisJs will set invoke it
-	 * automatically when running tests.
-	 *
-	 * NOTE: The return value of fakes is always cached, since multiple
-	 * calls to `use` after that should point to a same return value.
-	 *
-	 * @example
-	 * ```js
-	 * ioc.fake('App/User', function () {
-	 *  return new FakeUser()
-	 * })
-	 * ```
-	 */
-	public fake<Namespace extends keyof ContainerBindings>(
-		namespace: Namespace,
-		callback: BindFakeCallback<ContainerBindings[Namespace], ContainerBindings>
-	): void
-	public fake(namespace: string, callback: BindFakeCallback<unknown, ContainerBindings>): void
-	public fake(namespace: string, callback: BindFakeCallback<unknown, ContainerBindings>): void {
-		ensureIsFunction(callback, 'ioc.fake expect 2nd argument to be a function')
-		this.tracer.emit('fake', { namespace })
-		this.fakes.set(namespace, { callback })
-	}
-
-	/**
-	 * Use the binding by resolving it from the container. The resolve method
-	 * does some all the hard work to resolve the value for you.
-	 *
-	 * 1. The name will be searched for an existing binding.
-	 * 2. Checked against aliases.
-	 * 3. Checked against autoloaded directories.
-	 * 4. Fallback to Node.js `require` call.
-	 *
-	 * @example
-	 * ```js
-	 * ioc.use('View')                // alias
-	 * ioc.use('Adonis/Src/View')     // binding
-	 * ioc.use('App/Services/User')   // Autoload
-	 * ioc.use('lodash')              // Fallback to Node.js require
-	 * ```
-	 */
-	public use<Namespace extends keyof ContainerBindings>(
-		node: Namespace
-	): ContainerBindings[Namespace]
-	public use<T extends any = any>(node: string | LookupNode): T
-	public use<T extends any = any>(node: string | LookupNode): T {
-		/**
-		 * Get lookup node when node itself isn't a lookup node
-		 */
-		const lookedupNode = typeof node === 'string' ? this.lookup(node) : node
-
-		/**
-		 * Do not proceed when unable to lookup Ioc container namespace
-		 */
-		if (!lookedupNode || !lookedupNode.type) {
-			throw IocLookupException.lookupFailed(node as string)
-		}
-
-		/**
-		 * Attempt to resolve the module
-		 */
-		let value = this.resolve(lookedupNode)
-
-		/**
-		 * When not using proxies, then we must return the value untouched
-		 */
-		if (!this.proxiesEnabled) {
-			return value as T
-		}
-
-		/**
-		 * Wrap and return `esm` module default exports to proxy
-		 */
-		if (isEsm(value)) {
-			if (value.default) {
-				value = Object.assign({}, value, {
-					default: this.wrapAsProxy(lookedupNode.namespace, value.default),
-				})
-			}
-			return value as T
-		}
-
-		return this.wrapAsProxy<T>(lookedupNode.namespace, value)
-	}
-
-	/**
-	 * Make an instance of class and auto inject it's dependencies. The instance
-	 * is only created if `namespace` is part of an autoload or is a class
-	 * constructor.
-	 *
-	 * The bindings added via `ioc.bind` or `ioc.singleton` controls their return value
-	 * themselves using the factory function.
-	 */
-	public make<Namespace extends keyof ContainerBindings>(
-		node: Namespace,
-		args?: any[]
-	): ContainerBindings[Namespace]
-	public make<T extends any>(node: T, args?: any[]): MakeInferedType<T>
-	public make<T extends any>(node: T, args?: any[]): MakeInferedType<T> {
-		/**
-		 * If value is not a namespace string and not a lookup node,
-		 * then we make the value as it is.
-		 *
-		 * Also we do not support fakes for raw values and hence there is
-		 * no point in wrapping it to a proxy
-		 */
-		if (typeof node !== 'string' && !this.isLookupNode(node)) {
-			return this.injector.injectDependencies(node, args || [])
-		}
-
-		/**
-		 * Get lookup node when node itself isn't a lookup node
-		 */
-		const lookedupNode = typeof node === 'string' ? this.lookup(node as any) : (node as LookupNode)
-
-		/**
-		 * Do not proceed when unable to lookup Ioc container namespace
-		 */
-		if (!lookedupNode || !lookedupNode.type) {
-			throw IocLookupException.lookupFailed(node as string)
-		}
-
-		/**
-		 * Attempt to make the lookedupNode.
-		 */
-		const value = this.resolveAndMake(lookedupNode || node, args)
-
-		/**
-		 * When not using proxies, then we must return the value untouched
-		 */
-		if (!this.proxiesEnabled || isEsm(value)) {
-			return value
-		}
-
-		return this.wrapAsProxy(lookedupNode.namespace, value)
-	}
-
-	/**
-	 * Use the fake for a given namespace. You don't have to manually
-	 * read values from this method, unless you know what you are
-	 * doing.
-	 *
-	 * This method is internally used by ioc container proxy objects to
-	 * point to a fake when `useProxies` is called and fake exists.
-	 */
-	public useFake<Namespace extends keyof ContainerBindings>(
-		namespace: Namespace,
-		value?: ContainerBindings[Namespace]
-	): ContainerBindings[Namespace]
-	public useFake<T extends any = any>(namespace: string, value?: any): T
-	public useFake<T extends any = any>(namespace: string, value?: any): T {
-		const fake = this.fakes.get(namespace)
-		if (!fake) {
-			throw new Exception(`Cannot find fake for "${namespace}"`)
-		}
-
-		fake.cachedValue = fake.cachedValue || fake.callback(this, value)
-		return fake.cachedValue as T
+	public alias(directoryPath: string, alias: string): this {
+		this.directoryAliases[alias] = directoryPath
+		return this
 	}
 
 	/**
 	 * A boolean telling if a fake exists for a binding or
 	 * not.
 	 */
-	public hasFake<Namespace extends keyof ContainerBindings>(namespace: Namespace): boolean
-	public hasFake(namespace: string): boolean
 	public hasFake(namespace: string): boolean {
 		return this.fakes.has(namespace)
 	}
 
 	/**
-	 * Returns a boolean telling if an alias
-	 * exists
-	 */
-	public hasAlias<Namespace extends keyof ContainerBindings>(namespace: Namespace): boolean
-	public hasAlias(namespace: string): boolean
-	public hasAlias(namespace: string): boolean {
-		return !!this.aliases[namespace]
-	}
-
-	/**
 	 * Returns a boolean telling if binding for a given namespace
-	 * exists or not. Also optionally check for aliases too.
+	 * exists or not.
 	 *
 	 * @example
 	 * ```js
-	 * ioc.hasBinding('Adonis/Src/View')    // namespace
-	 * ioc.hasBinding('View', true)         // alias
+	 * ioc.hasBinding('Adonis/Src/View')
 	 * ```
 	 */
-	public hasBinding<Namespace extends keyof ContainerBindings>(
-		namespace: Namespace,
-		checkAliases?: boolean
-	): boolean
-	public hasBinding(namespace: string, checkAliases?: boolean): boolean
-	public hasBinding(namespace: string, checkAliases: boolean = false): boolean {
-		const binding = this.bindings[namespace]
-		if (!binding && checkAliases) {
-			return !!this.bindings[this.getAliasNamespace(namespace)!]
-		}
-
-		return !!binding
+	public hasBinding(namespace: string): boolean {
+		return !!this.bindings[namespace]
 	}
 
 	/**
-	 * Returns the complete namespace for a given alias. To avoid
-	 * `undefined` values, it is recommended to use `hasAlias`
-	 * before using this method.
-	 */
-	public getAliasNamespace(namespace: string): string | undefined {
-		return this.aliases[namespace]
-	}
-
-	/**
-	 * Returns a boolean telling if namespace is part of autoloads or not.
-	 * This method results may vary from the [[use]] method, since
-	 * the `use` method gives preference to the `bindings` first.
+	 * Returns a boolean telling if namespace is part of directory aliases or not.
 	 *
 	 * ### NOTE:
 	 * Check the following example carefully.
 	 *
 	 * @example
 	 * ```js
-	 * // Define autoload namespace
-	 * ioc.autoload(join(__dirname, 'app'), 'App')
-	 *
-	 * ioc.bind('App/Services/Foo', () => {
-	 * })
-	 *
-	 * // return true
-	 * ioc.isAutoloadNamespace('App/Services/Foo')
-	 *
-	 * // Returns value from `bind` and not disk
-	 * ioc.use('App/Services/Foo')
+	 * ioc.alias(join(__dirname, 'app'), 'App')
+	 * ioc.isAliasPath('App/Services/Foo')
 	 * ```
 	 */
-	public isAutoloadNamespace(namespace: string): boolean {
-		return !!this.getAutoloadBaseNamespace(namespace)
+	public isAliasPath(namespace: string): boolean {
+		if (this.bindings[namespace]) {
+			return false
+		}
+
+		return !!Object.keys(this.directoryAliases).find((alias) => {
+			return namespace.startsWith(`${alias}/`)
+		})
 	}
 
 	/**
-	 * Returns the base namespace for an autoloaded namespace.
+	 * Returns the alias for a given namespace.
 	 *
 	 * @example
 	 * ```js
-	 * ioc.autoload(join(__dirname, 'app'), 'App')
+	 * ioc.alias(join(__dirname, 'app'), 'App')
 	 *
-	 * ioc.getAutoloadBaseNamespace('App/Services/Foo') // returns App
+	 * ioc.getPathAlias('App/Services/Foo') // returns App
+	 * ioc.getPathAlias('Foo/Services/Foo') // returns undefined
 	 * ```
 	 */
-	public getAutoloadBaseNamespace(namespace: string): string | undefined {
-		return this.autoloadedAliases.find((alias) => namespace.startsWith(`${alias}/`))
+	public getPathAlias(namespace: string): string | undefined {
+		return Object.keys(this.directoryAliases).find((alias) => {
+			return namespace.startsWith(`${alias}/`)
+		})
 	}
 
 	/**
-	 * Restore the fake
-	 */
-	public restore<Namespace extends keyof ContainerBindings>(namespace: Namespace): void
-	public restore(namespace: string): void
-	public restore(namespace: string): void {
-		this.fakes.delete(namespace)
-	}
-
-	/**
-	 * Execute a callback by resolving bindings from the container and only
-	 * executed when all bindings exists in the container.
+	 * Clears the cache for directory aliasaes.
 	 *
-	 * This is a clean way to use bindings, when you are not that user application
-	 * is using them or not.
-	 *
-	 * ```js
-	 * boot () {
-	 *  this.app.with(['Adonis/Src/Auth'], (Auth) => {
-	 *    Auth.extend('mongo', 'serializer', function () {
-	 *      return new MongoSerializer()
-	 *    })
-	 *  })
-	 * }
-	 * ```
+	 * - Cache for aliases if cleared when no alias is defined
+	 * - Optionally, the require cache can be cleared as well
 	 */
-	public with(namespaces: string[], callback: (...args: any[]) => void): void {
-		ensureIsFunction(callback, 'ioc.with expect 2nd argument to be a function')
-		if (namespaces.every((namespace) => this.hasBinding(namespace, true))) {
-			callback(...namespaces.map((namespace) => this.use(namespace)))
-		}
-	}
-
-	/**
-	 * Call method on an object and inject dependencies to it automatically.
-	 */
-	public call<T extends object, K extends keyof T = any>(target: T, method: K, args?: any[]): any {
-		if (typeof target[method] !== 'function') {
-			throw new Exception(`Missing method "${method}" on "${target.constructor.name}"`)
+	public clearAliasesCache(alias?: string, removeFromRequireCache: boolean = false): void {
+		if (!alias) {
+			Array.from(this.aliasesImportCache.keys()).forEach((key) => {
+				this.removeAliasImportCache(key, removeFromRequireCache)
+			})
+			return
 		}
 
-		return this.injector.injectMethodDependencies(target, method as string, args || [])
+		this.removeAliasImportCache(alias, removeFromRequireCache)
 	}
 
 	/**
 	 * Lookup a namespace and return it's lookup node. The lookup node can speed
 	 * up resolving of namespaces via `use`, `useEsm` or `make` methods.
 	 */
-	public lookup(namespace: string, prefixNamespace?: string): null | LookupNode {
+	public lookup(namespace: string, prefixNamespace?: string): null | any {
 		/**
 		 * Ensure namespace is defined
 		 */
@@ -672,9 +384,9 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 		 * Build complete namespace
 		 */
 		if (namespace.startsWith('/')) {
-			namespace = namespace.substr(1)
+			namespace = namespace.substr(1) as any
 		} else if (prefixNamespace) {
-			namespace = `${prefixNamespace.replace(/\/$/, '')}/${namespace}`
+			namespace = `${prefixNamespace.replace(/\/$/, '')}/${namespace}` as any
 		}
 
 		/**
@@ -683,27 +395,17 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 		if (this.hasBinding(namespace)) {
 			return {
 				type: 'binding',
-				namespace,
+				namespace: namespace,
 			}
 		}
 
 		/**
-		 * Resolving aliases as binding
-		 */
-		if (this.hasAlias(namespace)) {
-			return {
-				type: 'binding',
-				namespace: this.getAliasNamespace(namespace)!,
-			}
-		}
-
-		/**
-		 * Namespace is part of pre-defined autoloads. We do not check
+		 * Namespace is part of pre-defined directory aliases. We do not check
 		 * for the module existence
 		 */
-		if (this.isAutoloadNamespace(namespace)) {
+		if (this.isAliasPath(namespace)) {
 			return {
-				type: 'autoload',
+				type: 'alias',
 				namespace: namespace,
 			}
 		}
@@ -712,8 +414,140 @@ export class Ioc<ContainerBindings extends any> implements IocContract<Container
 	}
 
 	/**
+	 * Use the binding by resolving it from the container. The resolve method
+	 * does some all the hard work to resolve the value for you.
+	 *
+	 * 1. The name will be searched for an existing binding.
+	 * 2. Checked against aliases directories.
+	 * 3. Finally an exception is raised when unable to perform lookup
+	 *
+	 * @example
+	 * ```js
+	 * ioc.use('Adonis/Src/View')     // binding
+	 * ioc.use('App/Services/User')   // Directory Alias
+	 * ```
+	 */
+	public use(namespace: string | LookupNode<any>): any {
+		/**
+		 * Get lookup node when node itself isn't a lookup node
+		 */
+		const lookedupNode = typeof namespace === 'string' ? this.lookup(namespace) : namespace
+
+		/**
+		 * Do not proceed when unable to lookup Ioc container namespace
+		 */
+		if (!this.isLookupNode(lookedupNode)) {
+			throw IocLookupException.lookupFailed(namespace as string)
+		}
+
+		const resolvedValue =
+			lookedupNode.type === 'binding'
+				? this.resolveBinding(lookedupNode.namespace)
+				: this.resolveAlias(lookedupNode.namespace)
+
+		/**
+		 * When not using proxies, then we must return the value untouched
+		 */
+		if (!this.proxiesEnabled) {
+			return resolvedValue
+		}
+
+		/**
+		 * Wrap and return `esm` module default exports to proxy
+		 */
+		if (isEsm(resolvedValue)) {
+			if (resolvedValue.default) {
+				resolvedValue.default = this.wrapAsProxy(lookedupNode.namespace, resolvedValue.default)
+			}
+			return resolvedValue
+		}
+
+		return this.wrapAsProxy(lookedupNode.namespace, resolvedValue)
+	}
+
+	/**
+	 * Make an instance of class and auto inject it's dependencies. The instance
+	 * is only created if `namespace` is part of a directory alias or is a class
+	 * constructor.
+	 *
+	 * The bindings added via `ioc.bind` or `ioc.singleton` controls their return value
+	 * themselves using the factory function.
+	 */
+	public make<T extends any>(namespace: T | LookupNode<string>, args?: any[]): InferMakeType<T> {
+		if (typeof namespace !== 'string' && !this.isLookupNode(namespace)) {
+			return this.injector.injectConstructorDependencies(namespace, args || [])
+		}
+
+		/**
+		 * Get lookup node when node itself isn't a lookup node
+		 */
+		const lookedupNode = typeof namespace === 'string' ? this.lookup(namespace) : namespace
+
+		/**
+		 * Do not proceed when unable to lookup Ioc container namespace
+		 */
+		if (!this.isLookupNode(lookedupNode)) {
+			throw IocLookupException.lookupFailed(namespace as string)
+		}
+
+		let resolvedValue: any
+		if (lookedupNode.type === 'binding') {
+			resolvedValue = this.resolveBinding(lookedupNode.namespace)
+		} else {
+			const value = this.resolveAlias(lookedupNode.namespace)
+			resolvedValue = isEsm(value) && value.default ? value.default : value
+			resolvedValue = this.injector.injectConstructorDependencies(resolvedValue, args || [])
+		}
+
+		/**
+		 * When not using proxies, then we must return the value untouched
+		 */
+		if (!this.proxiesEnabled || isEsm(resolvedValue)) {
+			return resolvedValue
+		}
+
+		return this.wrapAsProxy(lookedupNode.namespace, resolvedValue)
+	}
+
+	/**
+	 * Define a callback to be called when all of the container
+	 * bindings are available.
+	 */
+	public with(namespaces: readonly any[], cb: (...args: any) => void): void {
+		if (namespaces.every((namespace) => this.hasBinding(namespace))) {
+			/**
+			 * The callback accepts a tuple, whereas map returns an array. So we
+			 * need to cast the value to any by hand
+			 */
+			cb(...namespaces.map((namespace) => this.use(namespace)))
+		}
+	}
+
+	/**
+	 * Call method on an object and inject dependencies to it automatically.
+	 */
+	public call<T extends object, K extends ExtractFunctions<T>>(
+		target: T,
+		method: K,
+		args: any[]
+	): any {
+		if (typeof target[method] !== 'function') {
+			throw new Exception(`Missing method "${method}" on "${target.constructor.name}"`)
+		}
+
+		return this.injector.injectMethodDependencies(target, method as string, args || [])
+	}
+
+	/**
+	 * Restore a given fake
+	 */
+	public restore(namespace: string): void {
+		this.fakes.delete(namespace)
+	}
+
+	/**
 	 * Returns the resolver instance to resolve Ioc container bindings with
-	 * little ease. Since, the IoCResolver uses an in-memory cache to
+	 * little ease. Since, the IocResolver uses an in-memory cache to
 	 * improve the lookup speed, we suggest keeping a reference to
 	 * the output of this method to leverage caching
 	 */

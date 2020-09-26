@@ -7,23 +7,30 @@
  * file that was distributed with this source code.
  */
 
-import { IocContract } from '../Contracts'
+type ProxyOptions = {
+	hasFake: (namespace: string) => boolean
+	useFake: (namespace: string, value: any) => any
+}
 
 /**
  * Checks for the existence of fake on the target
  */
-function hasFake(target: any) {
-	return target.container.hasFake(target.binding)
+function hasFake(target: { options: ProxyOptions; namespace: string; value: any }) {
+	return target.options.hasFake(target.namespace)
 }
 
 /**
  * Calls the trap on the target
  */
-function callTrap(target: any, trap: any, ...args: any[]) {
+function callTrap(
+	target: { options: ProxyOptions; namespace: string; value: any },
+	trap: any,
+	...args: any[]
+) {
 	if (hasFake(target)) {
-		return Reflect[trap](target.container.useFake(target.binding, target.actual), ...args)
+		return Reflect[trap](target.options.useFake(target.namespace, target.value), ...args)
 	} else {
-		return Reflect[trap](target.actual, ...args)
+		return Reflect[trap](target.value, ...args)
 	}
 }
 
@@ -31,39 +38,39 @@ function callTrap(target: any, trap: any, ...args: any[]) {
  * Proxy handler to handle objects
  */
 const objectHandler = {
-	get(target: any, ...args: any[]) {
+	get(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'get', ...args)
 	},
 
-	apply(target: any, ...args: any[]) {
+	apply(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'apply', ...args)
 	},
 
-	defineProperty(target: any, ...args: any[]) {
+	defineProperty(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'defineProperty', ...args)
 	},
 
-	deleteProperty(target: any, ...args: any[]) {
+	deleteProperty(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'deleteProperty', ...args)
 	},
 
-	getOwnPropertyDescriptor(target: any, ...args: any[]) {
+	getOwnPropertyDescriptor(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'getOwnPropertyDescriptor', ...args)
 	},
 
-	getPrototypeOf(target: any, ...args: any[]) {
+	getPrototypeOf(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'getPrototypeOf', ...args)
 	},
 
-	has(target: any, ...args: any[]) {
+	has(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'has', ...args)
 	},
 
-	isExtensible(target: any, ...args: any[]) {
+	isExtensible(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'isExtensible', ...args)
 	},
 
-	ownKeys(target: any, ...args: any[]) {
+	ownKeys(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'ownKeys', ...args)
 	},
 
@@ -71,11 +78,11 @@ const objectHandler = {
 		throw new Error('Cannot prevent extensions during a fake')
 	},
 
-	set(target: any, ...args: any[]) {
+	set(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'set', ...args)
 	},
 
-	setPrototypeOf(target: any, ...args: any[]) {
+	setPrototypeOf(target: IocProxyObject, ...args: any[]) {
 		return callTrap(target, 'setPrototypeOf', ...args)
 	},
 }
@@ -84,16 +91,16 @@ const objectHandler = {
  * Proxy handler to handle classes and functions
  */
 const classHandler = Object.assign({}, objectHandler, {
-	construct(target: any, ...args: any[]) {
-		return callTrap(target, 'construct', args)
+	construct(target: { options: ProxyOptions; namespace: string; value: any }, ...args: any[]) {
+		return callTrap(target, 'construct', ...args)
 	},
 })
 
 /**
  * Proxies the objects to fallback to fake, when it exists.
  */
-export class IoCProxyObject {
-	constructor(public binding: string, public actual: any, public container: IocContract) {
+export class IocProxyObject {
+	constructor(public namespace: string, public value: any, public options: ProxyOptions) {
 		return new Proxy(this, objectHandler)
 	}
 }
@@ -101,11 +108,11 @@ export class IoCProxyObject {
 /**
  * Proxies the class constructor to fallback to fake, when it exists.
  */
-export function IocProxyClass(binding: string, actual: any, container: IocContract) {
+export function IocProxyClass(namespace: string, value: any, options: ProxyOptions) {
 	function Wrapped() {}
-	Wrapped.binding = binding
-	Wrapped.actual = actual
-	Wrapped.container = container
+	Wrapped.namespace = namespace
+	Wrapped.value = value
+	Wrapped.options = options
 
 	return new Proxy(Wrapped, classHandler)
 }

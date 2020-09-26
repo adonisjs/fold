@@ -8,17 +8,17 @@
  */
 
 import { Exception } from '@poppinss/utils'
-import { IocContract, IocResolverLookupNode } from '../Contracts'
+import { IocContract, IocResolverLookupNode, IocResolverContract } from '../Contracts'
 
 /**
  * Exposes the API to resolve and call bindings from the IoC container. The resolver
  * internally caches the IoC container lookup nodes to boost performance.
  */
-export class IocResolver {
-	private lookupCache: { [key: string]: IocResolverLookupNode } = {}
+export class IocResolver implements IocResolverContract<any> {
+	private lookupCache: { [key: string]: IocResolverLookupNode<string> } = {}
 
 	/**
-	 * The namespace that will be used a prefix when resolving
+	 * The namespace that will be used as a prefix when resolving
 	 * bindings
 	 */
 	private prefixNamespace = this.getPrefixNamespace()
@@ -69,7 +69,7 @@ export class IocResolver {
 	public resolve(
 		namespace: string,
 		prefixNamespace: string | undefined = this.prefixNamespace
-	): IocResolverLookupNode {
+	): IocResolverLookupNode<string> {
 		const cacheKey = prefixNamespace ? `${prefixNamespace}/${namespace}` : namespace
 
 		/**
@@ -96,8 +96,8 @@ export class IocResolver {
 		/**
 		 * Raise exception when unable to resolve the binding from the container.
 		 * NOTE: We are notfetching the binding, we are just checking for it's
-		 * existence. In case of autoloads, it's quite possible that the
-		 * binding check passes and the actual file is missing on the
+		 * existence. In case of directory aliases, it's quite possible that
+		 * the binding check passes and the actual file is missing on the
 		 * disk
 		 */
 		if (!lookupNode) {
@@ -112,11 +112,11 @@ export class IocResolver {
 	 * Calls the namespace.method expression with any arguments that needs to
 	 * be passed. Also supports type-hinting dependencies.
 	 */
-	public call<T extends any>(
-		namespace: string | IocResolverLookupNode,
+	public call(
+		namespace: string | IocResolverLookupNode<string>,
 		prefixNamespace?: string,
 		args?: any[]
-	): T {
+	): any {
 		const lookupNode =
 			typeof namespace === 'string' ? this.resolve(namespace, prefixNamespace) : namespace
 

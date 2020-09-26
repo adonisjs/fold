@@ -47,14 +47,14 @@ export class Injector {
 				throw InvalidInjectionException.invoke(injections[index], targetName, index)
 			}
 
-			return this.container['make'](injection)
+			return this.container.make(injection)
 		})
 	}
 
 	/**
 	 * Injects dependencies to the constructor of a class.
 	 */
-	public injectDependencies(target: any, runtimeValues: any[]) {
+	public injectConstructorDependencies(target: any, runtimeValues: any[]) {
 		if (!isClass(target) || target.makePlain === true) {
 			return target
 		}
