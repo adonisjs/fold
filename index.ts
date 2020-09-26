@@ -10,4 +10,4 @@
 export { Ioc } from './src/Ioc'
 export { inject } from './src/decorators'
 export { Registrar } from './src/Registrar'
-export { IocContract, IocResolverContract, IocResolverLookupNode } from './src/Contracts'
+export * from './src/Contracts'
