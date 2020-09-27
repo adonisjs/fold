@@ -393,7 +393,7 @@ export interface IocResolverContract<ContainerBindings extends any> {
 	 */
 	call<Namespace extends Extract<keyof ContainerBindings, string>>(
 		namespace: Namespace | string,
-		prefixNamespace: string,
+		prefixNamespace?: string,
 		args?: any[]
 	): any
 	call<Namespace extends Extract<keyof ContainerBindings, string>>(
