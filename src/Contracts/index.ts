@@ -378,10 +378,12 @@ export interface IocResolverContract<ContainerBindings extends any> {
 	 * Resolve IoC container binding
 	 */
 	resolve<Namespace extends Extract<keyof ContainerBindings, string>>(
-		namespace: Namespace | LookupNode<Namespace>
+		namespace: Namespace,
+		prefixNamespace?: string
 	): IocResolverLookupNode<Namespace>
 	resolve<Namespace extends string>(
-		namespace: Namespace | LookupNode<Namespace>
+		namespace: Namespace,
+		prefixNamespace?: string
 	): Namespace extends keyof ContainerBindings
 		? IocResolverLookupNode<Namespace>
 		: IocResolverLookupNode<string>
