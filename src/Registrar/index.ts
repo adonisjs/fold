@@ -27,9 +27,9 @@ export class Registrar {
 	private providers: any[] = []
 
 	/**
-	 * Whether or not the providers can be collected
+	 * Whether or not the providers have been registered
 	 */
-	private collected: boolean = false
+	private registered: boolean = false
 
 	constructor(public ioc: IocContract, private basePath?: string) {}
 
@@ -51,17 +51,21 @@ export class Registrar {
 	}
 
 	/**
-	 * Loop's over an array of provider paths and pushes them to the
+	 * Loop's over an array of provider paths, register them and pushes them to the
 	 * `providers` collection. This collection is later used to
-	 * register and boot providers
+	 *  boot providers
 	 */
-	private collect(providerPaths: string[]) {
+	private deepRegister(providerPaths: string[]) {
 		providerPaths.forEach((providerPath: string) => {
 			const provider = this.loadProvider(providerPath)
 			this.providers.push(provider)
 
+			if (typeof provider.register === 'function') {
+				provider.register()
+			}
+
 			if (provider.provides) {
-				this.collect(provider.provides)
+				this.deepRegister(provider.provides)
 			}
 		})
 	}
@@ -82,21 +86,12 @@ export class Registrar {
 	 * to boot them as well.
 	 */
 	public register() {
-		if (this.collected) {
+		if (this.registered) {
 			return this.providers
 		}
 
-		this.collected = true
-		this.collect(this.providersPaths)
-
-		/**
-		 * Register collected providers
-		 */
-		this.providers.forEach((provider) => {
-			if (typeof provider.register === 'function') {
-				provider.register()
-			}
-		})
+		this.registered = true
+		this.deepRegister(this.providersPaths)
 
 		return this.providers
 	}
