@@ -1448,7 +1448,7 @@ test.group('Ioc | lookup resolve', (group) => {
 		const fn = () => ioc.use({ type: 'binding', namespace: 'App/Foo' })
 		assert.throw(
 			fn,
-			'E_IOC_BINDING_NOT_FOUND: Cannot resolve "App/Foo" binding from the IoC Container'
+			'E_IOC_LOOKUP_FAILED: Cannot resolve "App/Foo" namespace from the IoC Container'
 		)
 	})
 
@@ -1521,7 +1521,7 @@ test.group('Ioc | lookup resolve', (group) => {
 
 		assert.throw(
 			fn,
-			'E_IOC_BINDING_NOT_FOUND: Cannot resolve "App/Foo" binding from the IoC Container'
+			'E_IOC_LOOKUP_FAILED: Cannot resolve "App/Foo" namespace from the IoC Container'
 		)
 	})
 })

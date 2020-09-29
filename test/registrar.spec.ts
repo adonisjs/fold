@@ -148,11 +148,12 @@ test.group('Registrar', (group) => {
     }`
 		)
 
+		const providerPath = join(fs.basePath, 'providers', 'BarProvider')
 		const registrar = new Registrar([new Ioc()])
-		registrar.useProviders([join(fs.basePath, 'providers', 'BarProvider')])
+		registrar.useProviders([providerPath])
 		const fn = () => registrar.register()
 
-		assert.throw(fn, /Make sure export default the provider/)
+		assert.throw(fn, `"${providerPath}" provider must use export default statement`)
 	})
 
 	test('resolve providers from relative path', async (assert) => {

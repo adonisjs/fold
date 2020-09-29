@@ -43,7 +43,7 @@ export class Registrar {
 		const provider = esmRequire(providerPath)
 
 		if (typeof provider !== 'function') {
-			throw new Exception(`Make sure export default the provider from "${providerPath}"`)
+			throw new Exception(`"${providerPath}" provider must use export default statement`)
 		}
 
 		return new provider(...this.providerConstructorParams)

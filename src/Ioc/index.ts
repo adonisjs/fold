@@ -79,7 +79,7 @@ export class Ioc implements IocContract {
 	private resolveBinding(namespace: string) {
 		const binding = this.bindings[namespace]
 		if (!binding) {
-			throw IocLookupException.missingBinding(namespace)
+			throw IocLookupException.lookupFailed(namespace)
 		}
 
 		/**

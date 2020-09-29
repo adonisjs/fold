@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { Exception } from '@poppinss/utils'
+import { IocLookupException } from '../Exceptions/IocLookupException'
 import { IocContract, IocResolverLookupNode, IocResolverContract } from '../Contracts'
 
 /**
@@ -95,13 +95,13 @@ export class IocResolver implements IocResolverContract<any> {
 
 		/**
 		 * Raise exception when unable to resolve the binding from the container.
-		 * NOTE: We are notfetching the binding, we are just checking for it's
+		 * NOTE: We are not fetching the binding, we are just checking for it's
 		 * existence. In case of directory aliases, it's quite possible that
 		 * the binding check passes and the actual file is missing on the
 		 * disk
 		 */
 		if (!lookupNode) {
-			throw new Exception(`Unable to resolve "${tokens.join('.')}" namespace from IoC container`)
+			throw IocLookupException.lookupFailed(tokens.join('.'))
 		}
 
 		this.lookupCache[cacheKey] = { ...lookupNode, method }
