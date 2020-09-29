@@ -7,7 +7,6 @@
  * file that was distributed with this source code.
  */
 
-import { IocLookupException } from '../Exceptions/IocLookupException'
 import { IocContract, IocResolverLookupNode, IocResolverContract } from '../Contracts'
 
 /**
@@ -101,7 +100,7 @@ export class IocResolver implements IocResolverContract<any> {
 		 * disk
 		 */
 		if (!lookupNode) {
-			throw IocLookupException.lookupFailed(tokens.join('.'))
+			this.container.onLookupFailed(tokens.join('.'))
 		}
 
 		this.lookupCache[cacheKey] = { ...lookupNode, method }

@@ -73,13 +73,20 @@ export class Ioc implements IocContract {
 	public directoryAliases: { [alias: string]: string } = {}
 
 	/**
+	 * Method to raise exception when Ioc Container look fails
+	 */
+	public onLookupFailed = (namespace: string): never => {
+		throw IocLookupException.lookupFailed(namespace)
+	}
+
+	/**
 	 * Returns the binding return value. This method must be called when
 	 * [[hasBinding]] returns true.
 	 */
 	private resolveBinding(namespace: string) {
 		const binding = this.bindings[namespace]
 		if (!binding) {
-			throw IocLookupException.lookupFailed(namespace)
+			this.onLookupFailed(namespace)
 		}
 
 		/**
@@ -118,13 +125,13 @@ export class Ioc implements IocContract {
 		 */
 		const alias = this.getPathAlias(namespace)
 		if (!alias) {
-			throw IocLookupException.lookupFailed(namespace)
+			this.onLookupFailed(namespace)
 		}
 
 		/**
 		 * Build path from the namespace and the alias
 		 */
-		const diskPath = namespace.replace(alias, this.directoryAliases[alias])
+		const diskPath = namespace.replace(alias!, this.directoryAliases[alias!])
 		const absPath = require.resolve(normalize(diskPath))
 
 		/**
@@ -437,7 +444,7 @@ export class Ioc implements IocContract {
 		 * Do not proceed when unable to lookup Ioc container namespace
 		 */
 		if (!this.isLookupNode(lookedupNode)) {
-			throw IocLookupException.lookupFailed(namespace as string)
+			this.onLookupFailed(namespace as string)
 		}
 
 		const resolvedValue =
@@ -487,7 +494,7 @@ export class Ioc implements IocContract {
 		 * Do not proceed when unable to lookup Ioc container namespace
 		 */
 		if (!this.isLookupNode(lookedupNode)) {
-			throw IocLookupException.lookupFailed(namespace as string)
+			this.onLookupFailed(namespace as string)
 		}
 
 		let resolvedValue: any

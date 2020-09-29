@@ -1524,4 +1524,17 @@ test.group('Ioc | lookup resolve', (group) => {
 			'E_IOC_LOOKUP_FAILED: Cannot resolve "App/Foo" namespace from the IoC Container'
 		)
 	})
+
+	test('define custom onLookupFailed message', async (assert) => {
+		await fs.add('Foo.js', "module.exports = 'bar'")
+
+		const ioc = new Ioc()
+		ioc.alias(fs.basePath, 'App')
+		ioc.onLookupFailed = function () {
+			throw new Error('Namespace is missing')
+		}
+
+		const fn = () => ioc.make({ type: 'binding', namespace: 'App/Foo' })
+		assert.throw(fn, 'Namespace is missing')
+	})
 })

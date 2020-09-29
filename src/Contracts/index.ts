@@ -367,6 +367,13 @@ export interface IocContract<ContainerBindings extends any = any> {
 		rcNamespaceKey?: string,
 		fallbackNamespace?: string
 	): IocResolverContract<ContainerBindings>
+
+	/**
+	 * The method invoked when unable to lookup a namespace
+	 * inside the IoC container. This is exposed as a public
+	 * property to the overwritten to raise custom exceptions
+	 */
+	onLookupFailed(namespace: string): never
 }
 
 /**
