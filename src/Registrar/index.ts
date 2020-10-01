@@ -7,6 +7,7 @@
  * file that was distributed with this source code.
  */
 
+import { dirname } from 'path'
 import { esmRequire, resolveFrom, Exception } from '@poppinss/utils'
 
 /**
@@ -38,15 +39,21 @@ export class Registrar {
 	 * imports, then default exports are handled
 	 * automatically.
 	 */
-	private loadProvider(providerPath: string) {
-		providerPath = this.basePath ? resolveFrom(this.basePath, providerPath) : providerPath
+	private loadProvider(providerPath: string, basePath?: string) {
+		providerPath = this.basePath
+			? resolveFrom(basePath || this.basePath, providerPath)
+			: providerPath
+
 		const provider = esmRequire(providerPath)
 
 		if (typeof provider !== 'function') {
 			throw new Exception(`"${providerPath}" provider must use export default statement`)
 		}
 
-		return new provider(...this.providerConstructorParams)
+		return {
+			provider: new provider(...this.providerConstructorParams),
+			resolvedPath: dirname(providerPath),
+		}
 	}
 
 	/**
@@ -54,13 +61,13 @@ export class Registrar {
 	 * `providers` collection. This collection is later used to
 	 * register and boot providers
 	 */
-	private collect(providerPaths: string[]) {
+	private collect(providerPaths: string[], basePath?: string) {
 		providerPaths.forEach((providerPath: string) => {
-			const provider = this.loadProvider(providerPath)
+			const { provider, resolvedPath } = this.loadProvider(providerPath, basePath)
 			this.providers.push(provider)
 
 			if (provider.provides) {
-				this.collect(provider.provides)
+				this.collect(provider.provides, resolvedPath)
 			}
 		})
 	}

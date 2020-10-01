@@ -200,7 +200,7 @@ test.group('Registrar', (group) => {
       public registered = false
       public booted = false
 
-      public provides = ['./providers/BazProvider']
+      public provides = ['./BazProvider']
 
       register () {
         this.registered = true
