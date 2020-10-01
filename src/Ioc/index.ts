@@ -381,7 +381,7 @@ export class Ioc implements IocContract {
 		 */
 		if (!namespace) {
 			throw new Exception(
-				'Empty string cannot be used as IoC container reference',
+				'Ioc container namespace cannot be an empty string or undefined',
 				500,
 				'E_INVALID_IOC_NAMESPACE'
 			)
