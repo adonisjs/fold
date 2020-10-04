@@ -280,6 +280,28 @@ test.group('Ioc | use', () => {
 
 		assert.equal(ioc.use('App/Foo'), 'foo')
 	})
+
+	test('trap "ioc.use" statement when binding is defined', (assert) => {
+		const ioc = new Ioc()
+		ioc.bind('App/Foo', () => {
+			return 'foo'
+		})
+
+		ioc.trap(() => {
+			return { name: 'foo' }
+		})
+
+		assert.deepEqual(ioc.use('App/Foo'), { name: 'foo' })
+	})
+
+	test('trap "ioc.use" statement when binding is not defined', (assert) => {
+		const ioc = new Ioc()
+		ioc.trap(() => {
+			return { name: 'foo' }
+		})
+
+		assert.deepEqual(ioc.use('App/Foo'), { name: 'foo' })
+	})
 })
 
 test.group('Ioc | directory aliases', (group) => {
@@ -662,6 +684,28 @@ test.group('Ioc | make', (group) => {
 
 		ioc.alias(fs.basePath, 'App')
 		assert.isFalse(types.isProxy(ioc.make('App/Bar')))
+	})
+
+	test('trap "ioc.make" statement when binding is defined', (assert) => {
+		const ioc = new Ioc()
+		ioc.bind('App/Foo', () => {
+			return 'foo'
+		})
+
+		ioc.trap(() => {
+			return { name: 'foo' }
+		})
+
+		assert.deepEqual(ioc.make('App/Foo'), { name: 'foo' })
+	})
+
+	test('trap "ioc.make" statement when binding is not defined', (assert) => {
+		const ioc = new Ioc()
+		ioc.trap(() => {
+			return { name: 'foo' }
+		})
+
+		assert.deepEqual(ioc.make('App/Foo'), { name: 'foo' })
 	})
 })
 

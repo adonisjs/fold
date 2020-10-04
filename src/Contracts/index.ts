@@ -374,6 +374,11 @@ export interface IocContract<ContainerBindings extends any = any> {
 	 * property to the overwritten to raise custom exceptions
 	 */
 	onLookupFailed(namespace: string): never
+
+	/**
+	 * Trap `ioc.use` and `ioc.make` statements
+	 */
+	trap(callback: (namespace: string) => any): this
 }
 
 /**

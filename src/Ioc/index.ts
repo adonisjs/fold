@@ -35,6 +35,11 @@ export class Ioc implements IocContract {
 	private proxiesEnabled: boolean = false
 
 	/**
+	 * A custom method to trap `ioc.use` and `ioc.make` statements
+	 */
+	private trapCallback: (namespace: string) => any
+
+	/**
 	 * Injector is used for injecting dependencies to the class constructor
 	 * and the methods
 	 */
@@ -436,6 +441,13 @@ export class Ioc implements IocContract {
 	 */
 	public use(namespace: string | LookupNode<any>): any {
 		/**
+		 * Invoke the trap callback when its defined
+		 */
+		if (this.trapCallback) {
+			return this.trapCallback(typeof namespace === 'string' ? namespace : namespace.namespace)
+		}
+
+		/**
 		 * Get lookup node when node itself isn't a lookup node
 		 */
 		const lookedupNode = typeof namespace === 'string' ? this.lookup(namespace) : namespace
@@ -483,6 +495,13 @@ export class Ioc implements IocContract {
 	public make<T extends any>(namespace: T | LookupNode<string>, args?: any[]): InferMakeType<T> {
 		if (typeof namespace !== 'string' && !this.isLookupNode(namespace)) {
 			return this.injector.injectConstructorDependencies(namespace, args || [])
+		}
+
+		/**
+		 * Invoke the trap callback when its defined
+		 */
+		if (this.trapCallback) {
+			return this.trapCallback(typeof namespace === 'string' ? namespace : namespace['namespace'])
 		}
 
 		/**
@@ -550,6 +569,14 @@ export class Ioc implements IocContract {
 	 */
 	public restore(namespace: string): void {
 		this.fakes.delete(namespace)
+	}
+
+	/**
+	 * Define a custom trap for `ioc.use` and `ioc.make` calls
+	 */
+	public trap(callback: (namespace: string) => any): this {
+		this.trapCallback = callback
+		return this
 	}
 
 	/**
