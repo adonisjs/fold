@@ -9,6 +9,7 @@
 
 import { dirname } from 'path'
 import { esmRequire, resolveFrom, Exception } from '@poppinss/utils'
+import { Constructor } from '../Contracts'
 
 /**
  * Registrar is used to register and boot the providers
@@ -25,6 +26,13 @@ export class Registrar {
 	 * own sub providers
 	 */
 	private providers: any[] = []
+
+	/**
+	 * Method to instantiate provider instances. One can also defined
+	 * a custom instantiater function
+	 */
+	private providersInstantiater = <T extends Constructor<any>>(provider: T) =>
+		new provider(...this.providerConstructorParams)
 
 	/**
 	 * Whether or not the providers can be collected
@@ -51,7 +59,7 @@ export class Registrar {
 		}
 
 		return {
-			provider: new provider(...this.providerConstructorParams),
+			provider: this.providersInstantiater(provider),
 			resolvedPath: dirname(providerPath),
 		}
 	}
@@ -75,8 +83,16 @@ export class Registrar {
 	/**
 	 * Register an array of provider paths
 	 */
-	public useProviders(providersPaths: string[]): this {
+	public useProviders(
+		providersPaths: string[],
+		callback?: <T extends Constructor<any>>(provider: T) => InstanceType<T>
+	): this {
 		this.providersPaths = providersPaths
+
+		if (typeof callback === 'function') {
+			this.providersInstantiater = callback
+		}
+
 		return this
 	}
 
