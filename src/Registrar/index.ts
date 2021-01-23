@@ -10,6 +10,15 @@
 import { dirname } from 'path'
 import { esmRequire, resolveFrom, Exception } from '@poppinss/utils'
 import { Constructor } from '../Contracts'
+import { pathToFileURL } from 'url'
+
+async function esmImport(path: string) {
+	const module = await import(pathToFileURL(path).href)
+	if (module.__esModule) {
+		return module.default.default
+	}
+	return module.default
+}
 
 /**
  * Registrar is used to register and boot the providers
@@ -39,7 +48,11 @@ export class Registrar {
 	 */
 	private collected: boolean = false
 
-	constructor(private providerConstructorParams: any[], private basePath?: string) {}
+	constructor(
+		private providerConstructorParams: any[],
+		private basePath?: string,
+		private isESM = false
+	) {}
 
 	/**
 	 * Load the provider by requiring the file from the disk
@@ -47,12 +60,12 @@ export class Registrar {
 	 * imports, then default exports are handled
 	 * automatically.
 	 */
-	private loadProvider(providerPath: string, basePath?: string) {
+	private async loadProvider(providerPath: string, basePath?: string) {
 		providerPath = this.basePath
 			? resolveFrom(basePath || this.basePath, providerPath)
 			: providerPath
 
-		const provider = esmRequire(providerPath)
+		const provider = this.isESM ? await esmImport(providerPath) : esmRequire(providerPath)
 
 		if (typeof provider !== 'function') {
 			throw new Exception(`"${providerPath}" provider must use export default statement`)
@@ -69,15 +82,15 @@ export class Registrar {
 	 * `providers` collection. This collection is later used to
 	 * register and boot providers
 	 */
-	private collect(providerPaths: string[], basePath?: string) {
-		providerPaths.forEach((providerPath: string) => {
-			const { provider, resolvedPath } = this.loadProvider(providerPath, basePath)
+	private async collect(providerPaths: string[], basePath?: string) {
+		for (const providerPath of providerPaths) {
+			const { provider, resolvedPath } = await this.loadProvider(providerPath, basePath)
 			this.providers.push(provider)
 
 			if (provider.provides) {
-				this.collect(provider.provides, resolvedPath)
+				await this.collect(provider.provides, resolvedPath)
 			}
-		})
+		}
 	}
 
 	/**
@@ -103,13 +116,13 @@ export class Registrar {
 	 * The provider instance will be returned, which can be used
 	 * to boot them as well.
 	 */
-	public register() {
+	public async register() {
 		if (this.collected) {
 			return this.providers
 		}
 
 		this.collected = true
-		this.collect(this.providersPaths)
+		await this.collect(this.providersPaths)
 
 		/**
 		 * Register collected providers
@@ -128,7 +141,7 @@ export class Registrar {
 	 * Boot methods are called in series.
 	 */
 	public async boot() {
-		const providers = this.register()
+		const providers = await this.register()
 
 		for (let provider of providers) {
 			if (typeof provider.boot === 'function') {
@@ -141,7 +154,7 @@ export class Registrar {
 	 * Register an boot providers together.
 	 */
 	public async registerAndBoot() {
-		const providers = this.register()
+		const providers = await this.register()
 		await this.boot()
 		return providers
 	}
