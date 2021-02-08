@@ -15,21 +15,21 @@ const toString = Function.prototype.toString
  * with `export default`.
  */
 export function isEsm(value: any): boolean {
-	return value && value.__esModule
+  return value && value.__esModule
 }
 
 /**
  * Returns a boolean telling if value is a primitive or object constructor.
  */
 export function isPrimtiveConstructor(value: any): boolean {
-	return [String, Function, Object, Date, Number, Boolean].indexOf(value) > -1
+  return [String, Function, Object, Date, Number, Boolean].indexOf(value) > -1
 }
 
 /**
  * Returns a function telling if value is a class or not
  */
 export function isClass(fn: any) {
-	return typeof fn === 'function' && /^class\s/.test(toString.call(fn))
+  return typeof fn === 'function' && /^class\s/.test(toString.call(fn))
 }
 
 /**
@@ -37,7 +37,7 @@ export function isClass(fn: any) {
  * and arrays too
  */
 export function isObject(value: any): boolean {
-	return value && typeof value === 'object' && !Array.isArray(value)
+  return value && typeof value === 'object' && !Array.isArray(value)
 }
 
 /**
@@ -45,37 +45,37 @@ export function isObject(value: any): boolean {
  * a function.
  */
 export function ensureIsFunction(callback: Function, message: string) {
-	if (typeof callback !== 'function') {
-		throw new Exception(message, 500, 'E_RUNTIME_EXCEPTION')
-	}
+  if (typeof callback !== 'function') {
+    throw new Exception(message, 500, 'E_RUNTIME_EXCEPTION')
+  }
 }
 
 /**
  * Clears the require cache for a given module
  */
 export function clearRequireCache(modulePath: string) {
-	const cacheItem = require.cache[modulePath]
-	if (!cacheItem) {
-		return
-	}
+  const cacheItem = require.cache[modulePath]
+  if (!cacheItem) {
+    return
+  }
 
-	/**
-	 * Just remove the module, when there is no
-	 * parent
-	 */
-	delete require.cache[modulePath]
-	if (!cacheItem.parent) {
-		return
-	}
+  /**
+   * Just remove the module, when there is no
+   * parent
+   */
+  delete require.cache[modulePath]
+  if (!cacheItem.parent) {
+    return
+  }
 
-	let i = cacheItem.parent.children.length
+  let i = cacheItem.parent.children.length
 
-	/**
-	 * Remove reference from the parent
-	 */
-	while (i--) {
-		if (cacheItem.parent.children[i].id === modulePath) {
-			cacheItem.parent.children.splice(i, 1)
-		}
-	}
+  /**
+   * Remove reference from the parent
+   */
+  while (i--) {
+    if (cacheItem.parent.children[i].id === modulePath) {
+      cacheItem.parent.children.splice(i, 1)
+    }
+  }
 }

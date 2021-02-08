@@ -15,65 +15,65 @@ import { InvalidInjectionException } from '../Exceptions/InvalidInjectionExcepti
  * Exposes the API to injecting dependencies to a class or a method
  */
 export class Injector {
-	constructor(private container: IocContract) {}
+  constructor(private container: IocContract) {}
 
-	/**
-	 * Resolves the injections to be injected to a method or the
-	 * class constructor
-	 */
-	private resolveInjections(targetName: string, injections: any[], runtimeValues: any[]): any[] {
-		/**
-		 * If the runtime values length is greater or same as the length
-		 * of injections, then we treat them as the source of truth
-		 * and inject them as it is
-		 */
-		if (runtimeValues.length >= injections.length) {
-			return runtimeValues
-		}
+  /**
+   * Resolves the injections to be injected to a method or the
+   * class constructor
+   */
+  private resolveInjections(targetName: string, injections: any[], runtimeValues: any[]): any[] {
+    /**
+     * If the runtime values length is greater or same as the length
+     * of injections, then we treat them as the source of truth
+     * and inject them as it is
+     */
+    if (runtimeValues.length >= injections.length) {
+      return runtimeValues
+    }
 
-		/**
-		 * Loop over all the injections and give preference to runtime value
-		 * for a given index, otherwise fallback to `container.make`.
-		 */
-		return injections.map((injection: any, index: number) => {
-			if (runtimeValues && runtimeValues[index] !== undefined) {
-				return runtimeValues[index]
-			}
+    /**
+     * Loop over all the injections and give preference to runtime value
+     * for a given index, otherwise fallback to `container.make`.
+     */
+    return injections.map((injection: any, index: number) => {
+      if (runtimeValues && runtimeValues[index] !== undefined) {
+        return runtimeValues[index]
+      }
 
-			/**
-			 * Disallow object and primitive constructors
-			 */
-			if (isPrimtiveConstructor(injection)) {
-				throw InvalidInjectionException.invoke(injections[index], targetName, index)
-			}
+      /**
+       * Disallow object and primitive constructors
+       */
+      if (isPrimtiveConstructor(injection)) {
+        throw InvalidInjectionException.invoke(injections[index], targetName, index)
+      }
 
-			return this.container.make(injection)
-		})
-	}
+      return this.container.make(injection)
+    })
+  }
 
-	/**
-	 * Injects dependencies to the constructor of a class.
-	 */
-	public injectConstructorDependencies(target: any, runtimeValues: any[]) {
-		if (!isClass(target) || target.makePlain === true) {
-			return target
-		}
+  /**
+   * Injects dependencies to the constructor of a class.
+   */
+  public injectConstructorDependencies(target: any, runtimeValues: any[]) {
+    if (!isClass(target) || target.makePlain === true) {
+      return target
+    }
 
-		const injections = target.hasOwnProperty('inject') ? target.inject.instance || [] : []
-		return new target(...this.resolveInjections(target.name, injections, runtimeValues))
-	}
+    const injections = target.hasOwnProperty('inject') ? target.inject.instance || [] : []
+    return new target(...this.resolveInjections(target.name, injections, runtimeValues))
+  }
 
-	/**
-	 * Injects dependencies to the constructor of a class.
-	 */
-	public injectMethodDependencies(target: any, method: string, runtimeValues: any[]) {
-		const constructor = target.constructor
+  /**
+   * Injects dependencies to the constructor of a class.
+   */
+  public injectMethodDependencies(target: any, method: string, runtimeValues: any[]) {
+    const constructor = target.constructor
 
-		const injections =
-			constructor && constructor.hasOwnProperty('inject') ? constructor.inject[method] || [] : []
+    const injections =
+      constructor && constructor.hasOwnProperty('inject') ? constructor.inject[method] || [] : []
 
-		return target[method](
-			...this.resolveInjections(`${constructor.name}.${method}`, injections, runtimeValues)
-		)
-	}
+    return target[method](
+      ...this.resolveInjections(`${constructor.name}.${method}`, injections, runtimeValues)
+    )
+  }
 }
