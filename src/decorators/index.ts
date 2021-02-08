@@ -12,7 +12,9 @@
  */
 export function inject(value?: any) {
 	function decorator(target: any, propertyKey: string): void
+	// eslint-disable-next-line no-redeclare
 	function decorator(target: any): void
+	// eslint-disable-next-line no-redeclare
 	function decorator(target: any, propertyKey?: string): void {
 		/**
 		 * Consturctor injections

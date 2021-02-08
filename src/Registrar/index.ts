@@ -8,7 +8,8 @@
  */
 
 import { dirname } from 'path'
-import { esmRequire, resolveFrom, Exception } from '@poppinss/utils'
+import { esmRequire, Exception } from '@poppinss/utils'
+import { resolveFrom } from '@poppinss/utils/build/helpers'
 import { Constructor } from '../Contracts'
 
 /**
