@@ -99,14 +99,18 @@ export class IocResolver implements IocResolverContract<any> {
    * Calls the namespace.method expression with any arguments that needs to
    * be passed. Also supports type-hinting dependencies.
    */
-  public call(
+  public async call(
     namespace: string | IocResolverLookupNode<string>,
     prefixNamespace?: string,
     args?: any[]
-  ): any {
+  ): Promise<any> {
     const lookupNode =
       typeof namespace === 'string' ? this.resolve(namespace, prefixNamespace) : namespace
 
-    return this.container.call(this.container.make(lookupNode.namespace), lookupNode.method, args)
+    return this.container.callAsync(
+      await this.container.makeAsync(lookupNode.namespace),
+      lookupNode.method,
+      args
+    )
   }
 }

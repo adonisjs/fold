@@ -11,7 +11,7 @@ import test from 'japa'
 import { Ioc } from '../src/Ioc'
 
 test.group('Ioc Resolver', () => {
-  test('call handle method when no explicit method is defined', (assert) => {
+  test('call handle method when no explicit method is defined', async (assert) => {
     class UserController {
       public handle() {
         return 'foo'
@@ -22,10 +22,10 @@ test.group('Ioc Resolver', () => {
     ioc.bind('App/UserController', () => new UserController())
 
     const resolver = ioc.getResolver()
-    assert.equal(resolver.call('App/UserController'), 'foo')
+    assert.equal(await resolver.call('App/UserController'), 'foo')
   })
 
-  test('call namespace expression with method', (assert) => {
+  test('call namespace expression with method', async (assert) => {
     class UserController {
       public getUser() {
         return 'foo'
@@ -36,7 +36,7 @@ test.group('Ioc Resolver', () => {
     ioc.bind('App/UserController', () => new UserController())
 
     const resolver = ioc.getResolver()
-    assert.equal(resolver.call('App/UserController.getUser'), 'foo')
+    assert.equal(await resolver.call('App/UserController.getUser'), 'foo')
   })
 
   test('call async namespace expression', async (assert) => {
@@ -55,17 +55,22 @@ test.group('Ioc Resolver', () => {
   })
 
   test('raise exception when unable to lookup namespace', async (assert) => {
+    assert.plan(1)
+
     const ioc = new Ioc()
     const resolver = ioc.getResolver()
 
-    const fn = () => resolver.call('App/UserController.getUser')
-    assert.throw(
-      fn,
-      'E_IOC_LOOKUP_FAILED: Cannot resolve "App/UserController" namespace from the IoC Container'
-    )
+    try {
+      await resolver.call('App/UserController.getUser')
+    } catch ({ message }) {
+      assert.equal(
+        message,
+        'E_IOC_LOOKUP_FAILED: Cannot resolve "App/UserController" namespace from the IoC Container'
+      )
+    }
   })
 
-  test('allow runtime prefix namespace', (assert) => {
+  test('allow runtime prefix namespace', async (assert) => {
     class UserController {
       public handle() {
         return 'foo'
@@ -76,10 +81,10 @@ test.group('Ioc Resolver', () => {
     ioc.bind('App/UserController', () => new UserController())
 
     const resolver = ioc.getResolver()
-    assert.equal(resolver.call('UserController', 'App'), 'foo')
+    assert.equal(await resolver.call('UserController', 'App'), 'foo')
   })
 
-  test('handle use case where namespace is same but prefix namespace is different', (assert) => {
+  test('handle use case where namespace is same but prefix namespace is different', async (assert) => {
     class UserController {
       public handle() {
         return 'user'
@@ -97,11 +102,11 @@ test.group('Ioc Resolver', () => {
     ioc.bind('Admin/UserController', () => new AdminController())
 
     const resolver = ioc.getResolver()
-    assert.equal(resolver.call('UserController', 'App'), 'user')
-    assert.equal(resolver.call('UserController', 'Admin'), 'admin')
+    assert.equal(await resolver.call('UserController', 'App'), 'user')
+    assert.equal(await resolver.call('UserController', 'Admin'), 'admin')
   })
 
-  test('handle use case where namespace is same but defined a different runtime prefix namespace', (assert) => {
+  test('handle use case where namespace is same but defined a different runtime prefix namespace', async (assert) => {
     class UserController {
       public handle() {
         return 'user'
@@ -119,11 +124,11 @@ test.group('Ioc Resolver', () => {
     ioc.bind('Admin/UserController', () => new AdminController())
 
     const resolver = ioc.getResolver(undefined, undefined, 'App')
-    assert.equal(resolver.call('UserController'), 'user')
-    assert.equal(resolver.call('UserController', 'Admin'), 'admin')
+    assert.equal(await resolver.call('UserController'), 'user')
+    assert.equal(await resolver.call('UserController', 'Admin'), 'admin')
   })
 
-  test('pass resolve result to the call method', (assert) => {
+  test('pass resolve result to the call method', async (assert) => {
     class UserController {
       public getUser() {
         return 'foo'
@@ -135,6 +140,6 @@ test.group('Ioc Resolver', () => {
 
     const resolver = ioc.getResolver()
     const lookupNode = resolver.resolve('App/UserController.getUser')
-    assert.equal(resolver.call(lookupNode), 'foo')
+    assert.equal(await resolver.call(lookupNode), 'foo')
   })
 })
