@@ -20,4 +20,22 @@ export class IocLookupException extends Exception {
       'E_IOC_LOOKUP_FAILED'
     )
   }
+
+  /**
+   * Invalid namespace type
+   */
+  public static invalidNamespace() {
+    return new this(
+      '"Ioc.lookup" accepts a namespace string or a lookup node',
+      500,
+      'E_INVALID_IOC_NAMESPACE'
+    )
+  }
+
+  /**
+   * Fake is missing and yet resolved
+   */
+  public static missingFake(namespace: string) {
+    return new this(`Cannot resolve fake for "${namespace}" namespace`, 500, 'E_MISSING_IOC_FAKE')
+  }
 }

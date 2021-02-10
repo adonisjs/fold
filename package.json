@@ -46,6 +46,7 @@
     "@adonisjs/require-ts": "^2.0.2",
     "@poppinss/dev-utils": "^1.1.0",
     "@types/node": "^14.14.25",
+    "benchmark": "^2.1.4",
     "commitizen": "^4.2.3",
     "cz-conventional-changelog": "^3.3.0",
     "del-cli": "^3.0.1",

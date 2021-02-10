@@ -7,12 +7,77 @@
  * file that was distributed with this source code.
  */
 
-/**
- * Extracts functions from a given object
- */
 export type ExtractFunctions<T> = {
-  [P in keyof T]: T[P] extends (...args: unknown[]) => unknown ? P : never
+  [P in keyof T]: T[P] extends (...args: any[]) => any ? P : never
 }[keyof T]
+
+/**
+ * Unwraps the promise
+ */
+type UnWrapPromise<T> = T extends Promise<infer U> ? U : T
+
+/**
+ * Shape of the bind callback method
+ */
+export type BindCallback<ReturnValue extends any, Container extends IocContract> = (
+  container: Container
+) => ReturnValue
+
+/**
+ * Shape of the fake callback method
+ */
+export type FakeCallback<ReturnValue extends any, Container extends IocContract> = (
+  container: Container,
+  originalValue: ReturnValue
+) => ReturnValue
+
+/**
+ * Shape of resolved lookup node, resolved using `getResolver().resolve()`
+ * method.
+ */
+export type IocResolverLookupNode<Namespace extends string> = {
+  namespace: Namespace
+  type: 'binding' | 'alias'
+  method: string
+}
+
+/**
+ * Shape of class constructor
+ */
+export type Constructor<T> = new (...args: any[]) => T
+
+/**
+ * Shape of class constructor with `makePlain` property
+ */
+export type PlainConstructor = {
+  makePlain: true
+}
+
+/**
+ * Type of the "withBindings" method
+ */
+export interface WithBindings<ContainerBindings extends any> {
+  <Bindings extends (keyof ContainerBindings)[]>(
+    namespaces: [...Bindings],
+    cb: (
+      ...args: {
+        [M in keyof Bindings]: Bindings[M] extends keyof ContainerBindings
+          ? ContainerBindings[Bindings[M]]
+          : any
+      }
+    ) => void
+  ): void
+  <Namespace extends (keyof ContainerBindings | string)[]>(
+    namespaces: readonly [...Namespace],
+    cb: (
+      ...args: {
+        [M in keyof Namespace]: Namespace[M] extends keyof ContainerBindings
+          ? ContainerBindings[Namespace[M]]
+          : any
+      }
+    ) => void
+  ): void
+}
 
 /**
  * Finding return type of the `ioc.make` method based upon the
@@ -32,51 +97,6 @@ export type InferMakeType<T> = T extends string | LookupNode<string>
   : T
 
 /**
- * Shape of class constructor
- */
-export type Constructor<T> = new (...args: any[]) => T
-
-/**
- * Shape of class constructor with `makePlain` property
- */
-export type PlainConstructor = {
-  makePlain: true
-}
-
-/**
- * Shape of aliases cache entry
- */
-export type AliasCacheItem = {
-  diskPath: string
-  cachedValue: any
-}
-
-/**
- * Shape of the bind callback method
- */
-export type BindCallback<ReturnValue extends any, Container extends IocContract> = (
-  container: Container
-) => ReturnValue
-
-/**
- * Shape of the fake callback method
- */
-export type BindFakeCallback<ReturnValue extends any, Container extends IocContract> = (
-  container: Container,
-  value?: any
-) => ReturnValue
-
-/**
- * Shape of resolved lookup node, resolved using `getResolver().resolve()`
- * method.
- */
-export type IocResolverLookupNode<Namespace extends string> = {
-  namespace: Namespace
-  type: 'binding' | 'alias'
-  method: string
-}
-
-/**
  * Shape of lookup node pulled using `ioc.lookup` method. This node
  * can be passed to `ioc.use`, or `ioc.make` to skip many checks
  * and resolve the binding right away.
@@ -87,274 +107,260 @@ export type LookupNode<Namespace extends string> = {
 }
 
 /**
- * Shape of binding stored inside the IoC container
- */
-export type Binding<ReturnValue extends any, Container extends IocContract> = {
-  callback: BindCallback<ReturnValue, Container>
-  singleton: boolean
-  cachedValue?: unknown
-}
-
-/**
- * Shape of fakes binding stored inside the IoC container
- */
-export type FakeBinding<ReturnValue extends any, Container extends IocContract> = {
-  callback: BindFakeCallback<ReturnValue, Container>
-  cachedValue?: unknown
-}
-
-/**
- * Shape of the IoC container
+ * Ioc container interface
  */
 export interface IocContract<ContainerBindings extends any = any> {
   /**
-   * Directories registered with aliases
+   * Registered aliases. The key is the alias and value is the
+   * absolute directory path
    */
-  directoryAliases: { [alias: string]: string }
+  importAliases: { [alias: string]: string }
 
   /**
-   * Instruct IoC container to use proxies when returning
-   * bindings from `use` and `make` methods.
+   * Enable/disable proxies. Proxies are mainly required for fakes to
+   * work
    */
   useProxies(enable?: boolean): this
 
   /**
-   * Add a new binding with a namespace. Keeping the namespace unique
-   * is the responsibility of the user. We do not restrict duplicate
-   * namespaces, since it's perfectly acceptable to provide new
-   * implementation for an existing binding.
-   *
-   * @example
-   * ```js
-   * ioc.bind('App/User', function () {
-   *  return new User()
-   * })
-   * ```
+   * Define the module type for resolving auto import aliases. Defaults
+   * to `cjs`
    */
-  bind<Namespace extends keyof ContainerBindings>(
-    namespace: Namespace,
-    callback: BindCallback<ContainerBindings[Namespace], this>
+  module: 'cjs' | 'esm'
+
+  /**
+   * Register a binding with a callback. The callback return value will be
+   * used when binding is resolved
+   */
+  bind<Binding extends keyof ContainerBindings>(
+    binding: Binding,
+    callback: BindCallback<ContainerBindings[Binding], this>
   ): this
-  bind<Namespace extends string>(
-    namespace: Namespace,
-    callback: Namespace extends keyof ContainerBindings
-      ? BindCallback<ContainerBindings[Namespace], this>
-      : BindCallback<unknown, this>
+  bind<Binding extends string>(
+    binding: Binding,
+    callback: BindCallback<
+      Binding extends keyof ContainerBindings ? ContainerBindings[Binding] : any,
+      this
+    >
   ): this
 
   /**
-   * Add a new binding as a singleton. This method behaves similar to
-   * [[bind]], just the value is cached after the first use. The
-   * `callback` will be invoked only once.
-   *
-   * @example
-   * ```js
-   * ioc.singleton('App/User', function () {
-   *  return new User()
-   * })
-   * ```
+   * Same as the [[bind]] method, but registers a singleton only. Singleton's callback
+   * is invoked only for the first time and then the cached value is used
    */
-  singleton<Namespace extends keyof ContainerBindings>(
-    namespace: Namespace,
-    callback: BindCallback<ContainerBindings[Namespace], this>
+  singleton<Binding extends keyof ContainerBindings>(
+    binding: Binding,
+    callback: BindCallback<ContainerBindings[Binding], this>
   ): this
-  singleton<Namespace extends string>(
-    namespace: Namespace,
-    callback: Namespace extends keyof ContainerBindings
-      ? BindCallback<ContainerBindings[Namespace], this>
-      : BindCallback<unknown, this>
+  singleton<Binding extends string>(
+    binding: Binding,
+    callback: BindCallback<
+      Binding extends keyof ContainerBindings ? ContainerBindings[Binding] : any,
+      this
+    >
   ): this
 
   /**
-   * Register a fake for an existing binding. The fakes only work when
-   * [[this.useProxies]] is invoked. AdonisJS will invoke it
-   * automatically when running tests.
-   *
-   * NOTE: The return value of fakes is always cached, since multiple
-   * calls to `use` after that should points to a same return value.
-   *
-   * @example
-   * ```js
-   * ioc.fake('App/User', function () {
-   *  return new FakeUser()
-   * })
-   * ```
+   * Define an import alias
+   */
+  alias(absolutePath: string, alias: string): this
+
+  /**
+   * Register a fake for a namespace. Fakes works both for "bindings" and "import aliases".
+   * Fakes only work when proxies are enabled using "useProxies".
    */
   fake<Namespace extends keyof ContainerBindings>(
     namespace: Namespace,
-    callback: BindFakeCallback<ContainerBindings[Namespace], this>
+    callback: FakeCallback<ContainerBindings[Namespace], this>
   ): this
   fake<Namespace extends string>(
     namespace: Namespace,
-    callback: Namespace extends keyof ContainerBindings
-      ? BindFakeCallback<ContainerBindings[Namespace], this>
-      : BindFakeCallback<unknown, this>
+    callback: FakeCallback<
+      Namespace extends keyof ContainerBindings ? ContainerBindings[Namespace] : any,
+      this
+    >
   ): this
 
   /**
-   * Define an alias for an existing directory and require
-   * files without fighting with relative paths.
-   *
-   * Given the following directory structure
-   *
-   * ```sh
-   * .app/
-   * ├── controllers
-   * │   └── foo.js
-   * ├── services
-   * │   └── foo.js
-   * ├── models
-   * │   └── foo.js
-   * ```
-   *
-   * You are in file `controllers/foo.js`
-   *
-   * ### Without alias
-   * ```js
-   * require('../services/foo')
-   * require('../models/foo')
-   * ```
-   *
-   * ### With outoload
-   * ```
-   * ioc.alias(join(__dirname, 'app'), 'App')
-   *
-   * ioc.use('App/services/foo')
-   * ioc.use('App/mdoels/foo')
-   * ```
+   * Clear selected or all the fakes. Calling the method with no arguments
+   * will clear all the fakes
    */
-  alias(directoryPath: string, alias: string): this
+  restore<Namespace extends keyof ContainerBindings>(namespace?: Namespace): this
+  restore(namespace?: string): this
 
   /**
-   * Use the binding by resolving it from the container. The resolve method
-   * does some all the hard work to resolve the value for you.
-   *
-   * 1. The name will be searched for an existing binding.
-   * 2. Checked against directory aliases.
-   * 3. Finally an exception is raised when unable to perform lookup
-   *
-   * @example
-   * ```js
-   * ioc.use('Adonis/Src/View')     // binding
-   * ioc.use('App/Services/User')   // Directory alias
-   * ```
-   */
-  use<Namespace extends Extract<keyof ContainerBindings, string>>(
-    namespace: Namespace | LookupNode<Namespace>
-  ): ContainerBindings[Namespace]
-  use<Namespace extends string>(
-    namespace: Namespace | LookupNode<Namespace>
-  ): Namespace extends keyof ContainerBindings ? ContainerBindings[Namespace] : any
-
-  /**
-   * Make an instance of class and auto inject it's dependencies. The instance
-   * is only created if `namespace` is part of a directory alias or is a class
-   * constructor.
-   *
-   * The bindings added via `ioc.bind` or `ioc.singleton` controls their return value
-   * themselves using the factory function.
-   */
-  make<Namespace extends Extract<keyof ContainerBindings, string>>(
-    namespace: Namespace | LookupNode<Namespace>,
-    args?: any[]
-  ): ContainerBindings[Namespace]
-  make<T extends any>(
-    namespace: T | LookupNode<string>,
-    args?: any[]
-  ): T extends keyof ContainerBindings ? ContainerBindings[T] : InferMakeType<T>
-
-  /**
-   * Define a callback to be called when all of the container
-   * bindings are available.
-   */
-  with<Namespace extends (keyof ContainerBindings | string)[]>(
-    namespaces: readonly [...Namespace],
-    cb: (
-      ...args: {
-        [M in keyof Namespace]: Namespace[M] extends keyof ContainerBindings
-          ? ContainerBindings[Namespace[M]]
-          : any
-      }
-    ) => void
-  ): void
-
-  /**
-   * Call method on an object and inject dependencies to it automatically.
-   */
-  call<T extends object, K extends ExtractFunctions<T>>(target: T, method: K, args: any[]): any
-
-  /**
-   * Lookup a namespace and return its lookup node. The lookup node can speed
-   * up resolving of namespaces via `use` or `make` methods.
-   */
-  lookup<Namespace extends Extract<keyof ContainerBindings, string>>(
-    namespace: Namespace,
-    prefixNamespace?: string
-  ): LookupNode<Namespace>
-  lookup<Namespace extends string>(
-    namespace: Namespace,
-    prefixNamespace?: string
-  ): Namespace extends keyof ContainerBindings ? LookupNode<Namespace> : LookupNode<string> | null
-
-  /**
-   * A boolean telling if a fake exists for a binding or
-   * not.
+   * Find if a fake has been registered for a given namespace
    */
   hasFake<Namespace extends keyof ContainerBindings>(namespace: Namespace): boolean
   hasFake(namespace: string): boolean
 
   /**
-   * Returns a boolean telling if binding for a given namespace
-   * exists or not.
-   *
-   * @example
-   * ```js
-   * ioc.hasBinding('Adonis/Src/View')
-   * ```
+   * Find if a binding exists for a given namespace
    */
-  hasBinding<Namespace extends keyof ContainerBindings>(namespace: Namespace): boolean
+  hasBinding<Binding extends keyof ContainerBindings>(namespace: Binding): boolean
   hasBinding(namespace: string): boolean
 
   /**
-   * Returns a boolean telling if namespace is part of directory aliases or not.
-   *
-   * ### NOTE:
-   * Check the following example carefully.
-   *
-   * @example
-   * ```js
-   * ioc.alias(join(__dirname, 'app'), 'App')
-   * ioc.isAliasPath('App/Services/Foo')
-   * ```
+   * Find if a namespace is part of the auto import aliases. Returns false, when namespace
+   * is an alias path but has an explicit binding too
    */
   isAliasPath(namespace: string): boolean
 
   /**
-   * Returns the base namespace for directory alias path.
+   * Lookup a namespace. The output contains the complete namespace,
+   * along with its type. The type is an "alias" or a "binding".
    *
-   * @example
-   * ```js
-   * ioc.alias(join(__dirname, 'app'), 'App')
+   * Null is returned when unable to lookup the namespace inside the container
    *
-   * ioc.getPathAlias('App/Services/Foo') // returns App
-   * ioc.getPathAlias('Foo/Services/Foo') // returns undefined
-   * ```
+   * Note: This method just checks if a namespace is registered or binding
+   *      or can be it resolved from auto import aliases or not. However,
+   *      it doesn't check for the module existence on the disk.
+   *
+   * Optionally you can define a prefix namespace
+   * to be used to build the complete namespace. For example:
+   *
+   * - namespace: UsersController
+   * - prefixNamespace: App/Controllers/Http
+   * - Output: App/Controllers/Http/UsersController
+   *
+   * Prefix namespace is ignored for absolute namespaces. For example:
+   *
+   * - namespace: /App/UsersController
+   * - prefixNamespace: App/Controllers/Http
+   * - Output: App/UsersController
    */
-  getPathAlias(namespace: string): string | undefined
+  lookup<Namespace extends Extract<keyof ContainerBindings, string>>(
+    namespace: Namespace | LookupNode<Namespace>,
+    prefixNamespace?: string
+  ): LookupNode<Namespace>
+  lookup<Namespace extends string>(
+    namespace: Namespace | LookupNode<Namespace>,
+    prefixNamespace?: string
+  ): Namespace extends keyof ContainerBindings ? LookupNode<Namespace> : LookupNode<string> | null
 
   /**
-   * Clears the cache for directory aliasaes.
-   *
-   * - Cache for aliases if cleared when no alias is defined
-   * - Optionally, the require cache can be cleared as well
+   * Same as [[lookup]]. But raises exception instead of returning null
    */
-  clearAliasesCache(alias?: string, clearRequireCache?: boolean): void
+  lookupOrFail<Namespace extends Extract<keyof ContainerBindings, string>>(
+    namespace: Namespace | LookupNode<Namespace>,
+    prefixNamespace?: string
+  ): LookupNode<Namespace>
+  lookupOrFail<Namespace extends string>(
+    namespace: Namespace | LookupNode<Namespace>,
+    prefixNamespace?: string
+  ): Namespace extends keyof ContainerBindings ? LookupNode<Namespace> : LookupNode<string>
 
   /**
-   * Restore a given fake
+   * Resolve a binding by invoking the binding factory function. An exception
+   * is raised, if the binding namespace is unregistered.
    */
-  restore<Namespace extends keyof ContainerBindings>(namespace: Namespace): void
-  restore(namespace: string): void
+  resolveBinding<Binding extends Extract<keyof ContainerBindings, string>>(
+    binding: Binding
+  ): ContainerBindings[Binding]
+  resolveBinding<Binding extends string>(
+    namespace: Binding
+  ): Binding extends keyof ContainerBindings ? ContainerBindings[Binding] : any
+
+  /**
+   * Import namespace from the auto import aliases. This method assumes you are
+   * using native ES modules
+   */
+  import(namespace: string): Promise<any>
+
+  /**
+   * Same as the "import" method, but uses CJS for requiring the module from its
+   * path
+   */
+  require(namespace: string): any
+
+  /**
+   * The use method looks up a namespace inside both the bindings and the
+   * auto import aliases
+   */
+  use<Binding extends Extract<keyof ContainerBindings, string>>(
+    lookupNode: Binding | LookupNode<Binding>
+  ): ContainerBindings[Binding]
+  use<Binding extends string>(
+    lookupNode: Binding | LookupNode<Binding>
+  ): Binding extends keyof ContainerBindings ? ContainerBindings[Binding] : any
+
+  /**
+   * Same as the [[use]] method, but instead uses ES modules for resolving
+   * the auto import aliases
+   */
+  useAsync<Binding extends Extract<keyof ContainerBindings, string>>(
+    lookupNode: Binding | LookupNode<Binding>
+  ): Promise<ContainerBindings[Binding]>
+  useAsync<Binding extends string>(
+    lookupNode: Binding | LookupNode<Binding>
+  ): Promise<Binding extends keyof ContainerBindings ? ContainerBindings[Binding] : any>
+
+  /**
+   * Makes an instance of the class by first resolving it.
+   */
+  make<Binding extends Extract<keyof ContainerBindings, string>>(
+    lookupNode: Binding | LookupNode<Binding>,
+    args?: any[]
+  ): ContainerBindings[Binding]
+  make<T extends any>(
+    value: T | LookupNode<string>,
+    args?: any[]
+  ): T extends keyof ContainerBindings ? ContainerBindings[T] : InferMakeType<T>
+
+  /**
+   * Same as the [[make]] method, but instead uses ES modules for resolving
+   * the auto import aliases
+   */
+  makeAsync<Binding extends Extract<keyof ContainerBindings, string>>(
+    lookupNode: Binding | LookupNode<Binding>,
+    args?: any[]
+  ): Promise<ContainerBindings[Binding]>
+  makeAsync<T extends any>(
+    value: T | LookupNode<string>,
+    args?: any[]
+  ): Promise<T extends keyof ContainerBindings ? ContainerBindings[T] : InferMakeType<T>>
+
+  /**
+   * The "withBindings" method invokes the defined callback when it is
+   * able to resolve all the mentioned bindings.
+   */
+  withBindings: WithBindings<ContainerBindings>
+
+  /**
+   * @deprecated: Use "withBindings" instead
+   */
+  with: WithBindings<ContainerBindings>
+
+  /**
+   * Call a method on an object and automatically inject its depdencies
+   */
+  call<T extends any, Method extends ExtractFunctions<T>>(
+    target: T,
+    method: Method,
+    args?: any[]
+  ): ReturnType<T[Method]>
+
+  /**
+   * Call a method on an object and automatically inject its depdencies
+   */
+  callAsync<T extends any, Method extends ExtractFunctions<T>>(
+    target: T,
+    method: Method,
+    args?: any[]
+  ): Promise<UnWrapPromise<ReturnType<T[Method]>>>
+
+  /**
+   * Trap container lookup calls. It includes
+   *
+   * - Ioc.use
+   * - Ioc.useAsync
+   * - Ioc.make
+   * - Ioc.makeAsync
+   * - Ioc.require
+   * - Ioc.import
+   * - Ioc.resolveBinding
+   */
+  trap(callback: (namespace: string) => any): this
 
   /**
    * Returns the resolver instance to resolve Ioc container bindings with
@@ -367,18 +373,6 @@ export interface IocContract<ContainerBindings extends any = any> {
     rcNamespaceKey?: string,
     fallbackNamespace?: string
   ): IocResolverContract<ContainerBindings>
-
-  /**
-   * The method invoked when unable to lookup a namespace
-   * inside the IoC container. This is exposed as a public
-   * property to the overwritten to raise custom exceptions
-   */
-  onLookupFailed(namespace: string): never
-
-  /**
-   * Trap `ioc.use` and `ioc.make` statements
-   */
-  trap(callback: (namespace: string) => any): this
 }
 
 /**

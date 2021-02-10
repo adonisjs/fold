@@ -7,12 +7,10 @@ const ioc = new Ioc()
 /**
  * Bind require as a singleton to IoC container
  */
-ioc.singleton('foo', function () {
-  return require('./foo')
-})
+ioc.alias(__dirname, 'perf')
 
 suite
-  .add('Ioc use', () => ioc.use('foo')) /** IoC container */
+  .add('Ioc use', () => ioc.use('perf/foo')) /** IoC container */
   .add('require', () => require('./foo')) /** Require */
   .on('cycle', function (event) {
     console.log(String(event.target))

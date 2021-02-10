@@ -90,19 +90,7 @@ export class IocResolver implements IocResolverContract<any> {
       method = tokens.pop()!
     }
 
-    const lookupNode = this.container.lookup(tokens.join('.'), prefixNamespace)
-
-    /**
-     * Raise exception when unable to resolve the binding from the container.
-     * NOTE: We are not fetching the binding, we are just checking for it's
-     * existence. In case of directory aliases, it's quite possible that
-     * the binding check passes and the actual file is missing on the
-     * disk
-     */
-    if (!lookupNode) {
-      this.container.onLookupFailed(tokens.join('.'))
-    }
-
+    const lookupNode = this.container.lookupOrFail(tokens.join('.'), prefixNamespace)
     this.lookupCache[cacheKey] = { ...lookupNode, method }
     return this.lookupCache[cacheKey]
   }
@@ -119,10 +107,6 @@ export class IocResolver implements IocResolverContract<any> {
     const lookupNode =
       typeof namespace === 'string' ? this.resolve(namespace, prefixNamespace) : namespace
 
-    return this.container.call(
-      this.container.make(lookupNode.namespace),
-      lookupNode.method,
-      args || []
-    )
+    return this.container.call(this.container.make(lookupNode.namespace), lookupNode.method, args)
   }
 }

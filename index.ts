@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
+export * from './src/Contracts'
 export { Ioc } from './src/Ioc'
 export { inject } from './src/decorators'
 export { Registrar } from './src/Registrar'
-export * from './src/Contracts'

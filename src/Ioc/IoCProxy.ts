@@ -7,28 +7,25 @@
  * file that was distributed with this source code.
  */
 
-type ProxyOptions = {
-  hasFake: (namespace: string) => boolean
-  useFake: (namespace: string, value: any) => any
-}
+import type { Fakes } from './Fakes'
 
 /**
  * Checks for the existence of fake on the target
  */
-function hasFake(target: { options: ProxyOptions; namespace: string; value: any }) {
-  return target.options.hasFake(target.namespace)
+function hasFake(target: { options: Fakes; namespace: string; value: any }) {
+  return target.options.has(target.namespace)
 }
 
 /**
  * Calls the trap on the target
  */
 function callTrap(
-  target: { options: ProxyOptions; namespace: string; value: any },
+  target: { options: Fakes; namespace: string; value: any },
   trap: any,
   ...args: any[]
 ) {
   if (hasFake(target)) {
-    return Reflect[trap](target.options.useFake(target.namespace, target.value), ...args)
+    return Reflect[trap](target.options.resolve(target.namespace, target.value), ...args)
   } else {
     return Reflect[trap](target.value, ...args)
   }
@@ -91,7 +88,7 @@ const objectHandler = {
  * Proxy handler to handle classes and functions
  */
 const classHandler = Object.assign({}, objectHandler, {
-  construct(target: { options: ProxyOptions; namespace: string; value: any }, ...args: any[]) {
+  construct(target: { options: Fakes; namespace: string; value: any }, ...args: any[]) {
     return callTrap(target, 'construct', ...args)
   },
 })
@@ -100,7 +97,7 @@ const classHandler = Object.assign({}, objectHandler, {
  * Proxies the objects to fallback to fake, when it exists.
  */
 export class IocProxyObject {
-  constructor(public namespace: string, public value: any, public options: ProxyOptions) {
+  constructor(public namespace: string, public value: any, public options: Fakes) {
     return new Proxy(this, objectHandler)
   }
 }
@@ -108,7 +105,7 @@ export class IocProxyObject {
 /**
  * Proxies the class constructor to fallback to fake, when it exists.
  */
-export function IocProxyClass(namespace: string, value: any, options: ProxyOptions) {
+export function IocProxyClass(namespace: string, value: any, options: Fakes) {
   function Wrapped() {}
   Wrapped.namespace = namespace
   Wrapped.value = value

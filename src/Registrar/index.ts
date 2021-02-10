@@ -48,7 +48,7 @@ export class Registrar {
    * imports, then default exports are handled
    * automatically.
    */
-  private loadProvider(providerPath: string, basePath?: string) {
+  private async loadProvider(providerPath: string, basePath?: string) {
     providerPath = this.basePath
       ? resolveFrom(basePath || this.basePath, providerPath)
       : providerPath
@@ -70,15 +70,15 @@ export class Registrar {
    * `providers` collection. This collection is later used to
    * register and boot providers
    */
-  private collect(providerPaths: string[], basePath?: string) {
-    providerPaths.forEach((providerPath: string) => {
-      const { provider, resolvedPath } = this.loadProvider(providerPath, basePath)
+  private async collect(providerPaths: string[], basePath?: string) {
+    for (let providerPath of providerPaths) {
+      const { provider, resolvedPath } = await this.loadProvider(providerPath, basePath)
       this.providers.push(provider)
 
       if (provider.provides) {
         this.collect(provider.provides, resolvedPath)
       }
-    })
+    }
   }
 
   /**
@@ -104,13 +104,13 @@ export class Registrar {
    * The provider instance will be returned, which can be used
    * to boot them as well.
    */
-  public register() {
+  public async register() {
     if (this.collected) {
       return this.providers
     }
 
     this.collected = true
-    this.collect(this.providersPaths)
+    await this.collect(this.providersPaths)
 
     /**
      * Register collected providers
@@ -129,7 +129,7 @@ export class Registrar {
    * Boot methods are called in series.
    */
   public async boot() {
-    const providers = this.register()
+    const providers = await this.register()
 
     for (let provider of providers) {
       if (typeof provider.boot === 'function') {
@@ -142,7 +142,7 @@ export class Registrar {
    * Register an boot providers together.
    */
   public async registerAndBoot() {
-    const providers = this.register()
+    const providers = await this.register()
     await this.boot()
     return providers
   }

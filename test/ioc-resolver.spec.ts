@@ -1,5 +1,5 @@
 /*
- * @poppinss/utils
+ * @adonisjs/fold
  *
  * (c) Harminder Virk <virk@adonisjs.com>
  *

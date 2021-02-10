@@ -38,7 +38,7 @@ test.group('Registrar', (group) => {
     const registrar = new Registrar([[new Ioc()]])
     registrar.useProviders([join(fs.basePath, 'providers', 'FooProvider')])
 
-    const providers = registrar.register()
+    const providers = await registrar.register()
     assert.isTrue((providers[0] as any).registered)
   })
 
@@ -56,7 +56,7 @@ test.group('Registrar', (group) => {
     const registrar = new Registrar([new Ioc()])
     registrar.useProviders([join(fs.basePath, 'providers', 'BarProvider')])
 
-    const providers = registrar.register()
+    const providers = await registrar.register()
     assert.isTrue((providers[0] as any).registered)
   })
 
@@ -132,6 +132,8 @@ test.group('Registrar', (group) => {
   })
 
   test('raise exception when provider is not exported as a default export', async (assert) => {
+    assert.plan(1)
+
     await fs.add(
       'providers/BarProvider.ts',
       `export class MyProvider {
@@ -151,9 +153,12 @@ test.group('Registrar', (group) => {
     const providerPath = join(fs.basePath, 'providers', 'BarProvider')
     const registrar = new Registrar([new Ioc()])
     registrar.useProviders([providerPath])
-    const fn = () => registrar.register()
 
-    assert.throw(fn, `"${providerPath}" provider must use export default statement`)
+    try {
+      await registrar.register()
+    } catch (error) {
+      assert.equal(error.message, `"${providerPath}" provider must use export default statement`)
+    }
   })
 
   test('resolve providers from relative path', async (assert) => {
@@ -173,7 +178,7 @@ test.group('Registrar', (group) => {
     const registrar = new Registrar([new Ioc()], fs.basePath)
     registrar.useProviders(['./providers/FooProvider.js'])
 
-    const providers = registrar.register()
+    const providers = await registrar.register()
     assert.isTrue((providers[0] as any).registered)
   })
 
