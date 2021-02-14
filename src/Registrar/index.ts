@@ -76,7 +76,7 @@ export class Registrar {
       this.providers.push(provider)
 
       if (provider.provides) {
-        this.collect(provider.provides, resolvedPath)
+        await this.collect(provider.provides, resolvedPath)
       }
     }
   }
