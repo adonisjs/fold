@@ -90,6 +90,6 @@
   },
   "publishConfig": {
     "access": "public",
-    "tag": "alpha"
+    "tag": "next"
   }
 }
