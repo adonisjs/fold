@@ -45,7 +45,7 @@
     "@adonisjs/mrm-preset": "^3.0.0",
     "@adonisjs/require-ts": "^2.0.4",
     "@poppinss/dev-utils": "^1.1.2",
-    "@types/node": "^15.0.1",
+    "@types/node": "^15.0.2",
     "benchmark": "^2.1.4",
     "commitizen": "^4.2.3",
     "cz-conventional-changelog": "^3.3.0",
