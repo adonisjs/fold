@@ -9,96 +9,103 @@
 
 import type { Fakes } from './Fakes'
 
-/**
- * Checks for the existence of fake on the target
- */
-function hasFake(target: { options: Fakes; namespace: string; value: any }) {
-  return target.options.has(target.namespace)
-}
-
-/**
- * Calls the trap on the target
- */
-function callTrap(
-  target: { options: Fakes; namespace: string; value: any },
-  trap: any,
-  ...args: any[]
-) {
-  if (hasFake(target)) {
-    return Reflect[trap](target.options.resolve(target.namespace, target.value), ...args)
-  } else {
-    return Reflect[trap](target.value, ...args)
-  }
+function getBindingValue(handler: { options: Fakes; namespace: string; value: any }) {
+  return handler.options.has(handler.namespace)
+    ? handler.options.resolve(handler.namespace, handler.value)
+    : handler.value
 }
 
 /**
  * Proxy handler to handle objects
  */
-const objectHandler = {
-  get(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'get', ...args)
-  },
+const objectHandler = (options: { options: Fakes; namespace: string; value: any }) => {
+  return {
+    get(_: object, key: string, receiver?: any) {
+      const descriptor = Object.getOwnPropertyDescriptor(options.value, key)
 
-  apply(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'apply', ...args)
-  },
+      /**
+       * Handling the proxy invariants use case. Learn more
+       *
+       * https://262.ecma-international.org/8.0/#sec-proxy-object-internal-methods-and-internal-slots-get-p-receiver
+       *
+       * Check the following "get" trap
+       * https://github.com/kpruden/on-change/blob/5b80da1f5f7ac80c37d7bd19122188acb7ad0b19/index.js#L44-L66
+       */
+      if (descriptor && !descriptor.configurable) {
+        if (descriptor.set && !descriptor.get) {
+          return undefined
+        }
+        if (descriptor.writable === false) {
+          return Reflect.get(options.value, key, receiver)
+        }
+      }
 
-  defineProperty(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'defineProperty', ...args)
-  },
+      return Reflect.get(getBindingValue(options), key, receiver)
+    },
 
-  deleteProperty(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'deleteProperty', ...args)
-  },
+    apply(_: object, thisArgument: any, args: any[]) {
+      return Reflect.apply(getBindingValue(options), thisArgument, args)
+    },
 
-  getOwnPropertyDescriptor(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'getOwnPropertyDescriptor', ...args)
-  },
+    defineProperty(_: object, propertyKey: PropertyKey, attributes: PropertyDescriptor) {
+      return Reflect.defineProperty(getBindingValue(options), propertyKey, attributes)
+    },
 
-  getPrototypeOf(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'getPrototypeOf', ...args)
-  },
+    deleteProperty(_: object, propertyKey: PropertyKey) {
+      return Reflect.deleteProperty(getBindingValue(options), propertyKey)
+    },
 
-  has(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'has', ...args)
-  },
+    getOwnPropertyDescriptor(_: object, propertyKey: PropertyKey) {
+      return Reflect.getOwnPropertyDescriptor(getBindingValue(options), propertyKey)
+    },
 
-  isExtensible(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'isExtensible', ...args)
-  },
+    getPrototypeOf(_: object) {
+      return Reflect.getPrototypeOf(getBindingValue(options))
+    },
 
-  ownKeys(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'ownKeys', ...args)
-  },
+    has(_: object, propertyKey: PropertyKey) {
+      return Reflect.has(getBindingValue(options), propertyKey)
+    },
 
-  preventExtensions() {
-    throw new Error('Cannot prevent extensions during a fake')
-  },
+    isExtensible(_: object) {
+      return Reflect.isExtensible(getBindingValue(options))
+    },
 
-  set(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'set', ...args)
-  },
+    ownKeys(_: object) {
+      return Reflect.ownKeys(getBindingValue(options))
+    },
 
-  setPrototypeOf(target: IocProxyObject, ...args: any[]) {
-    return callTrap(target, 'setPrototypeOf', ...args)
-  },
+    preventExtensions() {
+      throw new Error('Cannot prevent extensions during a fake')
+    },
+
+    set(_: object, propertyKey: PropertyKey, value: any, receiver?: any) {
+      return Reflect.set(getBindingValue(options), propertyKey, value, receiver)
+    },
+
+    setPrototypeOf(_: object, proto: object | null) {
+      return Reflect.setPrototypeOf(getBindingValue(options), proto)
+    },
+  }
 }
 
 /**
  * Proxy handler to handle classes and functions
  */
-const classHandler = Object.assign({}, objectHandler, {
-  construct(target: { options: Fakes; namespace: string; value: any }, ...args: any[]) {
-    return callTrap(target, 'construct', ...args)
-  },
-})
+const classHandler = (options: { options: Fakes; namespace: string; value: any }) => {
+  return Object.assign({}, objectHandler(options), {
+    construct(_: object, args: any[], newTarget?: any) {
+      return Reflect.construct(getBindingValue(options), args, newTarget)
+    },
+  })
+}
 
 /**
  * Proxies the objects to fallback to fake, when it exists.
  */
 export class IocProxyObject {
   constructor(public namespace: string, public value: any, public options: Fakes) {
-    return new Proxy(this, objectHandler)
+    return new Proxy(value, objectHandler({ namespace, value, options }))
   }
 }
 
@@ -106,10 +113,5 @@ export class IocProxyObject {
  * Proxies the class constructor to fallback to fake, when it exists.
  */
 export function IocProxyClass(namespace: string, value: any, options: Fakes) {
-  function Wrapped() {}
-  Wrapped.namespace = namespace
-  Wrapped.value = value
-  Wrapped.options = options
-
-  return new Proxy(Wrapped, classHandler)
+  return new Proxy(value, classHandler({ namespace, value, options }))
 }

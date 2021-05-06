@@ -255,8 +255,12 @@ test.group('Ioc | resolveBinding', () => {
 
   test('wrap output "class constructor" inside proxy when fake is registered', (assert) => {
     const ioc = new Ioc()
-    class User {}
-    class FakeUser {}
+    class User {
+      public username = 'user'
+    }
+    class FakeUser {
+      public username = 'fakeuser'
+    }
 
     ioc.bind('App/Foo', () => {
       return User
@@ -267,7 +271,27 @@ test.group('Ioc | resolveBinding', () => {
       return FakeUser
     })
 
-    assert.instanceOf(new (ioc.resolveBinding('App/Foo'))(), FakeUser)
+    assert.equal(new (ioc.resolveBinding('App/Foo'))().username, 'fakeuser')
+  })
+
+  test('instantiating class without defining the fake should work fine', (assert) => {
+    const ioc = new Ioc()
+
+    @inject(['App/Bar'])
+    class User {
+      public username = 'virk'
+    }
+
+    ioc.bind('App/Bar', () => {
+      return {}
+    })
+
+    ioc.bind('App/Foo', () => {
+      return User
+    })
+
+    ioc.useProxies(true)
+    assert.equal(ioc.make(ioc.resolveBinding('App/Foo')).username, 'virk')
   })
 
   test('class "static properties" must point to fake class', (assert) => {
@@ -292,7 +316,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.equal(ioc.resolveBinding('App/Foo').userName, 'nikk')
   })
 
-  test('class "constructor" must point to the fake object', (assert) => {
+  test('class non configurable properties should point to original object', (assert) => {
     const ioc = new Ioc()
     class User {
       public static userName = 'virk'
@@ -314,7 +338,7 @@ test.group('Ioc | resolveBinding', () => {
     const Foo = ioc.resolveBinding('App/Foo')
     const foo = new Foo()
 
-    assert.equal(foo.constructor.userName, 'nikk')
+    assert.equal(foo.constructor.userName, 'virk')
   })
 
   test('class "constructor" must point to the original object, when "no fake is defined"', (assert) => {
@@ -643,7 +667,7 @@ test.group('Ioc | require', (group) => {
     assert.equal(ioc.require('App/User.cjs').userName, 'virk')
   })
 
-  test('class "constructor" must point to the fake object', async (assert) => {
+  test('class non configurable properties should point to original object', async (assert) => {
     await fs.add(
       'app/User.ts',
       `
@@ -683,10 +707,10 @@ test.group('Ioc | require', (group) => {
     ioc.useProxies()
 
     const fakeUser = new (ioc.require('App/User').default)()
-    assert.equal(fakeUser.constructor.userName, 'romain')
+    assert.equal(fakeUser.constructor.userName, 'virk')
 
     const fakeUserCjs = new (ioc.require('App/User.cjs'))()
-    assert.equal(fakeUserCjs.constructor.userName, 'romain')
+    assert.equal(fakeUserCjs.constructor.userName, 'virk')
 
     ioc.useProxies(false)
 
@@ -1456,7 +1480,7 @@ test.group('Ioc | Proxy', (group) => {
       return FooFake
     })
 
-    assert.instanceOf(new value(), FooFake)
+    assert.equal(new value().name, 'foofake')
   })
 
   test('proxy class constructor via ioc.make', (assert) => {
@@ -1487,7 +1511,45 @@ test.group('Ioc | Proxy', (group) => {
       return FooFake
     })
 
-    assert.instanceOf(new value(), FooFake)
+    assert.equal(ioc.make(value).name, 'foofake')
+  })
+
+  test('proxy class constructor when no fake is defined', (assert) => {
+    class Foo {
+      public name = 'foo'
+      public getName() {
+        return this.name
+      }
+    }
+
+    const ioc = new Ioc()
+    ioc.useProxies()
+    ioc.bind('App/Foo', () => {
+      return Foo
+    })
+
+    const value = ioc.make('App/Foo')
+    assert.instanceOf(new value(), Foo)
+    assert.equal(new value().name, 'foo')
+  })
+
+  test('proxy class constructor via ioc.make when no fake is defined', (assert) => {
+    class Foo {
+      public name = 'foo'
+      public getName() {
+        return this.name
+      }
+    }
+
+    const ioc = new Ioc()
+    ioc.useProxies()
+    ioc.bind('App/Foo', () => {
+      return Foo
+    })
+
+    const value = ioc.make('App/Foo')
+    assert.instanceOf(new value(), Foo)
+    assert.equal(ioc.make(value).name, 'foo')
   })
 
   test('do not proxy literals when using ioc.make', (assert) => {
