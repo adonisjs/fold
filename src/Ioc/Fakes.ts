@@ -17,10 +17,8 @@ export class Fakes {
   /**
    * Registered fakes
    */
-  private list: Map<
-    string,
-    { callback: FakeCallback<any, IocContract>; cachedValue?: any }
-  > = new Map()
+  private list: Map<string, { callback: FakeCallback<any, IocContract>; cachedValue?: any }> =
+    new Map()
 
   constructor(private container: IocContract) {}
 
