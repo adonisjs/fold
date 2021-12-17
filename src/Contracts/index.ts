@@ -7,8 +7,10 @@
  * file that was distributed with this source code.
  */
 
+type Function = (...args: any[]) => any
+
 export type ExtractFunctions<T> = {
-  [P in keyof T]: T[P] extends (...args: any[]) => any ? P : never
+  [P in keyof T]: T[P] extends Function ? P : never
 }[keyof T]
 
 /**
@@ -338,7 +340,7 @@ export interface IocContract<ContainerBindings extends any = any> {
     target: T,
     method: Method,
     args?: any[]
-  ): ReturnType<T[Method]>
+  ): T[Method] extends Function ? ReturnType<T[Method]> : any
 
   /**
    * Call a method on an object and automatically inject its depdencies
@@ -347,7 +349,7 @@ export interface IocContract<ContainerBindings extends any = any> {
     target: T,
     method: Method,
     args?: any[]
-  ): Promise<UnWrapPromise<ReturnType<T[Method]>>>
+  ): T[Method] extends Function ? Promise<UnWrapPromise<ReturnType<T[Method]>>> : Promise<any>
 
   /**
    * Trap container lookup calls. It includes
