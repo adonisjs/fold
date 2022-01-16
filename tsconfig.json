@@ -3,6 +3,9 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "types": ["@types/node", "reflect-metadata"]
+    "types": [
+      "@types/node",
+      "reflect-metadata"
+    ]
   }
 }
