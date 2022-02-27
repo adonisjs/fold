@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
+import { test } from '@japa/runner'
 import 'reflect-metadata'
 import { join } from 'path'
 import { types } from 'util'
@@ -19,13 +19,13 @@ import { inject } from '../src/decorators'
 const fs = new Filesystem(join(__dirname, './app'))
 
 test.group('Ioc', () => {
-  test('raise error when bind callback is not a function', (assert) => {
+  test('raise error when bind callback is not a function', ({ assert }) => {
     const ioc = new Ioc()
     const fn = () => (ioc as any).bind('App/Foo', 'hello')
-    assert.throw(fn, 'E_RUNTIME_EXCEPTION: "ioc.bind" expect 2nd argument to be a function')
+    assert.throws(fn, 'E_RUNTIME_EXCEPTION: "ioc.bind" expect 2nd argument to be a function')
   })
 
-  test('add binding to the container', (assert) => {
+  test('add binding to the container', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -34,7 +34,7 @@ test.group('Ioc', () => {
     assert.deepEqual(ioc.lookup('App/Foo'), { namespace: 'App/Foo', type: 'binding' })
   })
 
-  test('add singleton binding to the container', (assert) => {
+  test('add singleton binding to the container', ({ assert }) => {
     const ioc = new Ioc()
     ioc.singleton('App/Foo', () => {
       return 'foo'
@@ -43,7 +43,7 @@ test.group('Ioc', () => {
     assert.deepEqual(ioc.lookup('App/Foo'), { namespace: 'App/Foo', type: 'binding' })
   })
 
-  test('register import alias', (assert) => {
+  test('register import alias', ({ assert }) => {
     const ioc = new Ioc()
     ioc.alias(join(__dirname, './app'), 'App')
 
@@ -52,14 +52,14 @@ test.group('Ioc', () => {
     assert.deepEqual(ioc.importAliases, { App: join(__dirname, './app') })
   })
 
-  test('register fake', (assert) => {
+  test('register fake', ({ assert }) => {
     const ioc = new Ioc()
     ioc.fake('App/Foo', () => {})
 
     assert.isTrue(ioc.hasFake('App/Foo'))
   })
 
-  test('return true from "hasBinding" when binding exists', (assert) => {
+  test('return true from "hasBinding" when binding exists', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return { foo: true }
@@ -69,7 +69,7 @@ test.group('Ioc', () => {
     assert.isFalse(ioc.hasBinding('Foo'))
   })
 
-  test('return true from "isAliasPath" when namespace is part of import aliases', (assert) => {
+  test('return true from "isAliasPath" when namespace is part of import aliases', ({ assert }) => {
     const ioc = new Ioc()
     ioc.alias(join(__dirname, './app'), 'App')
 
@@ -77,7 +77,9 @@ test.group('Ioc', () => {
     assert.isFalse(ioc.isAliasPath('Foo'))
   })
 
-  test('return false from "isAliasPath" when import alias has a conflict with binding', (assert) => {
+  test('return false from "isAliasPath" when import alias has a conflict with binding', ({
+    assert,
+  }) => {
     const ioc = new Ioc()
 
     ioc.alias(join(__dirname, './app'), 'App')
@@ -89,7 +91,7 @@ test.group('Ioc', () => {
     assert.isFalse(ioc.isAliasPath('Foo'))
   })
 
-  test('return true from "hasFake" when fake exists', (assert) => {
+  test('return true from "hasFake" when fake exists', ({ assert }) => {
     const ioc = new Ioc()
     ioc.fake('App/Foo', () => {})
 
@@ -98,7 +100,7 @@ test.group('Ioc', () => {
 })
 
 test.group('Ioc | lookup', () => {
-  test('lookup namespace', (assert) => {
+  test('lookup namespace', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -110,7 +112,7 @@ test.group('Ioc | lookup', () => {
     })
   })
 
-  test('lookup absolute namespace', (assert) => {
+  test('lookup absolute namespace', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -122,7 +124,7 @@ test.group('Ioc | lookup', () => {
     })
   })
 
-  test('lookup namespace with a prefix', (assert) => {
+  test('lookup namespace with a prefix', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -134,7 +136,7 @@ test.group('Ioc | lookup', () => {
     })
   })
 
-  test('lookup absolute namespace with a prefix', (assert) => {
+  test('lookup absolute namespace with a prefix', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -146,7 +148,7 @@ test.group('Ioc | lookup', () => {
     })
   })
 
-  test('lookup namespace from aliases', (assert) => {
+  test('lookup namespace from aliases', ({ assert }) => {
     const ioc = new Ioc()
     ioc.alias(join(__dirname, './app'), 'App')
 
@@ -156,7 +158,7 @@ test.group('Ioc | lookup', () => {
     })
   })
 
-  test('lookup namespace from aliases with a prefix', (assert) => {
+  test('lookup namespace from aliases with a prefix', ({ assert }) => {
     const ioc = new Ioc()
     ioc.alias(join(__dirname, './app'), 'App')
 
@@ -166,7 +168,7 @@ test.group('Ioc | lookup', () => {
     })
   })
 
-  test('lookup absolute namespace from aliases with a prefix', (assert) => {
+  test('lookup absolute namespace from aliases with a prefix', ({ assert }) => {
     const ioc = new Ioc()
     ioc.alias(join(__dirname, './app'), 'App')
 
@@ -176,7 +178,9 @@ test.group('Ioc | lookup', () => {
     })
   })
 
-  test('give preference to binding when alias and binding namespace has a conflict', (assert) => {
+  test('give preference to binding when alias and binding namespace has a conflict', ({
+    assert,
+  }) => {
     const ioc = new Ioc()
     ioc.alias(join(__dirname, './app'), 'App')
 
@@ -187,14 +191,16 @@ test.group('Ioc | lookup', () => {
     assert.deepEqual(ioc.lookup('App/Foo'), { namespace: 'App/Foo', type: 'binding' })
   })
 
-  test('return null when namespace is not a binding and neither part of import aliases', (assert) => {
+  test('return null when namespace is not a binding and neither part of import aliases', ({
+    assert,
+  }) => {
     const ioc = new Ioc()
     assert.isNull(ioc.lookup('App/Foo'))
   })
 })
 
 test.group('Ioc | resolveBinding', () => {
-  test('resolve binding', (assert) => {
+  test('resolve binding', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -203,25 +209,25 @@ test.group('Ioc | resolveBinding', () => {
     assert.equal(ioc.resolveBinding('App/Foo'), 'foo')
   })
 
-  test('do not resolve import alias', (assert) => {
+  test('do not resolve import alias', ({ assert }) => {
     const ioc = new Ioc()
     ioc.alias(join(__dirname, './app'), 'App')
 
-    assert.throw(
+    assert.throws(
       () => ioc.resolveBinding('App/Foo'),
       'E_IOC_LOOKUP_FAILED: Cannot resolve "App/Foo" namespace from the IoC Container'
     )
   })
 
-  test('raise exception when binding is not registered', (assert) => {
+  test('raise exception when binding is not registered', ({ assert }) => {
     const ioc = new Ioc()
-    assert.throw(
+    assert.throws(
       () => ioc.resolveBinding('App/Foo'),
       'E_IOC_LOOKUP_FAILED: Cannot resolve "App/Foo" namespace from the IoC Container'
     )
   })
 
-  test('resolve binding on every call', (assert) => {
+  test('resolve binding on every call', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return Symbol('foo')
@@ -230,7 +236,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.notStrictEqual(ioc.resolveBinding('App/Foo'), ioc.resolveBinding('App/Foo'))
   })
 
-  test('do not resolve singleton in subsequent calls', (assert) => {
+  test('do not resolve singleton in subsequent calls', ({ assert }) => {
     const ioc = new Ioc()
     ioc.singleton('App/Foo', () => {
       return Symbol('foo')
@@ -239,7 +245,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.strictEqual(ioc.resolveBinding('App/Foo'), ioc.resolveBinding('App/Foo'))
   })
 
-  test('wrap output "object" inside proxy when fake is registered', (assert) => {
+  test('wrap output "object" inside proxy when fake is registered', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return { foo: true }
@@ -253,7 +259,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.deepEqual(ioc.resolveBinding('App/Foo'), { foo: false })
   })
 
-  test('wrap output "class constructor" inside proxy when fake is registered', (assert) => {
+  test('wrap output "class constructor" inside proxy when fake is registered', ({ assert }) => {
     const ioc = new Ioc()
     class User {
       public username = 'user'
@@ -274,7 +280,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.equal(new (ioc.resolveBinding('App/Foo'))().username, 'fakeuser')
   })
 
-  test('instantiating class without defining the fake should work fine', (assert) => {
+  test('instantiating class without defining the fake should work fine', ({ assert }) => {
     const ioc = new Ioc()
 
     @inject(['App/Bar'])
@@ -294,7 +300,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.equal(ioc.make(ioc.resolveBinding('App/Foo')).username, 'virk')
   })
 
-  test('class "static properties" must point to fake class', (assert) => {
+  test('class "static properties" must point to fake class', ({ assert }) => {
     const ioc = new Ioc()
     class User {
       public static userName = 'virk'
@@ -316,7 +322,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.equal(ioc.resolveBinding('App/Foo').userName, 'nikk')
   })
 
-  test('class non configurable properties should point to original object', (assert) => {
+  test('class non configurable properties should point to original object', ({ assert }) => {
     const ioc = new Ioc()
     class User {
       public static userName = 'virk'
@@ -341,7 +347,9 @@ test.group('Ioc | resolveBinding', () => {
     assert.equal(foo.constructor.userName, 'virk')
   })
 
-  test('class "constructor" must point to the original object, when "no fake is defined"', (assert) => {
+  test('class "constructor" must point to the original object, when "no fake is defined"', ({
+    assert,
+  }) => {
     const ioc = new Ioc()
     class User {
       public static userName = 'virk'
@@ -359,7 +367,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.equal(foo.constructor.userName, 'virk')
   })
 
-  test('super class "constructor" must point to the fake class', (assert) => {
+  test('super class "constructor" must point to the fake class', ({ assert }) => {
     const ioc = new Ioc()
     class User {
       public static userName = 'virk'
@@ -392,7 +400,9 @@ test.group('Ioc | resolveBinding', () => {
     assert.deepEqual(Object.getPrototypeOf(bar.constructor)['userName'], 'romain')
   })
 
-  test('super class "constructor" must point to the original class, when "no fake is defined"', (assert) => {
+  test('super class "constructor" must point to the original class, when "no fake is defined"', ({
+    assert,
+  }) => {
     const ioc = new Ioc()
     class User {
       public static userName = 'virk'
@@ -416,7 +426,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.deepEqual(Object.getPrototypeOf(bar.constructor)['userName'], 'virk')
   })
 
-  test('do not wrap "literal" values inside proxy', (assert) => {
+  test('do not wrap "literal" values inside proxy', ({ assert }) => {
     const ioc = new Ioc()
     class FakeUser {
       public static userName = 'nikk'
@@ -434,7 +444,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.equal(ioc.resolveBinding('App/Foo'), 'foo')
   })
 
-  test('trap "ioc.use" statement when binding is defined', (assert) => {
+  test('trap "ioc.use" statement when binding is defined', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -447,7 +457,7 @@ test.group('Ioc | resolveBinding', () => {
     assert.deepEqual(ioc.use('App/Foo'), { name: 'foo' })
   })
 
-  test('trap "ioc.use" statement when binding is not defined', (assert) => {
+  test('trap "ioc.use" statement when binding is not defined', ({ assert }) => {
     const ioc = new Ioc()
     ioc.trap(() => {
       return { name: 'foo' }
@@ -458,11 +468,11 @@ test.group('Ioc | resolveBinding', () => {
 })
 
 test.group('Ioc | require', (group) => {
-  group.afterEach(async () => {
+  group.each.teardown(async () => {
     await fs.cleanup()
   })
 
-  test('import "esm ts" module', async (assert) => {
+  test('import "esm ts" module', async ({ assert }) => {
     await fs.add(
       'app/User.ts',
       `
@@ -480,7 +490,7 @@ test.group('Ioc | require', (group) => {
     assert.equal(new resolved.default().username, 'virk')
   })
 
-  test('handle path subsitions carefully', async (assert) => {
+  test('handle path subsitions carefully', async ({ assert }) => {
     await fs.add(
       'app/User/App/User.ts',
       `
@@ -498,7 +508,7 @@ test.group('Ioc | require', (group) => {
     assert.equal(new resolved.default().username, 'virk')
   })
 
-  test('import "cjs js" module', async (assert) => {
+  test('import "cjs js" module', async ({ assert }) => {
     await fs.add(
       'app/User.cjs.js',
       `
@@ -517,7 +527,7 @@ test.group('Ioc | require', (group) => {
     assert.equal(new resolved().username, 'virk')
   })
 
-  test('raise exception when module is missing', async (assert) => {
+  test('raise exception when module is missing', async ({ assert }) => {
     assert.plan(1)
 
     const ioc = new Ioc()
@@ -530,7 +540,7 @@ test.group('Ioc | require', (group) => {
     }
   })
 
-  test('wrap output "object" inside proxy when fake is registered', async (assert) => {
+  test('wrap output "object" inside proxy when fake is registered', async ({ assert }) => {
     await fs.add(
       'app/User.ts',
       `
@@ -573,7 +583,9 @@ test.group('Ioc | require', (group) => {
     assert.deepEqual(ioc.require('App/User.cjs'), { username: 'virk' })
   })
 
-  test('wrap output "class constructor" inside proxy when fake is registered', async (assert) => {
+  test('wrap output "class constructor" inside proxy when fake is registered', async ({
+    assert,
+  }) => {
     await fs.add(
       'app/User.ts',
       `
@@ -621,7 +633,7 @@ test.group('Ioc | require', (group) => {
     assert.equal(new (ioc.require('App/User.cjs'))().username, 'virk')
   })
 
-  test('class "static properties" must point to fake class', async (assert) => {
+  test('class "static properties" must point to fake class', async ({ assert }) => {
     await fs.add(
       'app/User.ts',
       `
@@ -667,7 +679,7 @@ test.group('Ioc | require', (group) => {
     assert.equal(ioc.require('App/User.cjs').userName, 'virk')
   })
 
-  test('class non configurable properties should point to original object', async (assert) => {
+  test('class non configurable properties should point to original object', async ({ assert }) => {
     await fs.add(
       'app/User.ts',
       `
@@ -721,7 +733,9 @@ test.group('Ioc | require', (group) => {
     assert.equal(userCjs.constructor.userName, 'virk')
   })
 
-  test('class "constructor" must point to the original object, when "no fake is defined"', async (assert) => {
+  test('class "constructor" must point to the original object, when "no fake is defined"', async ({
+    assert,
+  }) => {
     await fs.add(
       'app/User.ts',
       `
@@ -753,7 +767,7 @@ test.group('Ioc | require', (group) => {
     assert.equal(userCjs.constructor.userName, 'virk')
   })
 
-  test('super class "constructor" must point to the fake class', async (assert) => {
+  test('super class "constructor" must point to the fake class', async ({ assert }) => {
     await fs.add(
       'app/User.ts',
       `export default class User {
@@ -786,7 +800,9 @@ test.group('Ioc | require', (group) => {
     assert.deepEqual(Object.getPrototypeOf(bar.constructor)['userName'], 'romain')
   })
 
-  test('super class "constructor" must point to the original class, when "no fake is defined"', async (assert) => {
+  test('super class "constructor" must point to the original class, when "no fake is defined"', async ({
+    assert,
+  }) => {
     await fs.add(
       'app/User.ts',
       `export default class User {
@@ -812,7 +828,7 @@ test.group('Ioc | require', (group) => {
     assert.deepEqual(Object.getPrototypeOf(bar.constructor)['userName'], 'virk')
   })
 
-  test('do not wrap "literal" values inside proxy', async (assert) => {
+  test('do not wrap "literal" values inside proxy', async ({ assert }) => {
     await fs.add(
       'app/User.ts',
       `const name = 'virk'
@@ -834,7 +850,7 @@ test.group('Ioc | require', (group) => {
     assert.equal(ioc.require('App/User').default, 'virk')
   })
 
-  test('trap "ioc.use" statement when binding is defined', (assert) => {
+  test('trap "ioc.use" statement when binding is defined', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -847,7 +863,7 @@ test.group('Ioc | require', (group) => {
     assert.deepEqual(ioc.use('App/Foo'), { name: 'foo' })
   })
 
-  test('trap "ioc.use" statement when binding is not defined', (assert) => {
+  test('trap "ioc.use" statement when binding is not defined', ({ assert }) => {
     const ioc = new Ioc()
     ioc.trap(() => {
       return { name: 'foo' }
@@ -858,18 +874,18 @@ test.group('Ioc | require', (group) => {
 })
 
 test.group('Ioc | make', (group) => {
-  group.afterEach(async () => {
+  group.each.teardown(async () => {
     await fs.cleanup()
   })
 
-  test('make instance of a class', (assert) => {
+  test('make instance of a class', ({ assert }) => {
     const ioc = new Ioc()
     class Foo {}
 
     assert.instanceOf(ioc.make(Foo), Foo)
   })
 
-  test('make instance and inject dependencies', (assert) => {
+  test('make instance and inject dependencies', ({ assert }) => {
     const ioc = new Ioc()
 
     class Bar {}
@@ -893,7 +909,9 @@ test.group('Ioc | make', (group) => {
     assert.instanceOf(ioc.make(Foo).bar, Bar)
   })
 
-  test('make instance of a class and inject dependencies with runtime dependencies', (assert) => {
+  test('make instance of a class and inject dependencies with runtime dependencies', ({
+    assert,
+  }) => {
     const ioc = new Ioc()
 
     class Bar {}
@@ -920,7 +938,7 @@ test.group('Ioc | make', (group) => {
     assert.instanceOf(ioc.make(Foo, [new Baz(), 'foo']).bar, Baz)
   })
 
-  test('do not make instance when makePlain is set to true', (assert) => {
+  test('do not make instance when makePlain is set to true', ({ assert }) => {
     const ioc = new Ioc()
     class Foo {
       constructor(public bar: Bar) {}
@@ -943,7 +961,7 @@ test.group('Ioc | make', (group) => {
     assert.deepEqual(ioc.make(Foo), Foo)
   })
 
-  test('do not make instance when namespace is a binding', (assert) => {
+  test('do not make instance when namespace is a binding', ({ assert }) => {
     const ioc = new Ioc()
     class Bar {}
 
@@ -954,7 +972,7 @@ test.group('Ioc | make', (group) => {
     assert.deepEqual(ioc.make('App/Bar'), Bar)
   })
 
-  test('make instance when namespace is part of directory aliases', async (assert) => {
+  test('make instance when namespace is part of directory aliases', async ({ assert }) => {
     await fs.add(
       'Foo.js',
       `module.exports = class Foo {
@@ -969,7 +987,7 @@ test.group('Ioc | make', (group) => {
     assert.deepEqual(ioc.make('Admin/Foo').name, 'foo')
   })
 
-  test('inject dependencies when namespace is part of directory aliases', async (assert) => {
+  test('inject dependencies when namespace is part of directory aliases', async ({ assert }) => {
     await fs.add(
       'Foo.js',
       `module.exports = class Foo {
@@ -995,7 +1013,7 @@ test.group('Ioc | make', (group) => {
     assert.instanceOf(ioc.make('Admin/Foo').bar, Bar)
   })
 
-  test('allow faking directory aliases namespace', async (assert) => {
+  test('allow faking directory aliases namespace', async ({ assert }) => {
     await fs.add(
       'Foo.js',
       `module.exports = class Foo {
@@ -1020,7 +1038,7 @@ test.group('Ioc | make', (group) => {
     assert.isTrue(types.isProxy(ioc.use('Admin/Foo')))
   })
 
-  test('make instance when namespace is part of directory aliases', async (assert) => {
+  test('make instance when namespace is part of directory aliases', async ({ assert }) => {
     await fs.add(
       'Bar.ts',
       `export default class Bar {
@@ -1035,7 +1053,7 @@ test.group('Ioc | make', (group) => {
     assert.deepEqual(ioc.make('Admin/Bar').name, 'bar')
   })
 
-  test('inject dependencies when namespace is part of directory aliases', async (assert) => {
+  test('inject dependencies when namespace is part of directory aliases', async ({ assert }) => {
     await fs.add(
       'Bar.ts',
       `export default class Bar {
@@ -1061,7 +1079,7 @@ test.group('Ioc | make', (group) => {
     assert.instanceOf(ioc.make('Admin/Bar').baz, Baz)
   })
 
-  test('allow faking directory aliases namespace', async (assert) => {
+  test('allow faking directory aliases namespace', async ({ assert }) => {
     await fs.add(
       'Bar.ts',
       `export default class Bar {
@@ -1087,7 +1105,7 @@ test.group('Ioc | make', (group) => {
     assert.isTrue(types.isProxy(ioc.use('Admin/Bar').default))
   })
 
-  test('do not make esm named exports', async (assert) => {
+  test('do not make esm named exports', async ({ assert }) => {
     await fs.add(
       'Bar.ts',
       `export class Bar {
@@ -1100,7 +1118,7 @@ test.group('Ioc | make', (group) => {
     assert.equal(ioc.make('App/Bar').Bar.name, 'Bar')
   })
 
-  test('do not proxy named exports', async (assert) => {
+  test('do not proxy named exports', async ({ assert }) => {
     await fs.add(
       'Bar.ts',
       `export class Bar {
@@ -1115,7 +1133,7 @@ test.group('Ioc | make', (group) => {
     assert.isFalse(types.isProxy(ioc.make('App/Bar')))
   })
 
-  test('trap "ioc.make" statement when binding is defined', (assert) => {
+  test('trap "ioc.make" statement when binding is defined', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -1128,7 +1146,7 @@ test.group('Ioc | make', (group) => {
     assert.deepEqual(ioc.make('App/Foo'), { name: 'foo' })
   })
 
-  test('trap "ioc.make" statement when binding is not defined', (assert) => {
+  test('trap "ioc.make" statement when binding is not defined', ({ assert }) => {
     const ioc = new Ioc()
     ioc.trap(() => {
       return { name: 'foo' }
@@ -1139,7 +1157,7 @@ test.group('Ioc | make', (group) => {
 })
 
 test.group('Ioc | withBindings', () => {
-  test('execute the callback when all bindings exists', async (assert) => {
+  test('execute the callback when all bindings exists', async ({ assert }) => {
     assert.plan(2)
     const ioc = new Ioc()
 
@@ -1171,11 +1189,11 @@ test.group('Ioc | withBindings', () => {
 })
 
 test.group('Ioc | Proxy', (group) => {
-  group.afterEach(async () => {
+  group.each.teardown(async () => {
     await fs.cleanup()
   })
 
-  test('ensure proxy traps works fine on class instance', (assert) => {
+  test('ensure proxy traps works fine on class instance', ({ assert }) => {
     class Foo {
       public name = 'foo'
       public getName() {
@@ -1204,7 +1222,7 @@ test.group('Ioc | Proxy', (group) => {
     ])
   })
 
-  test('ensure proxy traps works fine with fakes', (assert) => {
+  test('ensure proxy traps works fine with fakes', ({ assert }) => {
     class Foo {
       public name = 'foo'
       public getName() {
@@ -1304,7 +1322,7 @@ test.group('Ioc | Proxy', (group) => {
      * Trap preventExtensions
      */
     const fn = () => Object.preventExtensions(value)
-    assert.throw(fn, 'Cannot prevent extensions during a fake')
+    assert.throws(fn, 'Cannot prevent extensions during a fake')
 
     ioc.fake('App/Foo', () => {
       return new FooFake()
@@ -1383,10 +1401,10 @@ test.group('Ioc | Proxy', (group) => {
      * Trap preventExtensions
      */
     const fn1 = () => Object.preventExtensions(value)
-    assert.throw(fn1, 'Cannot prevent extensions during a fake')
+    assert.throws(fn1, 'Cannot prevent extensions during a fake')
   })
 
-  test('ensure proxy traps works fine when fake has been restored', (assert) => {
+  test('ensure proxy traps works fine when fake has been restored', ({ assert }) => {
     class Foo {
       public name = 'foo'
       public getName() {
@@ -1452,7 +1470,7 @@ test.group('Ioc | Proxy', (group) => {
     ])
   })
 
-  test('proxy class constructor', (assert) => {
+  test('proxy class constructor', ({ assert }) => {
     class Foo {
       public name = 'foo'
       public getName() {
@@ -1483,7 +1501,7 @@ test.group('Ioc | Proxy', (group) => {
     assert.equal(new value().name, 'foofake')
   })
 
-  test('proxy class constructor via ioc.make', (assert) => {
+  test('proxy class constructor via ioc.make', ({ assert }) => {
     class Foo {
       public name = 'foo'
       public getName() {
@@ -1514,7 +1532,7 @@ test.group('Ioc | Proxy', (group) => {
     assert.equal(ioc.make(value).name, 'foofake')
   })
 
-  test('proxy class constructor when no fake is defined', (assert) => {
+  test('proxy class constructor when no fake is defined', ({ assert }) => {
     class Foo {
       public name = 'foo'
       public getName() {
@@ -1533,7 +1551,7 @@ test.group('Ioc | Proxy', (group) => {
     assert.equal(new value().name, 'foo')
   })
 
-  test('proxy class constructor via ioc.make when no fake is defined', (assert) => {
+  test('proxy class constructor via ioc.make when no fake is defined', ({ assert }) => {
     class Foo {
       public name = 'foo'
       public getName() {
@@ -1552,7 +1570,7 @@ test.group('Ioc | Proxy', (group) => {
     assert.equal(ioc.make(value).name, 'foo')
   })
 
-  test('do not proxy literals when using ioc.make', (assert) => {
+  test('do not proxy literals when using ioc.make', ({ assert }) => {
     const ioc = new Ioc()
     ioc.useProxies()
     ioc.bind('App/Foo', () => {
@@ -1569,7 +1587,7 @@ test.group('Ioc | Proxy', (group) => {
     assert.equal(value, 'foo')
   })
 
-  test('do not proxy literals when using ioc.use', (assert) => {
+  test('do not proxy literals when using ioc.use', ({ assert }) => {
     const ioc = new Ioc()
     ioc.useProxies()
     ioc.bind('App/Foo', () => {
@@ -1585,7 +1603,7 @@ test.group('Ioc | Proxy', (group) => {
     assert.equal(value, 'foo')
   })
 
-  test('proxy autoloaded class using use', async (assert) => {
+  test('proxy autoloaded class using use', async ({ assert }) => {
     await fs.add(
       'Bar.ts',
       `export = class Bar {
@@ -1613,7 +1631,7 @@ test.group('Ioc | Proxy', (group) => {
     assert.equal(new value().name, 'barfake')
   })
 
-  test('proxy bindings using use', async (assert) => {
+  test('proxy bindings using use', async ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Bar', () => {
       class Bar {
@@ -1639,7 +1657,7 @@ test.group('Ioc | Proxy', (group) => {
     assert.equal(new value().name, 'foofake')
   })
 
-  test('proxy autoloaded class using make', async (assert) => {
+  test('proxy autoloaded class using make', async ({ assert }) => {
     await fs.add(
       'Bar.ts',
       `export default class Bar {
@@ -1667,7 +1685,7 @@ test.group('Ioc | Proxy', (group) => {
     assert.equal(ioc.make('App/Bar').name, 'barfake')
   })
 
-  test('proxy bindings using make', (assert) => {
+  test('proxy bindings using make', ({ assert }) => {
     class Foo {
       public name = 'foo'
       public getName() {
@@ -1699,7 +1717,7 @@ test.group('Ioc | Proxy', (group) => {
 })
 
 test.group('Ioc | inject decorator', () => {
-  test('set inject property for constructor injections', (assert) => {
+  test('set inject property for constructor injections', ({ assert }) => {
     @inject(['App/Bar'])
     class Foo {
       constructor(public bar: any) {}
@@ -1710,7 +1728,7 @@ test.group('Ioc | inject decorator', () => {
     })
   })
 
-  test('set inject property for constructor injections via reflection', (assert) => {
+  test('set inject property for constructor injections via reflection', ({ assert }) => {
     class Bar {}
 
     @inject()
@@ -1723,7 +1741,9 @@ test.group('Ioc | inject decorator', () => {
     })
   })
 
-  test('set inject property for constructor by mix-matching reflection and custom injections', (assert) => {
+  test('set inject property for constructor by mix-matching reflection and custom injections', ({
+    assert,
+  }) => {
     class Bar {}
 
     @inject(['App/Baz'])
@@ -1734,7 +1754,7 @@ test.group('Ioc | inject decorator', () => {
     assert.deepEqual(Foo['inject'], { instance: ['App/Baz', Bar] })
   })
 
-  test('define custom injections after reflection index', (assert) => {
+  test('define custom injections after reflection index', ({ assert }) => {
     class Bar {}
 
     @inject([null, 'App/Baz'])
@@ -1745,7 +1765,7 @@ test.group('Ioc | inject decorator', () => {
     assert.deepEqual(Foo['inject'], { instance: [Bar, 'App/Baz'] })
   })
 
-  test('set injections when parameter has no type', (assert) => {
+  test('set injections when parameter has no type', ({ assert }) => {
     class Bar {}
 
     @inject()
@@ -1756,7 +1776,7 @@ test.group('Ioc | inject decorator', () => {
     assert.deepEqual(Foo['inject'], { instance: [Bar, Object] })
   })
 
-  test('set parameter injections', (assert) => {
+  test('set parameter injections', ({ assert }) => {
     class Bar {}
 
     class Foo {
@@ -1767,7 +1787,7 @@ test.group('Ioc | inject decorator', () => {
     assert.deepEqual(Foo['inject'], { greet: [Bar] })
   })
 
-  test('set multiple parameter injections', (assert) => {
+  test('set multiple parameter injections', ({ assert }) => {
     class Bar {}
 
     class Foo {
@@ -1778,7 +1798,7 @@ test.group('Ioc | inject decorator', () => {
     assert.deepEqual(Foo['inject'], { greet: [Bar, Object] })
   })
 
-  test('inject constructor dependencies injected via decorator', (assert) => {
+  test('inject constructor dependencies injected via decorator', ({ assert }) => {
     const ioc = new Ioc()
     class Bar {}
 
@@ -1790,7 +1810,7 @@ test.group('Ioc | inject decorator', () => {
     assert.instanceOf(ioc.make(Foo).bar, Bar)
   })
 
-  test('inject constructor dependencies with runtime arguments', (assert) => {
+  test('inject constructor dependencies with runtime arguments', ({ assert }) => {
     const ioc = new Ioc()
     class Bar {}
 
@@ -1805,7 +1825,7 @@ test.group('Ioc | inject decorator', () => {
     assert.equal(foo.username, 'virk')
   })
 
-  test('raise error when class has primitive or object constructor injections', (assert) => {
+  test('raise error when class has primitive or object constructor injections', ({ assert }) => {
     const ioc = new Ioc()
 
     @inject()
@@ -1814,10 +1834,10 @@ test.group('Ioc | inject decorator', () => {
     }
 
     const fn = () => ioc.make(Foo)
-    assert.throw(fn, 'Cannot inject "{String Constructor}" to "Foo" at position "1"')
+    assert.throws(fn, 'Cannot inject "{String Constructor}" to "Foo" at position "1"')
   })
 
-  test('inject method dependencies injected via decorator', (assert) => {
+  test('inject method dependencies injected via decorator', ({ assert }) => {
     assert.plan(1)
     const ioc = new Ioc()
 
@@ -1833,7 +1853,7 @@ test.group('Ioc | inject decorator', () => {
     ioc.call(ioc.make(Foo), 'greet', [])
   })
 
-  test('inject method dependencies with runtime arguments', (assert) => {
+  test('inject method dependencies with runtime arguments', ({ assert }) => {
     assert.plan(2)
     const ioc = new Ioc()
 
@@ -1850,7 +1870,7 @@ test.group('Ioc | inject decorator', () => {
     ioc.call(ioc.make(Foo), 'greet', ['virk'])
   })
 
-  test('inject method dependencies with interface type hinting', (assert) => {
+  test('inject method dependencies with interface type hinting', ({ assert }) => {
     assert.plan(2)
     const ioc = new Ioc()
 
@@ -1872,7 +1892,7 @@ test.group('Ioc | inject decorator', () => {
     ioc.call(ioc.make(Foo), 'greet', ['virk'])
   })
 
-  test('raise error when method has primitive or object constructor injections', (assert) => {
+  test('raise error when method has primitive or object constructor injections', ({ assert }) => {
     const ioc = new Ioc()
     class Bar {}
 
@@ -1882,10 +1902,10 @@ test.group('Ioc | inject decorator', () => {
     }
 
     const fn = () => ioc.call(ioc.make(Foo), 'greet', [])
-    assert.throw(fn, 'Cannot inject "{String Constructor}" to "Foo.greet" at position "1"')
+    assert.throws(fn, 'Cannot inject "{String Constructor}" to "Foo.greet" at position "1"')
   })
 
-  test('call object method even when it has zero injections', (assert) => {
+  test('call object method even when it has zero injections', ({ assert }) => {
     assert.plan(1)
     const ioc = new Ioc()
 
@@ -1900,11 +1920,11 @@ test.group('Ioc | inject decorator', () => {
 })
 
 test.group('Ioc | lookup resolve', (group) => {
-  group.afterEach(async () => {
+  group.each.teardown(async () => {
     await fs.cleanup()
   })
 
-  test('lookup binding from a lookup node', (assert) => {
+  test('lookup binding from a lookup node', ({ assert }) => {
     const ioc = new Ioc()
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -1913,7 +1933,7 @@ test.group('Ioc | lookup resolve', (group) => {
     assert.equal(ioc.use({ type: 'binding', namespace: 'App/Foo' }), 'foo')
   })
 
-  test('lookup directory alias value from a lookup node', async (assert) => {
+  test('lookup directory alias value from a lookup node', async ({ assert }) => {
     await fs.add('Foo.js', "module.exports = 'bar'")
 
     const ioc = new Ioc()
@@ -1922,20 +1942,20 @@ test.group('Ioc | lookup resolve', (group) => {
     assert.equal(ioc.use({ type: 'alias', namespace: 'App/Foo' }), 'bar')
   })
 
-  test('raise exception when unable to resolve lookup namespace', async (assert) => {
+  test('raise exception when unable to resolve lookup namespace', async ({ assert }) => {
     await fs.add('Foo.js', "module.exports = 'bar'")
     const ioc = new Ioc()
 
     ioc.alias(fs.basePath, 'App')
 
     const fn = () => ioc.use({ type: 'binding', namespace: 'App/Foo' })
-    assert.throw(
+    assert.throws(
       fn,
       'E_IOC_LOOKUP_FAILED: Cannot resolve "App/Foo" namespace from the IoC Container'
     )
   })
 
-  test('do not resolve binding for autoload lookup node', async (assert) => {
+  test('do not resolve binding for autoload lookup node', async ({ assert }) => {
     await fs.add('Foo.js', "module.exports = 'bar'")
     const ioc = new Ioc()
 
@@ -1944,13 +1964,13 @@ test.group('Ioc | lookup resolve', (group) => {
     })
 
     const fn = () => ioc.use({ type: 'alias', namespace: 'App/Foo' })
-    assert.throw(
+    assert.throws(
       fn,
       'E_IOC_LOOKUP_FAILED: Cannot resolve "App/Foo" namespace from the IoC Container'
     )
   })
 
-  test('make binding from binding lookup node', (assert) => {
+  test('make binding from binding lookup node', ({ assert }) => {
     const ioc = new Ioc()
     class Bar {}
 
@@ -1961,7 +1981,7 @@ test.group('Ioc | lookup resolve', (group) => {
     assert.equal(ioc.make({ type: 'binding', namespace: 'App/Foo' }), Bar)
   })
 
-  test('make binding from autoloaded lookup node', async (assert) => {
+  test('make binding from autoloaded lookup node', async ({ assert }) => {
     await fs.add(
       'Foo.js',
       `
@@ -1979,7 +1999,7 @@ test.group('Ioc | lookup resolve', (group) => {
     assert.equal(ioc.make({ type: 'alias', namespace: 'App/Foo' }).name, 'bar')
   })
 
-  test('do not make binding for autoload lookup node', async (assert) => {
+  test('do not make binding for autoload lookup node', async ({ assert }) => {
     await fs.add('Foo.js', "module.exports = 'bar'")
     const ioc = new Ioc()
 
@@ -1988,13 +2008,13 @@ test.group('Ioc | lookup resolve', (group) => {
     })
 
     const fn = () => ioc.make({ type: 'alias', namespace: 'App/Foo' })
-    assert.throw(
+    assert.throws(
       fn,
       'E_IOC_LOOKUP_FAILED: Cannot resolve "App/Foo" namespace from the IoC Container'
     )
   })
 
-  test('raise exception when unable to make lookup namespace', async (assert) => {
+  test('raise exception when unable to make lookup namespace', async ({ assert }) => {
     await fs.add('Foo.js', "module.exports = 'bar'")
 
     const ioc = new Ioc()
@@ -2002,7 +2022,7 @@ test.group('Ioc | lookup resolve', (group) => {
 
     const fn = () => ioc.make({ type: 'binding', namespace: 'App/Foo' })
 
-    assert.throw(
+    assert.throws(
       fn,
       'E_IOC_LOOKUP_FAILED: Cannot resolve "App/Foo" namespace from the IoC Container'
     )
