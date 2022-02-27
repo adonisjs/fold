@@ -10,18 +10,18 @@
 import { Filesystem } from '@poppinss/dev-utils'
 import { join } from 'path'
 
-import test from 'japa'
+import { test } from '@japa/runner'
 import { Registrar } from '../src/Registrar'
 import { Ioc } from '../src/Ioc'
 
 const fs = new Filesystem(join(__dirname, './app'))
 
 test.group('Registrar', (group) => {
-  group.afterEach(async () => {
+  group.each.teardown(async () => {
     await fs.cleanup()
   })
 
-  test('register an array of providers', async (assert) => {
+  test('register an array of providers', async ({ assert }) => {
     await fs.add(
       'providers/FooProvider.js',
       `module.exports = class MyProvider {
@@ -42,7 +42,7 @@ test.group('Registrar', (group) => {
     assert.isTrue((providers[0] as any).registered)
   })
 
-  test('register an array of providers when defined as es6 modules', async (assert) => {
+  test('register an array of providers when defined as es6 modules', async ({ assert }) => {
     await fs.add(
       'providers/BarProvider.ts',
       `export default class MyProvider {
@@ -60,7 +60,7 @@ test.group('Registrar', (group) => {
     assert.isTrue((providers[0] as any).registered)
   })
 
-  test('register and boot providers together', async (assert) => {
+  test('register and boot providers together', async ({ assert }) => {
     await fs.add(
       'providers/BarProvider.ts',
       `export default class MyProvider {
@@ -85,7 +85,7 @@ test.group('Registrar', (group) => {
     assert.isTrue((providers[0] as any).booted)
   })
 
-  test('let providers define their own sub providers', async (assert) => {
+  test('let providers define their own sub providers', async ({ assert }) => {
     await fs.add(
       'providers/BazProvider.ts',
       `export default class MyProvider {
@@ -131,7 +131,7 @@ test.group('Registrar', (group) => {
     assert.isTrue((providers[1] as any).booted)
   })
 
-  test('raise exception when provider is not exported as a default export', async (assert) => {
+  test('raise exception when provider is not exported as a default export', async ({ assert }) => {
     assert.plan(1)
 
     await fs.add(
@@ -161,7 +161,7 @@ test.group('Registrar', (group) => {
     }
   })
 
-  test('resolve providers from relative path', async (assert) => {
+  test('resolve providers from relative path', async ({ assert }) => {
     await fs.add(
       'providers/FooProvider.js',
       `module.exports = class MyProvider {
@@ -182,7 +182,7 @@ test.group('Registrar', (group) => {
     assert.isTrue((providers[0] as any).registered)
   })
 
-  test('resolve sub providers from relative path', async (assert) => {
+  test('resolve sub providers from relative path', async ({ assert }) => {
     await fs.add(
       'providers/BazProvider.ts',
       `export default class MyProvider {

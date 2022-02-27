@@ -7,11 +7,11 @@
  * file that was distributed with this source code.
  */
 
-import test from 'japa'
+import { test } from '@japa/runner'
 import { Ioc } from '../src/Ioc'
 
 test.group('Ioc Resolver', () => {
-  test('call handle method when no explicit method is defined', async (assert) => {
+  test('call handle method when no explicit method is defined', async ({ assert }) => {
     class UserController {
       public handle() {
         return 'foo'
@@ -25,7 +25,7 @@ test.group('Ioc Resolver', () => {
     assert.equal(await resolver.call('App/UserController'), 'foo')
   })
 
-  test('call namespace expression with method', async (assert) => {
+  test('call namespace expression with method', async ({ assert }) => {
     class UserController {
       public getUser() {
         return 'foo'
@@ -39,7 +39,7 @@ test.group('Ioc Resolver', () => {
     assert.equal(await resolver.call('App/UserController.getUser'), 'foo')
   })
 
-  test('call async namespace expression', async (assert) => {
+  test('call async namespace expression', async ({ assert }) => {
     class UserController {
       public async getUser() {
         return 'foo'
@@ -54,7 +54,7 @@ test.group('Ioc Resolver', () => {
     assert.equal(value, 'foo')
   })
 
-  test('raise exception when unable to lookup namespace', async (assert) => {
+  test('raise exception when unable to lookup namespace', async ({ assert }) => {
     assert.plan(1)
 
     const ioc = new Ioc()
@@ -70,7 +70,7 @@ test.group('Ioc Resolver', () => {
     }
   })
 
-  test('allow runtime prefix namespace', async (assert) => {
+  test('allow runtime prefix namespace', async ({ assert }) => {
     class UserController {
       public handle() {
         return 'foo'
@@ -84,7 +84,9 @@ test.group('Ioc Resolver', () => {
     assert.equal(await resolver.call('UserController', 'App'), 'foo')
   })
 
-  test('handle use case where namespace is same but prefix namespace is different', async (assert) => {
+  test('handle use case where namespace is same but prefix namespace is different', async ({
+    assert,
+  }) => {
     class UserController {
       public handle() {
         return 'user'
@@ -106,7 +108,9 @@ test.group('Ioc Resolver', () => {
     assert.equal(await resolver.call('UserController', 'Admin'), 'admin')
   })
 
-  test('handle use case where namespace is same but defined a different runtime prefix namespace', async (assert) => {
+  test('handle use case where namespace is same but defined a different runtime prefix namespace', async ({
+    assert,
+  }) => {
     class UserController {
       public handle() {
         return 'user'
@@ -128,7 +132,7 @@ test.group('Ioc Resolver', () => {
     assert.equal(await resolver.call('UserController', 'Admin'), 'admin')
   })
 
-  test('pass resolve result to the call method', async (assert) => {
+  test('pass resolve result to the call method', async ({ assert }) => {
     class UserController {
       public getUser() {
         return 'foo'
