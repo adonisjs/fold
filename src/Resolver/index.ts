@@ -102,15 +102,14 @@ export class IocResolver implements IocResolverContract<any> {
   public async call(
     namespace: string | IocResolverLookupNode<string>,
     prefixNamespace?: string,
-    args?: any[]
+    args?: any[] | ((instance: any) => any[])
   ): Promise<any> {
     const lookupNode =
       typeof namespace === 'string' ? this.resolve(namespace, prefixNamespace) : namespace
 
-    return this.container.callAsync(
-      await this.container.makeAsync(lookupNode.namespace),
-      lookupNode.method,
-      args
-    )
+    const instance = await this.container.makeAsync(lookupNode.namespace)
+    args = typeof args === 'function' ? args(instance) : args
+
+    return this.container.callAsync(instance, lookupNode.method, args)
   }
 }

@@ -146,4 +146,41 @@ test.group('Ioc Resolver', () => {
     const lookupNode = resolver.resolve('App/UserController.getUser')
     assert.equal(await resolver.call(lookupNode), 'foo')
   })
+
+  test('pass arguments to the call method', async ({ assert }) => {
+    class UserController {
+      public getUser(input: string) {
+        return input
+      }
+    }
+
+    const ioc = new Ioc()
+    ioc.bind('App/UserController', () => new UserController())
+
+    const resolver = ioc.getResolver()
+    const lookupNode = resolver.resolve('App/UserController.getUser')
+    assert.equal(await resolver.call(lookupNode, undefined, ['foo']), 'foo')
+  })
+
+  test('pass arguments to the call method from a function', async ({ assert }) => {
+    class UserController {
+      public selfInput = 'foo'
+
+      public getUser(input: string) {
+        return input
+      }
+    }
+
+    const ioc = new Ioc()
+    ioc.bind('App/UserController', () => new UserController())
+
+    const resolver = ioc.getResolver()
+    const lookupNode = resolver.resolve('App/UserController.getUser')
+    assert.equal(
+      await resolver.call(lookupNode, undefined, (controller) => {
+        return [controller.selfInput]
+      }),
+      'foo'
+    )
+  })
 })

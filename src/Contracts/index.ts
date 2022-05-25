@@ -402,11 +402,11 @@ export interface IocResolverContract<ContainerBindings extends any> {
   call<Namespace extends Extract<keyof ContainerBindings, string>>(
     namespace: Namespace | string,
     prefixNamespace?: string,
-    args?: any[]
+    args?: any[] | ((instance: any) => any[])
   ): Promise<any>
   call<Namespace extends Extract<keyof ContainerBindings, string>>(
     namespace: IocResolverLookupNode<Namespace | string>,
     prefixNamespace: undefined,
-    args?: any[]
+    args?: any[] | ((instance: any) => any[])
   ): Promise<any>
 }
