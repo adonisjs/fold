@@ -16,7 +16,8 @@ import { Filesystem } from '@poppinss/dev-utils'
 import { Ioc } from '../src/Ioc'
 import { inject } from '../src/decorators'
 
-const fs = new Filesystem(join(__dirname, './app'))
+const appPath: string = join(__dirname, './app')
+const fs = new Filesystem(appPath)
 
 test.group('Ioc', () => {
   test('raise error when bind callback is not a function', ({ assert }) => {
@@ -45,11 +46,11 @@ test.group('Ioc', () => {
 
   test('register import alias', ({ assert }) => {
     const ioc = new Ioc()
-    ioc.alias(join(__dirname, './app'), 'App')
+    ioc.alias(appPath, 'App')
 
     assert.deepEqual(ioc.lookup('App/Foo'), { namespace: 'App/Foo', type: 'alias' })
     assert.isNull(ioc.lookup('Apple/Foo'))
-    assert.deepEqual(ioc.importAliases, { App: join(__dirname, './app') })
+    assert.deepEqual(ioc.importAliases, { App: appPath })
   })
 
   test('register fake', ({ assert }) => {
@@ -71,7 +72,7 @@ test.group('Ioc', () => {
 
   test('return true from "isAliasPath" when namespace is part of import aliases', ({ assert }) => {
     const ioc = new Ioc()
-    ioc.alias(join(__dirname, './app'), 'App')
+    ioc.alias(appPath, 'App')
 
     assert.isTrue(ioc.isAliasPath('App/Foo'))
     assert.isFalse(ioc.isAliasPath('Foo'))
@@ -82,7 +83,7 @@ test.group('Ioc', () => {
   }) => {
     const ioc = new Ioc()
 
-    ioc.alias(join(__dirname, './app'), 'App')
+    ioc.alias(appPath, 'App')
     ioc.bind('App/Foo', () => {
       return { foo: true }
     })
@@ -150,7 +151,7 @@ test.group('Ioc | lookup', () => {
 
   test('lookup namespace from aliases', ({ assert }) => {
     const ioc = new Ioc()
-    ioc.alias(join(__dirname, './app'), 'App')
+    ioc.alias(appPath, 'App')
 
     assert.deepEqual(ioc.lookup('App/Foo'), {
       namespace: 'App/Foo',
@@ -160,7 +161,7 @@ test.group('Ioc | lookup', () => {
 
   test('lookup namespace from aliases with a prefix', ({ assert }) => {
     const ioc = new Ioc()
-    ioc.alias(join(__dirname, './app'), 'App')
+    ioc.alias(appPath, 'App')
 
     assert.deepEqual(ioc.lookup('Foo', 'App'), {
       namespace: 'App/Foo',
@@ -170,7 +171,7 @@ test.group('Ioc | lookup', () => {
 
   test('lookup absolute namespace from aliases with a prefix', ({ assert }) => {
     const ioc = new Ioc()
-    ioc.alias(join(__dirname, './app'), 'App')
+    ioc.alias(appPath, 'App')
 
     assert.deepEqual(ioc.lookup('/App/Foo', 'App'), {
       namespace: 'App/Foo',
@@ -182,7 +183,7 @@ test.group('Ioc | lookup', () => {
     assert,
   }) => {
     const ioc = new Ioc()
-    ioc.alias(join(__dirname, './app'), 'App')
+    ioc.alias(appPath, 'App')
 
     ioc.bind('App/Foo', () => {
       return 'foo'
@@ -211,7 +212,7 @@ test.group('Ioc | resolveBinding', () => {
 
   test('do not resolve import alias', ({ assert }) => {
     const ioc = new Ioc()
-    ioc.alias(join(__dirname, './app'), 'App')
+    ioc.alias(appPath, 'App')
 
     assert.throws(
       () => ioc.resolveBinding('App/Foo'),
