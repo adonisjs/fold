@@ -2,14 +2,15 @@
   "name": "@adonisjs/fold",
   "version": "8.2.0",
   "description": "Simplest and straight forward implementation for IoC container in JavaScript",
+  "main": "index.js",
   "files": [
     "src",
     "index.js"
   ],
-  "type": "module",
   "exports": {
     ".": "./index.js"
   },
+  "type": "module",
   "scripts": {
     "pretest": "npm run lint",
     "test": "node --loader=ts-node/esm bin/test.ts",
@@ -27,7 +28,10 @@
     "access": "public",
     "tag": "latest"
   },
-  "keywords": ["ioc", "container"],
+  "keywords": [
+    "ioc",
+    "container"
+  ],
   "author": "virk,adonisjs",
   "license": "MIT",
   "devDependencies": {
@@ -40,7 +44,6 @@
     "@swc/core": "^1.2.203",
     "@types/node": "^18.0.0",
     "del-cli": "^4.0.1",
-    "ejs": "^3.1.8",
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-adonis": "^3.0.2",
@@ -92,5 +95,16 @@
     "tag": "latest",
     "branch": "main",
     "anyBranch": false
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adonisjs/fold.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adonisjs/fold/issues"
+  },
+  "homepage": "https://github.com/adonisjs/fold#readme"
 }
