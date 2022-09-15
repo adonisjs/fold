@@ -1,112 +1,56 @@
 {
   "name": "@adonisjs/fold",
   "version": "8.2.0",
-  "description": "Dependency manager and IoC container for your next NodeJs application",
-  "main": "build/index.js",
+  "description": "Simplest and straight forward implementation for IoC container in JavaScript",
   "files": [
-    "build/src",
-    "build/index.d.ts",
-    "build/index.js"
+    "src",
+    "index.js"
   ],
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  },
   "scripts": {
-    "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
-    "test": "node -r @adonisjs/require-ts/build/register bin/test.ts",
-    "lint": "eslint . --ext=.ts",
+    "test": "node --loader=ts-node/esm bin/test.ts",
     "clean": "del-cli build",
     "compile": "npm run lint && npm run clean && tsc",
     "build": "npm run compile",
-    "commit": "git-cz",
     "release": "np --message=\"chore(release): %s\"",
     "version": "npm run build",
-    "sync-labels": "github-label-sync --labels ./node_modules/@adonisjs/mrm-preset/gh-labels.json adonisjs/fold",
+    "prepublishOnly": "npm run build",
+    "lint": "eslint . --ext=.ts",
     "format": "prettier --write .",
-    "prepublishOnly": "npm run build"
-  },
-  "author": "adonisjs,virk",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/poppinss/adonis-fold.git"
-  },
-  "keywords": [
-    "ioc",
-    "dependency",
-    "injection",
-    "service",
-    "provider",
-    "autoloading"
-  ],
-  "bugs": {
-    "url": "https://github.com/poppinss/adonis-fold/issues"
-  },
-  "homepage": "https://github.com/poppinss/adonis-fold#readme",
-  "devDependencies": {
-    "@adonisjs/mrm-preset": "^5.0.3",
-    "@adonisjs/require-ts": "^2.0.12",
-    "@japa/assert": "^1.3.5",
-    "@japa/run-failed-tests": "^1.0.8",
-    "@japa/runner": "^2.1.1",
-    "@japa/spec-reporter": "^1.2.0",
-    "@poppinss/dev-utils": "^2.0.3",
-    "@types/node": "^18.7.15",
-    "benchmark": "^2.1.4",
-    "commitizen": "^4.2.5",
-    "cz-conventional-changelog": "^3.3.0",
-    "del-cli": "^5.0.0",
-    "eslint": "^8.23.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-adonis": "^2.1.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "github-label-sync": "^2.2.0",
-    "husky": "^8.0.1",
-    "mrm": "^4.1.0",
-    "np": "^7.6.2",
-    "prettier": "^2.7.1",
-    "reflect-metadata": "^0.1.13",
-    "typescript": "^4.8.2"
-  },
-  "nyc": {
-    "exclude": [
-      "test"
-    ],
-    "extension": [
-      ".ts"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "node ./node_modules/@adonisjs/mrm-preset/validateCommit/conventional/validate.js"
-    }
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
-  "np": {
-    "contents": ".",
-    "anyBranch": false
-  },
-  "dependencies": {
-    "@poppinss/utils": "^5.0.0"
+    "sync-labels": "github-label-sync --labels .github/labels.json adonisjs/fold"
   },
   "publishConfig": {
     "access": "public",
     "tag": "latest"
   },
-  "mrmConfig": {
-    "core": true,
-    "license": "MIT",
-    "services": [
-      "github-actions"
-    ],
-    "minNodeVersion": "14.15.4",
-    "probotApps": [
-      "stale",
-      "lock"
-    ],
-    "runGhActionsOnWindows": false
+  "keywords": ["ioc", "container"],
+  "author": "virk,adonisjs",
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^17.0.2",
+    "@commitlint/config-conventional": "^17.0.2",
+    "@japa/assert": "^1.3.4",
+    "@japa/run-failed-tests": "^1.0.7",
+    "@japa/runner": "^2.0.9",
+    "@japa/spec-reporter": "^1.1.12",
+    "@swc/core": "^1.2.203",
+    "@types/node": "^18.0.0",
+    "del-cli": "^4.0.1",
+    "ejs": "^3.1.8",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-adonis": "^3.0.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "github-label-sync": "^2.2.0",
+    "husky": "^8.0.1",
+    "np": "^7.6.1",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3"
   },
   "eslintConfig": {
     "extends": [
@@ -137,5 +81,16 @@
     "bracketSpacing": true,
     "arrowParens": "always",
     "printWidth": 100
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "np": {
+    "message": "chore(release): %s",
+    "tag": "latest",
+    "branch": "main",
+    "anyBranch": false
   }
 }
