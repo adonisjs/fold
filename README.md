@@ -14,7 +14,7 @@ Many existing implementations of IoC containers take the concept too far and sta
 
 Therefore, with this project, I live to the ethos of JavaScript and yet build a container that can help you create loosely coupled systems.
 
-I have explained the [reasons for using an IoC container](https://github.com/thetutlage/meta/discussions/4) in this post. It might be a great idea to read the post first ✌️.
+I have explained the [reasons for using an IoC container](https://github.com/thetutlage/meta/discussions/4) in this post. It might be a great idea to read the post first ✌️
 
 ## Goals of the project
 
@@ -81,9 +81,9 @@ This property can define the dependencies for the class methods (including the c
 > **Do you remember?** I said that JavaScript is not as powerful as Java or PHP. This is a classic example of that. In other languages, you can use reflection to look up the classes to inject, whereas, in JavaScript, you have to tell the container explicitly.
 
 ### TypeScript to the rescue
-Wait, you can still use reflection with TypeScript decorators. So yes, decorators exist in JavaScript too, but they cannot inspect the types of parameters. TypeScript decorators can.
+Wait, you can use decorators with combination of TypeScript's [emitDecoratorMetaData](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata) option to perform reflection.
 
-Also, TypeScript decorators are not as powerful as the reflection in other languages. For example, in PHP, you can use interfaces for reflection. Whereas in TypeScript, you cannot.
+It is worth noting, TypeScript decorators are not as powerful as the reflection API in other languages. For example, in PHP, you can use interfaces for reflection. Whereas in TypeScript, you cannot.
 
 With that said, let's look at the previous example, but in TypeScript this time.
 
@@ -139,12 +139,12 @@ createServer((req) => {
 In the above example:
 
 - The container will create an instance of the `Database` class since it is set to `undefined` inside the runtime values array.
-The container will use the `req` value for the `Request` class.
+- However, for the second position (ie `request`), the container will use the `req` value.
 
 ## Making class with runtime bindings
 The runtime values are positional. This means that the caller of `container.make` needs to know the position of arguments to inject runtime values.
 
-On the other hand, the runtime bindings provide value for a concrete class constructor. 
+On the other hand, the runtime bindings can provide value for a concrete class constructor. 
 
 Let's look at the previous example but use runtime bindings this time.
 
@@ -182,7 +182,7 @@ await container.make(UserService, [], runtimeBindings)
 ## Calling methods
 You can also call class methods to look up/inject dependencies automatically. 
 
-In the following example, the `UserService.find` method needs an instance of the Database class, and the `container.call` method will look at the `containerInjections` property to find the values to inject.
+In the following example, the `UserService.find` method needs an instance of the Database class. The `container.call` method will look at the `containerInjections` property to find the values to inject.
 
 ```ts
 class Database {}
