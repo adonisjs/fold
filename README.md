@@ -1,6 +1,14 @@
 AdonisJS Fold
 > Simplest, straightforward implementation for IoC container in JavaScript
 
+<br />
+
+<div align="center">
+
+[![gh-workflow-image]][gh-workflow-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url] [![snyk-image]][snyk-url]
+
+</div>
+
 ## Why this project exists?
 Many existing implementations of IoC containers take the concept too far and start to feel more like Java. JavaScript inherently does not have all the bells and whistles; you need to have similar IoC container benefits as PHP or Java.
 
@@ -370,14 +378,6 @@ Now, if you use the `@inject` decorator to resolve the `User` model, then the co
 However, in this case, we want more than just creating an instance of the model. We want to look up the database and create an instance with the row values.
 
 This is where the `@bind` decorator comes into the picture. To perform database lookups, it registers a custom provider on the `UsersController` class.
-
-<br />
-
-<div align="center">
-
-[![gh-workflow-image]][gh-workflow-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url] [![snyk-image]][snyk-url]
-
-</div>
 
 [gh-workflow-image]: https://img.shields.io/github/workflow/status/adonisjs/fold/test?style=for-the-badge
 [gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/test.yml "Github action"
