@@ -76,7 +76,7 @@ assert(service.db instanceof Database)
 
 The `static containerInjections` property is required by the container to know which values to inject when creating an instance of the class.
 
-This property can define the dependencies for the class methods (including the constructor). The values are defined as an array of class constructors or literal values.
+This property can define the dependencies for the class methods (including the constructor). The dependencies are defined as an array. The first item from the array will be injected as the first argument and so on.
 
 > **Do you remember?** I said that JavaScript is not as powerful as Java or PHP. This is a classic example of that. In other languages, you can use reflection to look up the classes to inject, whereas, in JavaScript, you have to tell the container explicitly.
 
@@ -141,44 +141,6 @@ In the above example:
 - The container will create an instance of the `Database` class since it is set to `undefined` inside the runtime values array.
 - However, for the second position (ie `request`), the container will use the `req` value.
 
-## Making class with runtime bindings
-The runtime values are positional. This means that the caller of `container.make` needs to know the position of arguments to inject runtime values.
-
-On the other hand, the runtime bindings can provide value for a concrete class constructor. 
-
-Let's look at the previous example but use runtime bindings this time.
-
-```ts
-createServer((req) => {
-  const runtimeBindings = new Map()
-  runtimeBindings.set(Request, req)
-  
-  const service = await container.make(UserService, [], runtimeBindings)
-  assert(service.request === req)
-})
-```
-
-Here we are telling the container that when someone asks for the `Request` class, give them this pre-defined value. The logic is applied to the entire resolution chain. For example, if `UserService` injects another service that needs a request, the same request will be passed.
-
-```ts
-@inject()
-class TeamService {
-  constructor (db: Database, request: Request) {}
-}
-
-@inject()
-class UserService {
-  constructor (db: Database, request: Request, team: TeamService) {
-  }
-}
-
-const runtimeBindings = new Map()
-runtimeBindings.set(Request, req)
-
-// Both the UserService and the TeamService get the same request
-await container.make(UserService, [], runtimeBindings)
-```
-
 ## Calling methods
 You can also call class methods to look up/inject dependencies automatically. 
 
@@ -217,7 +179,7 @@ const service = await container.make(UserService)
 await container.call(service, 'find')
 ```
 
-The **runtime values** and **runtime bindings** are also supported with the `container.call` method.
+The **runtime values** are also supported with the `container.call` method.
 
 ## Container bindings
 Alongside making class instances, you can also register bindings inside the container.
@@ -237,6 +199,8 @@ assert(db instanceof Database)
 
 I used a string-based key for the binding name in the previous example. However, you can also bind `Symbols` or maybe the `class constructor` directly.
 
+> **Warning**: The container binding can either be a `string`, a `symbol` or a `class constructor`.
+
 ```ts
 container.bind(Database, () => {
   return new Database()
@@ -248,12 +212,11 @@ Now, when someone calls `container.make(Database)`, the container will invoke th
 ### Factory function arguments
 The factory receives the following three arguments.
 
-- The `container` reference.
+- The `resolver` reference. Resolver is something container uses under the hood to resolve dependencies. The same instance is passed to the factory, so that you can resolve dependencies to construct the class.
 - An optional array of runtime values defined during the `container.make` call.
-- An optional map of runtime bindings defined during the `container.make` call.
 
 ```ts
-container.bind(Database, (self, runtimeValues, runtimeBindings) => {
+container.bind(Database, (resolver, runtimeValues) => {
   return new Database()
 })
 ```
@@ -270,6 +233,24 @@ You can bind a singleton to the container using the `container.singleton` method
 container.singleton(Database, () => {
   return new Database()
 })
+```
+
+## Binding values
+Along side the factory functions, you can also bind direct values to the container.
+
+```ts
+container.bindValue('router', router)
+```
+
+The values are given priority over the factory functions. So, if you register a value with the same name as the factory function binding, the value will be resolved from the container.
+
+The values can also be registered at the resolver level. In the following example, the `Request` binding only exists for an isolated instance of the resolver and not for the entire container.
+
+```ts
+const resolver = container.createResolver()
+resolver.bindValue(Request, req)
+
+await resolve.make(SomeClass)
 ```
 
 ## Observing container
@@ -341,19 +322,16 @@ const container = new Container({
 Container providers are static functions that can live on a class to resolve the injections for a given method.
 
 ```ts
+import { ContainerResolver } from '@adonisjs/fold'
+import { InspectableConstructor } from '@adonisjs/fold/types'
+
 class UsersController {
   static containerProvider(
-    self,
-    originalProvider,
-    property,
-    runtimeValues,
-    runtimeBindings,
+    binding: InspectableConstructor,
+    property: string | symbol | number,
+    resolver: ContainerResolver<any>,
+    runtimeValues?: any[]
   ) {
-    if (property === 'constructor') {
-      return originalProvider.resolve(self, property, runtimeValues, runtimeBindings)
-    }
-
-    // otherwise self, handle it
   }
 }
 ```

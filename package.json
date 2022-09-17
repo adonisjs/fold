@@ -13,6 +13,7 @@
   "type": "module",
   "scripts": {
     "pretest": "npm run lint",
+    "vscode:test": "node --loader=ts-node/esm bin/test.ts",
     "test": "node --loader=ts-node/esm bin/test.ts",
     "clean": "del-cli build",
     "compile": "npm run lint && npm run clean && tsc",
@@ -48,6 +49,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-adonis": "^3.0.2",
     "eslint-plugin-prettier": "^4.0.0",
+    "expect-type": "^0.14.2",
     "github-label-sync": "^2.2.0",
     "husky": "^8.0.1",
     "np": "^7.6.1",
@@ -106,5 +108,8 @@
   "bugs": {
     "url": "https://github.com/adonisjs/fold/issues"
   },
-  "homepage": "https://github.com/adonisjs/fold#readme"
+  "homepage": "https://github.com/adonisjs/fold#readme",
+  "dependencies": {
+    "@sindresorhus/is": "^5.3.0"
+  }
 }
