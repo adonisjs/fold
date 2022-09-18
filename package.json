@@ -29,7 +29,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "tag": "latest"
+    "tag": "next"
   },
   "keywords": [
     "ioc",
@@ -98,7 +98,7 @@
   },
   "np": {
     "message": "chore(release): %s",
-    "tag": "latest",
+    "tag": "next",
     "branch": "main",
     "anyBranch": false
   },
