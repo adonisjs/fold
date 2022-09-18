@@ -111,6 +111,26 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   }
 
   /**
+   * Find if the resolver has a binding registered using the
+   * "bind", the "singleton", or the "bindValue" methods.
+   */
+   hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
+   hasBinding(binding: string | symbol | Constructor<any>): boolean {
+     return this.#bindingValues.has(binding)
+      || this.#containerBindingValues.has(binding)
+      || this.#containerBindings.has(binding)
+   }
+
+   /**
+    * Find if the resolver has all the bindings registered using the
+    * "bind", the "singleton", or the "bindValue" methods.
+    */
+   hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
+   hasAllBindings(bindings: (string | symbol | Constructor<any>)[]): boolean {
+     return bindings.every((binding) => this.hasBinding(binding))
+   }
+
+   /**
    * Resolves the binding or constructor a class instance as follows.
    *
    * - Resolve the binding from the values (if registered)

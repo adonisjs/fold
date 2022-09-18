@@ -93,6 +93,22 @@ test.group('Container | Bindings', () => {
     assert.instanceOf(route1, Route)
     assert.notStrictEqual(route, route1)
   })
+
+  test('find if a binding exists', async ({ assert }) => {
+    const container = new Container()
+    class Route {}
+
+    const routeSymbol = Symbol('route')
+
+    container.bind(Route, () => new Route())
+    container.bind('route', () => new Route())
+    container.bind(routeSymbol, () => new Route())
+
+    assert.isTrue(container.hasBinding(Route))
+    assert.isTrue(container.hasBinding('route'))
+    assert.isTrue(container.hasBinding(routeSymbol))
+    assert.isFalse(container.hasBinding('db'))
+  })
 })
 
 test.group('Container | Bindings Singleton', () => {
@@ -185,6 +201,22 @@ test.group('Container | Bindings Singleton', () => {
     assert.instanceOf(route, Route)
     assert.instanceOf(route1, Route)
     assert.strictEqual(route, route1)
+  })
+
+  test('find if a binding exists', async ({ assert }) => {
+    const container = new Container()
+    class Route {}
+
+    const routeSymbol = Symbol('route')
+
+    container.singleton(Route, () => new Route())
+    container.singleton('route', () => new Route())
+    container.singleton(routeSymbol, () => new Route())
+
+    assert.isTrue(container.hasBinding(Route))
+    assert.isTrue(container.hasBinding('route'))
+    assert.isTrue(container.hasBinding(routeSymbol))
+    assert.isFalse(container.hasBinding('db'))
   })
 })
 
@@ -289,5 +321,21 @@ test.group('Container | Binding values', () => {
       () => container.bindValue({}, 1),
       'Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted'
     )
+  })
+
+  test('find if a binding exists', async ({ assert }) => {
+    const container = new Container()
+    class Route {}
+
+    const routeSymbol = Symbol('route')
+
+    container.bindValue(Route, new Route())
+    container.bindValue('route', new Route())
+    container.bindValue(routeSymbol, new Route())
+
+    assert.isTrue(container.hasBinding(Route))
+    assert.isTrue(container.hasBinding('route'))
+    assert.isTrue(container.hasBinding(routeSymbol))
+    assert.isFalse(container.hasBinding('db'))
   })
 })

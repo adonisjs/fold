@@ -27,7 +27,6 @@ test.group('Resolver', () => {
     assert.strictEqual(resolvedService, service1)
     assert.strictEqual(resolvedService.name, 'resolver_service')
   })
-
   test('use custom containerProvider from the class constructor', async ({ assert }) => {
     assert.plan(4)
 
@@ -54,5 +53,22 @@ test.group('Resolver', () => {
 
     expectTypeOf(resolvedService).toEqualTypeOf<UserService>()
     assert.instanceOf(resolvedService, UserService)
+  })
+
+  test('find if a binding exists', async ({ assert }) => {
+    const container = new Container()
+    const resolver = container.createResolver()
+    class Route {}
+
+    const routeSymbol = Symbol('route')
+
+    container.bind(Route, () => new Route())
+    resolver.bindValue('route', new Route())
+    container.bindValue(routeSymbol, new Route())
+
+    assert.isTrue(resolver.hasBinding(Route))
+    assert.isTrue(resolver.hasBinding('route'))
+    assert.isTrue(resolver.hasBinding(routeSymbol))
+    assert.isFalse(resolver.hasBinding('db'))
   })
 })
