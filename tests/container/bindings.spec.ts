@@ -60,19 +60,19 @@ test.group('Container | Bindings', () => {
     assert.throws(
       // @ts-expect-error
       () => container.bind(1, () => {}),
-      'A binding name either be a string, symbol or class constructor'
+      'Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted'
     )
 
     assert.throws(
       // @ts-expect-error
       () => container.bind([], () => {}),
-      'A binding name either be a string, symbol or class constructor'
+      'Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted'
     )
 
     assert.throws(
       // @ts-expect-error
       () => container.bind({}, () => {}),
-      'A binding name either be a string, symbol or class constructor'
+      'Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted'
     )
   })
 
@@ -153,19 +153,19 @@ test.group('Container | Bindings Singleton', () => {
     assert.throws(
       // @ts-expect-error
       () => container.singleton(1, () => {}),
-      'A binding name either be a string, symbol or class constructor'
+      'Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted'
     )
 
     assert.throws(
       // @ts-expect-error
       () => container.singleton([], () => {}),
-      'A binding name either be a string, symbol or class constructor'
+      'Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted'
     )
 
     assert.throws(
       // @ts-expect-error
       () => container.singleton({}, () => {}),
-      'A binding name either be a string, symbol or class constructor'
+      'Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted'
     )
   })
 
@@ -275,19 +275,19 @@ test.group('Container | Binding values', () => {
     assert.throws(
       // @ts-expect-error
       () => container.bindValue(1, 1),
-      'A binding name either be a string, symbol or class constructor'
+      'Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted'
     )
 
     assert.throws(
       // @ts-expect-error
       () => container.bindValue([], 1),
-      'A binding name either be a string, symbol or class constructor'
+      'Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted'
     )
 
     assert.throws(
       // @ts-expect-error
       () => container.bindValue({}, 1),
-      'A binding name either be a string, symbol or class constructor'
+      'Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted'
     )
   })
 })

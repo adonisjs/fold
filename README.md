@@ -16,6 +16,8 @@ Therefore, with this project, I live to the ethos of JavaScript and yet build a 
 
 I have explained the [reasons for using an IoC container](https://github.com/thetutlage/meta/discussions/4) in this post. It might be a great idea to read the post first ✌️
 
+> **Note**: AdonisJS fold is highly inspired by the Laravel IoC container. Thanks to Taylor for imaginging such a simple, yet powerful API.
+
 ## Goals of the project
 
 - **Keep the code visually pleasing**. If you have used any other implementation of an IoC container, you will automatically find `@adonisjs/fold` easy to read and follow.
@@ -35,7 +37,7 @@ yarn add @adonisjs/fold
 pnpm add @adonisjs/fold
 ```
 
-Once done, you can import the `Container` class from the package and create an instance. For the most part, you will use a single instance of the container.
+Once done, you can import the `Container` class from the package and create an instance of it. For the most part, you will use a single instance of the container.
 
 ```ts
 import { Container } from '@adonisjs/fold'
@@ -44,7 +46,7 @@ const container = new Container()
 ```
 
 ## Making classes
-You can construct an instance of a class by calling the `container.make` method. The method is asynchronous since it allows for lazy load dependencies in factory functions (More on factory functions later).
+You can construct an instance of a class by calling the `container.make` method. The method is asynchronous since it allows for lazy loading dependencies via factory functions (More on factory functions later).
 
 ```ts
 class UserService {}
@@ -182,9 +184,10 @@ await container.call(service, 'find')
 The **runtime values** are also supported with the `container.call` method.
 
 ## Container bindings
-Alongside making class instances, you can also register bindings inside the container.
+Alongside making class instances, you can also register bindings inside the container. Bindings are simple key-value pairs. 
 
-Bindings are simple key-value pairs. The value is a factory function invoked when someone resolves the binding from the container.
+- The key can either be a `string`, a `symbol` or a `class constructor`.
+- The value is a factory function invoked when someone resolves the binding from the container.
 
 ```ts
 const container = new Container()
@@ -197,17 +200,13 @@ const db = await container.make('db')
 assert(db instanceof Database)
 ```
 
-I used a string-based key for the binding name in the previous example. However, you can also bind `Symbols` or maybe the `class constructor` directly.
-
-> **Warning**: The container binding can either be a `string`, a `symbol` or a `class constructor`.
+Following is an example of binding the class constructor to the container and self constructing an instance of it using the factory function.
 
 ```ts
 container.bind(Database, () => {
   return new Database()
 })
 ```
-
-Now, when someone calls `container.make(Database)`, the container will invoke the factory function and uses its return value. So basically, you have taken over the construction of a class from the container.
 
 ### Factory function arguments
 The factory receives the following three arguments.
@@ -260,78 +259,49 @@ You can pass an instance of the [EventEmitter](https://nodejs.org/dist/latest-v1
 import { EventEmitter } from 'node:events'
 const emitter = new EventEmitter()
 
-emitter.on('container:make', ({ value, binding }) => {
+emitter.on('container:resolve', ({ value, binding }) => {
   // value is the resolved value
-  // binding name can be a mix of string, class constructors, and symbols.
+  // binding name can be a mix of string, class constructor, or a symbol.
 })
 
 const container = new Container({ emitter })
 ```
 
-> **Note**: Events are not emitted for the runtime values since the container does not resolve them. However, they are emitted by the runtime bindings.
+## Container hooks
+You can use container hooks when you want to modify a resolved value before it is returned from the `make` method.
 
-## Debugging container
-You can define a function to log the lookup calls as the container attempts to resolve dependencies.
+- The hook is called everytime a binding is resolved from the container.
+- It is called only once for the singleton bindings.
+- The hook gets called everytime you construct an instance of a class by passing the class constructor directly.
 
-The logs are individual objects with the parent id and the resolution status.
+> **Note**: The hook callback can also be an async function
 
 ```ts
-const container = new Container({
-  log: function (data) {
-    logger.trace(data)
-  }
+container.resolving(Validator, (validator) => {
+  validate.rule('email', function () {})
 })
 ```
 
-```ts
-// Resolved
-{
-  id: 2,
-  parentId: 1,
-  binding: Database,
-  value: new Database(),
-  method: "constructor",
-  position: 0
-  status: 'resolved'
-  error: null,
-}
-
-// Error
-{
-  id: 2,
-  parentId: 1,
-  binding: Database,
-  value: null,
-  method: "constructor",
-  position: 0
-  status: 'error'
-  error: new Error('Unable to resolve Database binding'),
-}
-```
-
-- `id` is the unique id for the resolution. They are only generated when a logger is attached.
-- `parentId` is the unique id of the parent for which the dependency is getting resolved.
-- `binding` is the binding to resolve.
-- `value` is the resolved value.
-- `method` is the method name in which we will inject the resolved value.
-- `position` is the argument position in which we will inject the value.
-- `status` is the resolution status.
-- `error` exists only when the status is an error.
-
 ## Container providers
-Container providers are static functions that can live on a class to resolve the injections for a given method.
+Container providers are static functions that can live on a class to resolve the dependencies for the class constructor or a given class method.
+
+Once, you define the `containerProvider` on the class, the IoC container will rely on it for resolving dependencies and will not use the default provider.
 
 ```ts
 import { ContainerResolver } from '@adonisjs/fold'
-import { InspectableConstructor } from '@adonisjs/fold/types'
+import { ContainerProvider } from '@adonisjs/fold/types'
 
 class UsersController {
-  static containerProvider(
-    binding: InspectableConstructor,
-    property: string | symbol | number,
-    resolver: ContainerResolver<any>,
-    runtimeValues?: any[]
-  ) {
+  static containerProvider: ContainerProvider = (
+    binding,
+    property,
+    resolver,
+    defaultProvider,
+    runtimeValues
+  ) => {
+    console.log(binding === UserService)
+    console.log(this === UserService)
+    return defaultProvider(binding, property, resolver, runtimeValues)
   }
 }
 ```
@@ -356,6 +326,30 @@ Now, if you use the `@inject` decorator to resolve the `User` model, then the co
 However, in this case, we want more than just creating an instance of the model. We want to look up the database and create an instance with the row values.
 
 This is where the `@bind` decorator comes into the picture. To perform database lookups, it registers a custom provider on the `UsersController` class.
+
+## Binding types
+If you are using the container inside a TypeScript project, then you can define the types for all the bindings in advance at the time of creating the container instance.
+
+Defining types will ensure the `bind`, `singleton` and `bindValue` method accepts only the known bindings and assert their types as well.
+
+```ts
+class Route {}
+class Databse {}
+
+type ContainerBindings = {
+  route: Route
+  db: Database
+}
+
+const container = new Container<ContainerBindings>()
+
+// Fully typed
+container.bind('route', () => new Route())
+container.bind('db', () => new Database())
+
+// Fully typed - db: Database
+const db = await container.make('db')
+```
 
 [gh-workflow-image]: https://img.shields.io/github/workflow/status/adonisjs/fold/test?style=for-the-badge
 [gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/test.yml "Github action"

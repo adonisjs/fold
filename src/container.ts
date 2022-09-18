@@ -1,7 +1,17 @@
+/*
+ * @adonisjs/fold
+ *
+ * (c) AdonisJS
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 import type {
   Make,
   Hooks,
   Bindings,
+  BindingKey,
   Constructor,
   HookCallback,
   BindingValues,
@@ -9,12 +19,8 @@ import type {
   ExtractFunctions,
   ContainerOptions,
 } from './types.js'
+import { isClass } from './helpers.js'
 import { ContainerResolver } from './resolver.js'
-
-const toString = Function.prototype.toString
-function isClass<T>(value: any): value is Constructor<T> {
-  return typeof value === 'function' && /^class\s/.test(toString.call(value))
-}
 
 /**
  * The container class exposes the API to register bindings, values
@@ -25,6 +31,13 @@ function isClass<T>(value: any): value is Constructor<T> {
  *
  * ```ts
  * new Container<{ 'route': Route, encryption: Encryption }>()
+ * ```
+ *
+ * You can resolve bindings and construct classes as follows
+ *
+ * ```ts
+ * await container.make(BINDING_NAME)
+ * await container.make(CLASS_CONSTRUCTOR)
  * ```
  */
 export class Container<KnownBindings extends Record<any, any>> {
@@ -39,6 +52,9 @@ export class Container<KnownBindings extends Record<any, any>> {
    */
   #bindingValues: BindingValues = new Map()
 
+  /**
+   * Registered hooks.
+   */
   #hooks: Hooks = new Map()
 
   /**
@@ -52,19 +68,37 @@ export class Container<KnownBindings extends Record<any, any>> {
 
   /**
    * Create a container resolver to resolve bindings, or make classes.
+   *
+   * ```ts
+   * const resolver = container.createResolver()
+   * await resolver.make(CLASS_CONSTRUCTOR)
+   * ```
+   *
+   * Bind values with the resolver. Resolver values are isolated from the
+   * container.
+   *
+   * ```ts
+   * resolver.bindValue(HttpContext, new HttpContext())
+   * await resolver.make(UsersController)
+   * ```
    */
   createResolver() {
     return new ContainerResolver(this.#bindings, this.#bindingValues, this.#hooks, this.#options)
   }
 
   /**
-   * Resolve the binding as follows.
+   * Resolves the binding or constructor a class instance as follows.
    *
    * - Resolve the binding from the values (if registered)
    * - Resolve the binding from the bindings (if registered)
    * - If binding is a class, then create a instance of it. The constructor
    *   dependencies are further resolved as well.
    * - All other values are returned as it is.
+   *
+   * ```ts
+   * await container.make('route')
+   * await container.make(Database)
+   * ```
    */
   make<Binding extends keyof KnownBindings>(
     binding: Binding,
@@ -76,9 +110,15 @@ export class Container<KnownBindings extends Record<any, any>> {
   }
 
   /**
-   * Call a method on an object by injecting its dependencies
+   * Call a method on an object by injecting its dependencies. The method
+   * dependencies are resolved in the same manner as a class constructor
+   * dependencies.
+   *
+   * ```ts
+   * await container.call(await container.make(UsersController), 'index')
+   * ```
    */
-  async call<Value extends Record<any, any>, Method extends ExtractFunctions<Value>>(
+  call<Value extends Record<any, any>, Method extends ExtractFunctions<Value>>(
     value: Value,
     method: Method,
     runtimeValues?: any[]
@@ -87,10 +127,22 @@ export class Container<KnownBindings extends Record<any, any>> {
   }
 
   /**
-   * Register a binding with the resolver factory function.
+   * Register a binding inside the container. The method receives a
+   * key-value pair.
+   *
+   * - Key can be a string, symbol or a constructor.
+   * - The value is always a factory function to construct the dependency.
    *
    * ```ts
+   * container.bind('route', () => new Route())
+   * await container.make('route')
+   *
    * container.bind(Route, () => new Route())
+   * await container.make(Route)
+   *
+   * const routeSymbol = Symbol('route')
+   * container.bind(routeSymbol, () => new Route())
+   * await container.make(routeSymbol)
    * ```
    */
   bind<Binding extends keyof KnownBindings>(
@@ -116,7 +168,9 @@ export class Container<KnownBindings extends Record<any, any>> {
     >
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new Error(`A binding name either be a string, symbol or class constructor`)
+      throw new Error(
+        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
+      )
     }
 
     this.#bindings.set(binding, { resolver, isSingleton: false })
@@ -146,18 +200,29 @@ export class Container<KnownBindings extends Record<any, any>> {
       : never
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new Error(`A binding name either be a string, symbol or class constructor`)
+      throw new Error(
+        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
+      )
     }
 
     this.#bindingValues.set(binding, value)
   }
 
   /**
-   * Register a binding as a singleton with
-   * the resolver factory function.
+   * Register a binding as a single. The singleton method is same
+   * as the bind method, but the factory function is invoked
+   * only once.
    *
    * ```ts
+   * container.singleton('route', () => new Route())
+   * await container.make('route')
+   *
    * container.singleton(Route, () => new Route())
+   * await container.make(Route)
+   *
+   * const routeSymbol = Symbol('route')
+   * container.singleton(routeSymbol, () => new Route())
+   * await container.make(routeSymbol)
    * ```
    */
   singleton<Binding extends keyof KnownBindings>(
@@ -183,7 +248,9 @@ export class Container<KnownBindings extends Record<any, any>> {
     >
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new Error(`A binding name either be a string, symbol or class constructor`)
+      throw new Error(
+        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
+      )
     }
 
     this.#bindings.set(binding, { resolver, isSingleton: true })
@@ -202,15 +269,15 @@ export class Container<KnownBindings extends Record<any, any>> {
    * In other words, the hooks are not executed for direct values registered
    * with the container
    */
-  resolved<Binding extends keyof KnownBindings>(
+  resolving<Binding extends keyof KnownBindings>(
     binding: Binding extends string | symbol ? Binding : never,
     callback: HookCallback<KnownBindings, KnownBindings[Binding]>
   ): void
-  resolved<Binding extends Constructor<any>>(
+  resolving<Binding extends Constructor<any>>(
     binding: Binding,
     callback: HookCallback<KnownBindings, InstanceType<Binding>>
   ): void
-  resolved<Binding extends string | symbol | Constructor<any>>(
+  resolving<Binding extends BindingKey>(
     binding: Binding,
     callback: Binding extends Constructor<infer A>
       ? HookCallback<KnownBindings, A>

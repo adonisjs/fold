@@ -16,7 +16,7 @@ test.group('Container | Hooks', () => {
       return new Route()
     })
 
-    container.resolved('route', (route) => {
+    container.resolving('route', (route) => {
       expectTypeOf(route).toEqualTypeOf<Route>()
       route.pattern = '/'
     })
@@ -39,7 +39,7 @@ test.group('Container | Hooks', () => {
       return new Route()
     })
 
-    container.resolved('route', (route) => {
+    container.resolving('route', (route) => {
       expectTypeOf(route).toEqualTypeOf<Route>()
       route.invocations++
     })
@@ -64,7 +64,7 @@ test.group('Container | Hooks', () => {
 
     container.bindValue('route', new Route())
 
-    container.resolved('route', (route) => {
+    container.resolving('route', (route) => {
       expectTypeOf(route).toEqualTypeOf<Route>()
       route.invocations++
     })
@@ -87,7 +87,7 @@ test.group('Container | Hooks', () => {
       invocations: number = 0
     }
 
-    container.resolved(Route, (route) => {
+    container.resolving(Route, (route) => {
       expectTypeOf(route).toEqualTypeOf<Route>()
       route.invocations++
     })

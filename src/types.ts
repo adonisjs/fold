@@ -1,3 +1,12 @@
+/*
+ * @adonisjs/fold
+ *
+ * (c) AdonisJS
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 import { ContainerResolver } from './resolver.js'
 
 /**
@@ -17,12 +26,18 @@ export type Constructor<T> = new (...args: any[]) => T
  */
 export type InspectableConstructor = Function & {
   containerInjections?: Record<string | number | symbol, any[]>
+  containerProvider?: ContainerProvider
 }
 
 /**
  * Returns the inferred value for the make method
  */
 export type Make<T> = T extends Constructor<infer A> ? A : T
+
+/**
+ * Accepted values for the binding key
+ */
+export type BindingKey = string | symbol | Constructor<any>
 
 /**
  * Shape of the binding resolver
@@ -36,14 +51,14 @@ export type BindingResolver<KnownBindings extends Record<any, any>, Value> = (
  * Shape of the registered bindings
  */
 export type Bindings = Map<
-  string | symbol | Constructor<any>,
+  BindingKey,
   { resolver: BindingResolver<Record<any, any>, any>; isSingleton: boolean }
 >
 
 /**
  * Shape of the registered binding values
  */
-export type BindingValues = Map<string | symbol | Constructor<any>, any>
+export type BindingValues = Map<BindingKey, any>
 
 /**
  * The data emitted using the `container:resolve` event. If known bindings
@@ -73,7 +88,30 @@ export type HookCallback<KnownBindings extends Record<any, any>, Value> = (
 /**
  * Hooks can be registered for all the supported binding datatypes.
  */
-export type Hooks = Map<string | symbol | Constructor<any>, Set<HookCallback<any, any>>>
+export type Hooks = Map<BindingKey, Set<HookCallback<any, any>>>
+
+/**
+ * The default implementation of the container
+ * provider.
+ */
+export type DefaultContainerProvider = (
+  binding: InspectableConstructor,
+  property: string | symbol | number,
+  resolver: ContainerResolver<any>,
+  runtimeValues?: any[]
+) => Promise<any[]>
+
+/**
+ * The container provider to discover and build dependencies
+ * for the constructor or the class method.
+ */
+export type ContainerProvider = (
+  binding: InspectableConstructor,
+  property: string | symbol | number,
+  resolver: ContainerResolver<any>,
+  defaultProvider: DefaultContainerProvider,
+  runtimeValues?: any[]
+) => Promise<any[]>
 
 /**
  * Options accepted by the container class
