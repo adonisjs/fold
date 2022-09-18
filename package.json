@@ -2,13 +2,15 @@
   "name": "@adonisjs/fold",
   "version": "8.2.0",
   "description": "Simplest and straight forward implementation for IoC container in JavaScript",
-  "main": "index.js",
+  "main": "build/index.js",
   "files": [
-    "src",
-    "index.js"
+    "build/src",
+    "build/index.d.ts",
+    "build/index.js"
   ],
   "exports": {
-    ".": "./index.js"
+    ".": "./build/index.js",
+    "./types": "./build/src/types.js"
   },
   "type": "module",
   "scripts": {
@@ -53,6 +55,7 @@
     "github-label-sync": "^2.2.0",
     "husky": "^8.0.1",
     "np": "^7.6.1",
+    "p-event": "^5.0.1",
     "prettier": "^2.7.1",
     "ts-node": "^10.8.1",
     "typescript": "^4.7.3"
@@ -108,8 +111,5 @@
   "bugs": {
     "url": "https://github.com/adonisjs/fold/issues"
   },
-  "homepage": "https://github.com/adonisjs/fold#readme",
-  "dependencies": {
-    "@sindresorhus/is": "^5.3.0"
-  }
+  "homepage": "https://github.com/adonisjs/fold#readme"
 }
