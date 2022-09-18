@@ -1,5 +1,13 @@
 import { containerProvider } from './provider.js'
-import type { Bindings, BindingValues, Constructor, ExtractFunctions, Make } from './types.js'
+import type {
+  Make,
+  Hooks,
+  Bindings,
+  Constructor,
+  BindingValues,
+  ExtractFunctions,
+  ContainerOptions,
+} from './types.js'
 
 const toString = Function.prototype.toString
 function isClass<T>(value: any): value is Constructor<T> {
@@ -28,13 +36,55 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   #containerBindingValues: BindingValues
 
   /**
+   * Reference to the container hooks
+   */
+  #containerHooks: Hooks = new Map()
+
+  /**
    * Binding values local to the resolver
    */
   #bindingValues: BindingValues = new Map()
 
-  constructor(bindings: Bindings, bindingValues: BindingValues) {
+  /**
+   * Container options
+   */
+  #options: ContainerOptions
+
+  constructor(
+    bindings: Bindings,
+    bindingValues: BindingValues,
+    hooks: Hooks,
+    options: ContainerOptions
+  ) {
     this.#containerBindings = bindings
     this.#containerBindingValues = bindingValues
+    this.#containerHooks = hooks
+    this.#options = options
+  }
+
+  /**
+   * Notify emitter
+   */
+  #emit(binding: string | symbol | Constructor<any>, value: any) {
+    if (!this.#options.emitter) {
+      return
+    }
+
+    this.#options.emitter.emit('container:resolve', { binding, value })
+  }
+
+  /**
+   * Execute hooks for a given binding
+   */
+  async #execHooks(binding: string | symbol | Constructor<any>, value: any) {
+    const callbacks = this.#containerHooks.get(binding)
+    if (!callbacks || callbacks.size === 0) {
+      return
+    }
+
+    for (let callback of callbacks) {
+      await callback(value, this)
+    }
   }
 
   /**
@@ -66,14 +116,18 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      * First priority is given to the RESOLVER binding values
      */
     if (this.#bindingValues.has(binding)) {
-      return this.#bindingValues.get(binding)
+      const value = this.#bindingValues.get(binding)
+      this.#emit(binding, value)
+      return value
     }
 
     /**
      * Next priority is given to the CONTAINER binding values
      */
     if (this.#containerBindingValues.has(binding)) {
-      return this.#containerBindingValues.get(binding)
+      const value = this.#containerBindingValues.get(binding)
+      this.#emit(binding, value)
+      return value
     }
 
     /**
@@ -81,7 +135,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      */
     if (this.#containerBindings.has(binding)) {
       const { resolver, isSingleton } = this.#containerBindings.get(binding)!
-      const value = await resolver(this)
+      const value = await resolver(this, runtimeValues)
 
       /**
        * Caching singletons
@@ -90,6 +144,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
         this.#containerBindingValues.set(binding, value)
       }
 
+      await this.#execHooks(binding, value)
+      this.#emit(binding, value)
       return value
     }
 
@@ -99,7 +155,12 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      */
     if (isAClass) {
       const dependencies = await containerProvider(binding, 'constructor', this, runtimeValues)
-      return new binding(...dependencies) as Promise<Make<Binding>>
+      const value = new binding(...dependencies) as Promise<Make<Binding>>
+
+      await this.#execHooks(binding, value)
+      this.#emit(binding, value)
+
+      return value
     }
 
     return binding as unknown as Promise<Make<Binding>>

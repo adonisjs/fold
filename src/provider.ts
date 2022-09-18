@@ -1,5 +1,5 @@
 import { ContainerResolver } from './resolver.js'
-import { InspectableConstructor } from './types.js'
+import type { InspectableConstructor } from './types.js'
 
 const primitiveConstructors = [String, Function, Object, Date, Number, Boolean]
 

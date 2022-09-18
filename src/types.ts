@@ -28,7 +28,8 @@ export type Make<T> = T extends Constructor<infer A> ? A : T
  * Shape of the binding resolver
  */
 export type BindingResolver<KnownBindings extends Record<any, any>, Value> = (
-  resolver: ContainerResolver<KnownBindings>
+  resolver: ContainerResolver<KnownBindings>,
+  runtimeValues?: any[]
 ) => Value | Promise<Value>
 
 /**
@@ -43,3 +44,42 @@ export type Bindings = Map<
  * Shape of the registered binding values
  */
 export type BindingValues = Map<string | symbol | Constructor<any>, any>
+
+/**
+ * The data emitted using the `container:resolve` event. If known bindings
+ * are defined, then the bindings and values will be correctly
+ * inferred.
+ */
+export type ContainerResolveEventData<KnownBindings> =
+  | {
+      binding: Constructor<unknown>
+      value: unknown
+    }
+  | {
+      [K in keyof KnownBindings]: {
+        binding: K
+        value: KnownBindings[K]
+      }
+    }[keyof KnownBindings]
+
+/**
+ * Shape of the hooks callback
+ */
+export type HookCallback<KnownBindings extends Record<any, any>, Value> = (
+  value: Value,
+  resolver: ContainerResolver<KnownBindings>
+) => void | Promise<void>
+
+/**
+ * Hooks can be registered for all the supported binding datatypes.
+ */
+export type Hooks = Map<string | symbol | Constructor<any>, Set<HookCallback<any, any>>>
+
+/**
+ * Options accepted by the container class
+ */
+export type ContainerOptions = {
+  emitter?: {
+    emit(event: string | symbol, ...values: any[]): any
+  }
+}

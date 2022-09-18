@@ -1,10 +1,13 @@
-import {
-  BindingResolver,
-  Bindings,
-  BindingValues,
-  Constructor,
-  ExtractFunctions,
+import type {
   Make,
+  Hooks,
+  Bindings,
+  Constructor,
+  HookCallback,
+  BindingValues,
+  BindingResolver,
+  ExtractFunctions,
+  ContainerOptions,
 } from './types.js'
 import { ContainerResolver } from './resolver.js'
 
@@ -36,11 +39,22 @@ export class Container<KnownBindings extends Record<any, any>> {
    */
   #bindingValues: BindingValues = new Map()
 
+  #hooks: Hooks = new Map()
+
+  /**
+   * Container options
+   */
+  #options: ContainerOptions
+
+  constructor(options?: ContainerOptions) {
+    this.#options = options || {}
+  }
+
   /**
    * Create a container resolver to resolve bindings, or make classes.
    */
   createResolver() {
-    return new ContainerResolver(this.#bindings, this.#bindingValues)
+    return new ContainerResolver(this.#bindings, this.#bindingValues, this.#hooks, this.#options)
   }
 
   /**
@@ -173,5 +187,42 @@ export class Container<KnownBindings extends Record<any, any>> {
     }
 
     this.#bindings.set(binding, { resolver, isSingleton: true })
+  }
+
+  /**
+   * Define hooks to be executed after a binding has been resolved
+   * from the container.
+   *
+   * The hooks are executed for
+   *
+   * - Bindings
+   * - Only once for singletons
+   * - And class constructor
+   *
+   * In other words, the hooks are not executed for direct values registered
+   * with the container
+   */
+  resolved<Binding extends keyof KnownBindings>(
+    binding: Binding extends string | symbol ? Binding : never,
+    callback: HookCallback<KnownBindings, KnownBindings[Binding]>
+  ): void
+  resolved<Binding extends Constructor<any>>(
+    binding: Binding,
+    callback: HookCallback<KnownBindings, InstanceType<Binding>>
+  ): void
+  resolved<Binding extends string | symbol | Constructor<any>>(
+    binding: Binding,
+    callback: Binding extends Constructor<infer A>
+      ? HookCallback<KnownBindings, A>
+      : Binding extends keyof KnownBindings
+      ? HookCallback<KnownBindings, KnownBindings[Binding]>
+      : never
+  ): void {
+    if (!this.#hooks.has(binding)) {
+      this.#hooks.set(binding, new Set())
+    }
+
+    const callbacks = this.#hooks.get(binding)!
+    callbacks.add(callback)
   }
 }
