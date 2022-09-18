@@ -188,13 +188,13 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       if (bindingProvider) {
         dependencies = await bindingProvider(
           binding,
-          'constructor',
+          '_constructor',
           this,
           containerProvider,
           runtimeValues
         )
       } else {
-        dependencies = await containerProvider(binding, 'constructor', this, runtimeValues)
+        dependencies = await containerProvider(binding, '_constructor', this, runtimeValues)
       }
 
       const value = new binding(...dependencies) as Promise<Make<Binding>>

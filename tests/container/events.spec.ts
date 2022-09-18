@@ -139,12 +139,12 @@ test.group('Container | Events', () => {
     class Config {}
     class Encryption {
       static containerInjections = {
-        constructor: [Config],
+        _constructor: [Config],
       }
     }
     class Route {
       static containerInjections = {
-        constructor: [Encryption],
+        _constructor: [Encryption],
       }
     }
 

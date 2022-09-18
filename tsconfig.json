@@ -9,6 +9,8 @@
     "removeComments": true,
     "declaration": true,
     "rootDir": "./",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "outDir": "./build",
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,

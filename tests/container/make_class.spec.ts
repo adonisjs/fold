@@ -81,7 +81,7 @@ test.group('Container | Make class', () => {
 
     class UserService {
       static containerInjections = {
-        constructor: [Database],
+        _constructor: [Database],
       }
       constructor(public db: Database) {}
     }
@@ -99,7 +99,7 @@ test.group('Container | Make class', () => {
       args: any[]
 
       static containerInjections = {
-        constructor: [{ foo: 'bar' }, 1, ['foo'], false, undefined, null, false],
+        _constructor: [{ foo: 'bar' }, 1, ['foo'], false, undefined, null, false],
       }
       constructor(...args: any[]) {
         this.args = args
@@ -119,7 +119,7 @@ test.group('Container | Make class', () => {
   }) => {
     class UserService {
       static containerInjections = {
-        constructor: [],
+        _constructor: [],
       }
       constructor(public name: string) {}
     }
@@ -137,7 +137,7 @@ test.group('Container | Make class', () => {
       args: any[]
 
       static containerInjections = {
-        constructor: [String],
+        _constructor: [String],
       }
       constructor() {}
     }

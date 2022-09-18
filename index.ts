@@ -8,4 +8,5 @@
  */
 
 export { Container } from './src/container.js'
+export { inject } from './src/decorators/inject.js'
 export { ContainerResolver } from './src/resolver.js'

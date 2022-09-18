@@ -41,7 +41,7 @@ test.group('Resolver', () => {
       ) => {
         assert.deepEqual(binding, UserService)
         assert.deepEqual(this, UserService)
-        assert.equal(property, 'constructor')
+        assert.equal(property, '_constructor')
         return defaultProvider(binding, property, resolver, runtimeValues)
       }
       name: string
