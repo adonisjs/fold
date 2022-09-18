@@ -1,4 +1,5 @@
 AdonisJS Fold
+
 > Simplest, straightforward implementation for IoC container in JavaScript
 
 <br />
@@ -10,6 +11,7 @@ AdonisJS Fold
 </div>
 
 ## Why this project exists?
+
 Many existing implementations of IoC containers take the concept too far and start to feel more like Java. JavaScript inherently does not have all the bells and whistles; you need to have similar IoC container benefits as PHP or Java.
 
 Therefore, with this project, I live to the ethos of JavaScript and yet build a container that can help you create loosely coupled systems.
@@ -25,6 +27,7 @@ I have explained the [reasons for using an IoC container](https://github.com/the
 - **Build it for JavaScript and improve with TypeScript** - The implementation of `@adonisjs/fold` works with vanilla JavaScript. It's just you have to write less code when using TypeScript. Thanks to its decorators metadata API.
 
 ## Usage
+
 Install the package from the npm packages registry.
 
 ```sh
@@ -46,6 +49,7 @@ const container = new Container()
 ```
 
 ## Making classes
+
 You can construct an instance of a class by calling the `container.make` method. The method is asynchronous since it allows for lazy loading dependencies via factory functions (More on factory functions later).
 
 ```ts
@@ -64,10 +68,10 @@ class Database {}
 
 class UserService {
   static containerInjections = {
-    constructor: [Database]
+    constructor: [Database],
   }
 
-  constructor (db) {
+  constructor(db) {
     this.db = db
   }
 }
@@ -83,6 +87,7 @@ This property can define the dependencies for the class methods (including the c
 > **Do you remember?** I said that JavaScript is not as powerful as Java or PHP. This is a classic example of that. In other languages, you can use reflection to look up the classes to inject, whereas, in JavaScript, you have to tell the container explicitly.
 
 ### TypeScript to the rescue
+
 Wait, you can use decorators with combination of TypeScript's [emitDecoratorMetaData](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata) option to perform reflection.
 
 It is worth noting, TypeScript decorators are not as powerful as the reflection API in other languages. For example, in PHP, you can use interfaces for reflection. Whereas in TypeScript, you cannot.
@@ -96,7 +101,7 @@ class Database {}
 
 @inject()
 class UserService {
-  constructor (db: Database) {
+  constructor(db: Database) {
     this.db = db
   }
 }
@@ -105,12 +110,13 @@ const service = await container.make(UserService)
 assert(service.db instanceof Database)
 ```
 
-The `@inject` decorator looks at the types of all the constructor parameters and defines the `static containerInjections` property behind the scenes. 
+The `@inject` decorator looks at the types of all the constructor parameters and defines the `static containerInjections` property behind the scenes.
 
 > **Note**: The decorator-based reflection can only work with concrete values, not interfaces or types since they are removed during runtime.
 
 ## Making class with runtime values
-When calling the `container.make` method, you can pass runtime values that take precedence over the `containerInjections` array. 
+
+When calling the `container.make` method, you can pass runtime values that take precedence over the `containerInjections` array.
 
 In the following example, the `UserService` accepts an instance of the ongoing HTTP request as the 2nd param. Now, when making an instance of this class, you can pass that instance manually.
 
@@ -122,7 +128,7 @@ class Database {}
 
 @inject()
 class UserService {
-  constructor (db: Database, request: Request) {
+  constructor(db: Database, request: Request) {
     this.db = db
     this.request = request
   }
@@ -132,7 +138,7 @@ class UserService {
 ```ts
 createServer((req) => {
   const runtimeValues = [undefined, req]
-  
+
   const service = await container.make(UserService, runtimeValues)
   assert(service.request === req)
 })
@@ -144,7 +150,8 @@ In the above example:
 - However, for the second position (ie `request`), the container will use the `req` value.
 
 ## Calling methods
-You can also call class methods to look up/inject dependencies automatically. 
+
+You can also call class methods to look up/inject dependencies automatically.
 
 In the following example, the `UserService.find` method needs an instance of the Database class. The `container.call` method will look at the `containerInjections` property to find the values to inject.
 
@@ -153,7 +160,7 @@ class Database {}
 
 class UserService {
   static containerInjections = {
-    find: [Database]
+    find: [Database],
   }
 
   async find(db) {
@@ -184,7 +191,8 @@ await container.call(service, 'find')
 The **runtime values** are also supported with the `container.call` method.
 
 ## Container bindings
-Alongside making class instances, you can also register bindings inside the container. Bindings are simple key-value pairs. 
+
+Alongside making class instances, you can also register bindings inside the container. Bindings are simple key-value pairs.
 
 - The key can either be a `string`, a `symbol` or a `class constructor`.
 - The value is a factory function invoked when someone resolves the binding from the container.
@@ -209,6 +217,7 @@ container.bind(Database, () => {
 ```
 
 ### Factory function arguments
+
 The factory receives the following three arguments.
 
 - The `resolver` reference. Resolver is something container uses under the hood to resolve dependencies. The same instance is passed to the factory, so that you can resolve dependencies to construct the class.
@@ -221,11 +230,13 @@ container.bind(Database, (resolver, runtimeValues) => {
 ```
 
 ### When to use the factory functions?
+
 I am answering this question from a framework creator perspective. I never use the `@inject` decorator on my classes shipped as packages. Instead, I define their construction logic using factory functions and keep classes free from any knowledge of the container.
 
 So, if you create packages for AdonisJS, I highly recommend using factory functions. Leave the `@inject` decorator for the end user.
 
 ## Binding singletons
+
 You can bind a singleton to the container using the `container.singleton` method. It is the same as the `container.bind` method, except the factory function is called only once, and the return value is cached forever.
 
 ```ts
@@ -235,6 +246,7 @@ container.singleton(Database, () => {
 ```
 
 ## Binding values
+
 Along side the factory functions, you can also bind direct values to the container.
 
 ```ts
@@ -253,6 +265,7 @@ await resolve.make(SomeClass)
 ```
 
 ## Observing container
+
 You can pass an instance of the [EventEmitter](https://nodejs.org/dist/latest-v18.x/docs/api/events.html#class-eventemitter) or [emittery](https://github.com/sindresorhus/emittery) to listen for events as container resolves dependencies.
 
 ```ts
@@ -268,6 +281,7 @@ const container = new Container({ emitter })
 ```
 
 ## Container hooks
+
 You can use container hooks when you want to modify a resolved value before it is returned from the `make` method.
 
 - The hook is called everytime a binding is resolved from the container.
@@ -283,6 +297,7 @@ container.resolving(Validator, (validator) => {
 ```
 
 ## Container providers
+
 Container providers are static functions that can live on a class to resolve the dependencies for the class constructor or a given class method.
 
 Once, you define the `containerProvider` on the class, the IoC container will rely on it for resolving dependencies and will not use the default provider.
@@ -307,6 +322,7 @@ class UsersController {
 ```
 
 ### Why would I use custom providers?
+
 Custom providers can be handy when creating an instance of the class is not enough to construct it properly.
 
 Let's take an example of [AdonisJS route model binding](https://github.com/adonisjs/route-model-binding). With route model binding, you can query the database using models based on the value of a route parameter and inject the model instance inside the controller.
@@ -328,6 +344,7 @@ However, in this case, we want more than just creating an instance of the model.
 This is where the `@bind` decorator comes into the picture. To perform database lookups, it registers a custom provider on the `UsersController` class.
 
 ## Binding types
+
 If you are using the container inside a TypeScript project, then you can define the types for all the bindings in advance at the time of creating the container instance.
 
 Defining types will ensure the `bind`, `singleton` and `bindValue` method accepts only the known bindings and assert their types as well.
@@ -352,15 +369,11 @@ const db = await container.make('db')
 ```
 
 [gh-workflow-image]: https://img.shields.io/github/workflow/status/adonisjs/fold/test?style=for-the-badge
-[gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/test.yml "Github action"
-
+[gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/test.yml 'Github action'
 [npm-image]: https://img.shields.io/npm/v/@adonisjs/fold/latest.svg?style=for-the-badge&logo=npm
-[npm-url]: https://www.npmjs.com/package/@adonisjs/fold/v/latest "npm"
-
+[npm-url]: https://www.npmjs.com/package/@adonisjs/fold/v/latest 'npm'
 [typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?style=for-the-badge&logo=typescript
-
 [license-url]: LICENSE.md
 [license-image]: https://img.shields.io/github/license/adonisjs/fold?style=for-the-badge
-
 [snyk-image]: https://img.shields.io/snyk/vulnerabilities/github/adonisjs/fold?label=Snyk%20Vulnerabilities&style=for-the-badge
-[snyk-url]: https://snyk.io/test/github/adonisjs/fold?targetFile=package.json "snyk"
+[snyk-url]: https://snyk.io/test/github/adonisjs/fold?targetFile=package.json 'snyk'
