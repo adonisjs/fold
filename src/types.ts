@@ -56,6 +56,11 @@ export type Bindings = Map<
 >
 
 /**
+ * Shape of the registered swaps
+ */
+export type Swaps = Map<BindingKey, BindingResolver<Record<any, any>, any>>
+
+/**
  * Shape of the registered binding values
  */
 export type BindingValues = Map<BindingKey, any>

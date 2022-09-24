@@ -161,4 +161,23 @@ test.group('Container | Events', () => {
     assert.deepEqual(events[1], { binding: Encryption, value: new Encryption() })
     assert.deepEqual(events[2], { binding: Route, value: route })
   })
+
+  test('emit event when swaps are resolved', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container({ emitter })
+    class Route {}
+    class FakedRoute extends Route {}
+
+    container.swap(Route, () => new FakedRoute())
+
+    const [event, route] = await Promise.all([
+      pEvent(emitter, 'container:resolve'),
+      container.make(Route),
+    ])
+
+    expectTypeOf(route).toEqualTypeOf<Route>()
+    assert.instanceOf(route, Route)
+    assert.instanceOf(route, FakedRoute)
+    assert.deepEqual(event, { binding: Route, value: route })
+  })
 })

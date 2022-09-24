@@ -10,6 +10,7 @@
 import type {
   Make,
   Hooks,
+  Swaps,
   Bindings,
   Constructor,
   BindingValues,
@@ -52,6 +53,14 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   #containerBindingValues: BindingValues
 
   /**
+   * Pre-registered swaps for bindings. They are shared between
+   * the container and resolver.
+   *
+   * We do not mutate this property within the resolver
+   */
+  #containerSwaps: Swaps
+
+  /**
    * Reference to the container hooks
    */
   #containerHooks: Hooks = new Map()
@@ -69,11 +78,13 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   constructor(
     bindings: Bindings,
     bindingValues: BindingValues,
+    swaps: Swaps,
     hooks: Hooks,
     options: ContainerOptions
   ) {
     this.#containerBindings = bindings
     this.#containerBindingValues = bindingValues
+    this.#containerSwaps = swaps
     this.#containerHooks = hooks
     this.#options = options
   }
@@ -160,6 +171,18 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      */
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isAClass) {
       return binding as Promise<Make<Binding>>
+    }
+
+    /**
+     * Entertain swaps when registered
+     */
+    if (this.#containerSwaps.has(binding)) {
+      const resolver = this.#containerSwaps.get(binding)!
+      const value = await resolver(this, runtimeValues)
+
+      await this.#execHooks(binding, value)
+      this.#emit(binding, value)
+      return value
     }
 
     /**

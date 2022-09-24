@@ -102,4 +102,33 @@ test.group('Container | Hooks', () => {
     assert.instanceOf(route, Route)
     assert.equal(route.invocations, 1)
   })
+
+  test('run hooks when a swap is resolved', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container({ emitter })
+    class Route {
+      invocations: number = 0
+    }
+    class FakedRoute extends Route {}
+
+    container.resolving(Route, (route) => {
+      expectTypeOf(route).toEqualTypeOf<Route>()
+      route.invocations++
+    })
+
+    container.swap(Route, () => {
+      return new FakedRoute()
+    })
+
+    await container.make('route')
+    await container.make('route')
+    await container.make('route')
+
+    const route = await container.make(Route)
+    expectTypeOf(route).toEqualTypeOf<Route>()
+
+    assert.instanceOf(route, Route)
+    assert.instanceOf(route, FakedRoute)
+    assert.equal(route.invocations, 1)
+  })
 })

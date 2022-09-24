@@ -264,6 +264,43 @@ resolver.bindValue(Request, req)
 await resolve.make(SomeClass)
 ```
 
+## Swapping implementations
+When using the container to resolve a tree of dependencies, quite often you will have no control over the construction of a class and therefore you will be not able to swap/fake its dependencies when writing tests.
+
+In the following example, the `UsersController` needs an instance of the `UserService` class.
+
+```ts
+@inject()
+class UsersController {
+  constructor (service: UserService) {}
+}
+```
+
+In the following test, we are making an HTTP request that will be handled by the `UsersController`. However, within the test, we have no control over the construction of the controller class.
+
+```ts
+test('get all users', async ({ client }) => {
+  // I WANTED TO FAKE USER SERVICE FIRST?
+  const response = await client.get('users')
+})
+```
+
+To make things simpler, you can tell the container to use a swapped implementation for a given class constructor as follows.
+
+```ts
+test('get all users', async ({ client }) => {
+  class MyFakedService extends UserService {}
+
+  /**
+   * From now on, the container will return an instance
+   * of `MyFakedService`.
+   */
+  container.swap(UserService, () => new MyFakedService())
+
+  const response = await client.get('users')
+})
+```
+
 ## Observing container
 
 You can pass an instance of the [EventEmitter](https://nodejs.org/dist/latest-v18.x/docs/api/events.html#class-eventemitter) or [emittery](https://github.com/sindresorhus/emittery) to listen for events as container resolves dependencies.

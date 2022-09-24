@@ -10,6 +10,7 @@
 import type {
   Make,
   Hooks,
+  Swaps,
   Bindings,
   BindingKey,
   Constructor,
@@ -41,6 +42,11 @@ import { ContainerResolver } from './resolver.js'
  * ```
  */
 export class Container<KnownBindings extends Record<any, any>> {
+  /**
+   * A collection of bindings with registered swapped implementations
+   */
+  #swaps: Swaps = new Map()
+
   /**
    * Registered bindings. Singleton and normal bindings, both are
    * registered inside the bindings map
@@ -83,7 +89,13 @@ export class Container<KnownBindings extends Record<any, any>> {
    * ```
    */
   createResolver() {
-    return new ContainerResolver(this.#bindings, this.#bindingValues, this.#hooks, this.#options)
+    return new ContainerResolver(
+      this.#bindings,
+      this.#bindingValues,
+      this.#swaps,
+      this.#hooks,
+      this.#options
+    )
   }
 
   /**
@@ -272,6 +284,64 @@ export class Container<KnownBindings extends Record<any, any>> {
     }
 
     this.#bindings.set(binding, { resolver, isSingleton: true })
+  }
+
+  swap<Binding extends keyof KnownBindings>(
+    /**
+     * Need to narrow down the "Binding" for the case where "KnownBindings" are <any, any>
+     */
+    binding: Binding extends string | symbol ? Binding : never,
+    resolver: BindingResolver<KnownBindings, KnownBindings[Binding]>
+  ): void
+  swap<Binding extends Constructor<any>>(
+    binding: Binding,
+    resolver: BindingResolver<KnownBindings, InstanceType<Binding>>
+  ): void
+  swap<Binding>(
+    binding: Binding,
+    resolver: BindingResolver<
+      KnownBindings,
+      Binding extends Constructor<infer A>
+        ? A
+        : Binding extends keyof KnownBindings
+        ? KnownBindings[Binding]
+        : never
+    >
+  ): void {
+    if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
+      throw new Error(
+        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
+      )
+    }
+
+    this.#swaps.set(binding, resolver)
+  }
+
+  /**
+   * Restore binding by removing its swap
+   */
+  restore(binding: keyof KnownBindings | Constructor<any>) {
+    if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
+      throw new Error(
+        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
+      )
+    }
+    this.#swaps.delete(binding)
+  }
+
+  /**
+   * Restore mentioned or all bindings by removing
+   * their swaps
+   */
+  restoreAll(bindings?: (keyof KnownBindings | Constructor<any>)[]) {
+    if (!bindings) {
+      this.#swaps.clear()
+      return
+    }
+
+    for (let binding of bindings) {
+      this.restore(binding)
+    }
   }
 
   /**
