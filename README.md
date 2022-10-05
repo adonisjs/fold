@@ -68,7 +68,7 @@ class Database {}
 
 class UserService {
   static containerInjections = {
-    constructor: [Database],
+    _constructor: [Database],
   }
 
   constructor(db) {
@@ -82,7 +82,7 @@ assert(service.db instanceof Database)
 
 The `static containerInjections` property is required by the container to know which values to inject when creating an instance of the class.
 
-This property can define the dependencies for the class methods (including the constructor). The dependencies are defined as an array. The first item from the array will be injected as the first argument and so on.
+This property can define the dependencies for the class methods (including the constructor). The dependencies are defined as an array. The dependencies are injected in the same order as they are defined inside the array.
 
 > **Do you remember?** I said that JavaScript is not as powerful as Java or PHP. This is a classic example of that. In other languages, you can use reflection to look up the classes to inject, whereas, in JavaScript, you have to tell the container explicitly.
 
@@ -112,7 +112,7 @@ assert(service.db instanceof Database)
 
 The `@inject` decorator looks at the types of all the constructor parameters and defines the `static containerInjections` property behind the scenes.
 
-> **Note**: The decorator-based reflection can only work with concrete values, not interfaces or types since they are removed during runtime.
+> **Note**: The decorator-based reflection can only work with concrete values, not with interfaces or types since they are removed during the runtime.
 
 ## Making class with runtime values
 
