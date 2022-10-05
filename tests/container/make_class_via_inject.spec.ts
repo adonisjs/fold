@@ -176,4 +176,47 @@ test.group('Container | Make class via inject', () => {
     assert.instanceOf(fooResult, Database)
     assert.instanceOf(barResult, Emitter)
   })
+
+  test('raise exception when injecting primitive classes', async ({ assert }) => {
+    @inject()
+    class UserService {
+      constructor(public db: string) {}
+    }
+
+    const container = new Container()
+    await assert.rejects(
+      () => container.make(UserService),
+      'Cannot inject "[Function: String]". The value cannot be constructed'
+    )
+  })
+
+  test('raise exception when injecting a typescript type', async ({ assert }) => {
+    type Db = {}
+
+    @inject()
+    class UserService {
+      constructor(public db: Db) {}
+    }
+
+    const container = new Container()
+    await assert.rejects(
+      () => container.make(UserService),
+      'Cannot inject "[Function: Object]". The value cannot be constructed'
+    )
+  })
+
+  test('raise exception when injecting a typescript interface', async ({ assert }) => {
+    interface Db {}
+
+    @inject()
+    class UserService {
+      constructor(public db: Db) {}
+    }
+
+    const container = new Container()
+    await assert.rejects(
+      () => container.make(UserService),
+      'Cannot inject "[Function: Object]". The value cannot be constructed'
+    )
+  })
 })

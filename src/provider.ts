@@ -7,6 +7,7 @@
  * file that was distributed with this source code.
  */
 
+import { inspect } from 'node:util'
 import string from '@poppinss/utils/string'
 import { ContainerResolver } from './resolver.js'
 import type { InspectableConstructor } from './types.js'
@@ -51,7 +52,7 @@ export async function containerProvider(
         const injection = injections[index]
         if (primitiveConstructors.includes(injection)) {
           throw new InvalidDependencyException(
-            string.interpolate(InvalidDependencyException.message, { value: injection })
+            string.interpolate(InvalidDependencyException.message, { value: inspect(injection) })
           )
         }
 
@@ -72,7 +73,7 @@ export async function containerProvider(
 
       if (primitiveConstructors.includes(injection)) {
         throw new InvalidDependencyException(
-          string.interpolate(InvalidDependencyException.message, { value: injection })
+          string.interpolate(InvalidDependencyException.message, { value: inspect(injection) })
         )
       }
 

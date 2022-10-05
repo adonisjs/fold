@@ -133,4 +133,15 @@ test.group('Container | Call method', () => {
     expectTypeOf(fooResult).toEqualTypeOf<{ db: Database; name: string; id: number }>()
     assert.deepEqual(fooResult, { db: new Database(), id: 1, name: 'foo' })
   })
+
+  test('raise exception when method does not exist', async ({ assert }) => {
+    class UserService {}
+
+    const container = new Container()
+    await assert.rejects(
+      // @ts-expect-error
+      () => container.call(new UserService(), 'foo'),
+      'Missing method "foo" on "UserService {}"'
+    )
+  })
 })

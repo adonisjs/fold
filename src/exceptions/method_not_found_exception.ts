@@ -12,5 +12,5 @@ import { Exception } from '@poppinss/utils'
 export class MethodNotFoundException extends Exception {
   static code = 'E_METHOD_NOT_FOUND'
   static status = 500
-  static message = 'Missing method "{{ method }}" on object "{{ object }}"'
+  static message = 'Missing method "{{ method }}" on "{{ object }}"'
 }
