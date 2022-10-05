@@ -97,6 +97,6 @@ test.group('Provider', () => {
 
     await assert.rejects(async () => {
       await containerProvider(UserService, 'constructor', resolver, [undefined, { foo: 'bar' }])
-    }, 'Cannot inject "String"')
+    }, 'Cannot inject "[Function: String]". The value cannot be constructed')
   })
 })

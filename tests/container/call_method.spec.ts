@@ -7,12 +7,12 @@ test.group('Container | Call method', () => {
     const container = new Container()
 
     // @ts-expect-error
-    await assert.rejects(() => container.call(1, 'foo'), 'method "foo" does not exists on "Number"')
+    await assert.rejects(() => container.call(1, 'foo'), 'Missing method "foo" on "1"')
 
     await assert.rejects(
       // @ts-expect-error
       () => container.call(false, 'foo'),
-      'method "foo" does not exists on "Boolean"'
+      'Missing method "foo" on "false"'
     )
 
     await assert.rejects(
@@ -30,25 +30,25 @@ test.group('Container | Call method', () => {
     await assert.rejects(
       // @ts-expect-error
       () => container.call(new Map([[1, 1]]), 'foo'),
-      'method "foo" does not exists on "Map"'
+      'Missing method "foo" on "Map(1) { 1 => 1 }"'
     )
 
     await assert.rejects(
       // @ts-expect-error
       () => container.call(new Set([1]), 'foo'),
-      'method "foo" does not exists on "Set"'
+      'Missing method "foo" on "Set(1) { 1 }"'
     )
 
     await assert.rejects(
       // @ts-expect-error
       () => container.call(['foo'], 'foo'),
-      'method "foo" does not exists on "Array"'
+      'Missing method "foo" on "[ \'foo\' ]"'
     )
 
     await assert.rejects(
       // @ts-expect-error
       () => container.call(function foo() {}, 'foo'),
-      'method "foo" does not exists on "Function"'
+      'Missing method "foo" on "[Function: foo]"'
     )
   })
 

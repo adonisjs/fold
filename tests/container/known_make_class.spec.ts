@@ -143,7 +143,10 @@ test.group('Container | Make class | Known bindings', () => {
     }
 
     const container = new Container<{ foo: 'bar' }>()
-    await assert.rejects(() => container.make(UserService), 'Cannot inject "String"')
+    await assert.rejects(
+      () => container.make(UserService),
+      'Cannot inject "[Function: String]". The value cannot be constructed'
+    )
   })
 
   test('return primitive constructor as it is', async ({ assert }) => {
