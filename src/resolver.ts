@@ -7,6 +7,9 @@
  * file that was distributed with this source code.
  */
 
+import { inspect } from 'node:util'
+import string from '@poppinss/utils/string'
+
 import type {
   Make,
   Hooks,
@@ -20,6 +23,8 @@ import type {
 } from './types.js'
 import { isClass } from './helpers.js'
 import { containerProvider } from './provider.js'
+import { MethodNotFoundException } from './exceptions/method_not_found_exception.js'
+import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exception.js'
 
 /**
  * Container resolver exposes the APIs to resolve bindings. You can think
@@ -268,7 +273,9 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     runtimeValues?: any[]
   ): Promise<ReturnType<Value[Method]>> {
     if (typeof value[method] !== 'function') {
-      throw new Error(`method "${String(method)}" does not exists on "${value.constructor.name}"`)
+      throw new MethodNotFoundException(
+        string.interpolate(MethodNotFoundException.message, { method, object: inspect(value) })
+      )
     }
 
     const dependencies = await containerProvider(value.constructor, method, this, runtimeValues)
@@ -299,9 +306,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       : never
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new Error(
-        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
-      )
+      throw new InvalidBindingKeyException()
     }
 
     this.#bindingValues.set(binding, value)

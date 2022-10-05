@@ -22,6 +22,7 @@ import type {
 } from './types.js'
 import { isClass } from './helpers.js'
 import { ContainerResolver } from './resolver.js'
+import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exception.js'
 
 /**
  * The container class exposes the API to register bindings, values
@@ -198,9 +199,7 @@ export class Container<KnownBindings extends Record<any, any>> {
     >
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new Error(
-        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
-      )
+      throw new InvalidBindingKeyException()
     }
 
     this.#bindings.set(binding, { resolver, isSingleton: false })
@@ -230,9 +229,7 @@ export class Container<KnownBindings extends Record<any, any>> {
       : never
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new Error(
-        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
-      )
+      throw new InvalidBindingKeyException()
     }
 
     this.#bindingValues.set(binding, value)
@@ -278,9 +275,7 @@ export class Container<KnownBindings extends Record<any, any>> {
     >
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new Error(
-        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
-      )
+      throw new InvalidBindingKeyException()
     }
 
     this.#bindings.set(binding, { resolver, isSingleton: true })
@@ -309,9 +304,7 @@ export class Container<KnownBindings extends Record<any, any>> {
     >
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new Error(
-        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
-      )
+      throw new InvalidBindingKeyException()
     }
 
     this.#swaps.set(binding, resolver)
@@ -322,9 +315,7 @@ export class Container<KnownBindings extends Record<any, any>> {
    */
   restore(binding: keyof KnownBindings | Constructor<any>) {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new Error(
-        `Invalid binding key type. Only "string", "symbol" and "class constructor" is accepted`
-      )
+      throw new InvalidBindingKeyException()
     }
     this.#swaps.delete(binding)
   }

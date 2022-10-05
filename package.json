@@ -112,5 +112,8 @@
   "bugs": {
     "url": "https://github.com/adonisjs/fold/issues"
   },
-  "homepage": "https://github.com/adonisjs/fold#readme"
+  "homepage": "https://github.com/adonisjs/fold#readme",
+  "dependencies": {
+    "@poppinss/utils": ">=6.0.0-0"
+  }
 }

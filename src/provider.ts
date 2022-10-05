@@ -7,8 +7,10 @@
  * file that was distributed with this source code.
  */
 
+import string from '@poppinss/utils/string'
 import { ContainerResolver } from './resolver.js'
 import type { InspectableConstructor } from './types.js'
+import { InvalidDependencyException } from './exceptions/invalid_dependency_exception.js'
 
 const primitiveConstructors = [String, Function, Object, Date, Number, Boolean]
 
@@ -48,7 +50,9 @@ export async function containerProvider(
 
         const injection = injections[index]
         if (primitiveConstructors.includes(injection)) {
-          throw new Error(`Cannot inject "${injection.name}"`)
+          throw new InvalidDependencyException(
+            string.interpolate(InvalidDependencyException.message, { value: injection })
+          )
         }
 
         return resolver.make(injection)
@@ -67,7 +71,9 @@ export async function containerProvider(
       }
 
       if (primitiveConstructors.includes(injection)) {
-        throw new Error(`Cannot inject "${injection.name}"`)
+        throw new InvalidDependencyException(
+          string.interpolate(InvalidDependencyException.message, { value: injection })
+        )
       }
 
       return resolver.make(injection)
