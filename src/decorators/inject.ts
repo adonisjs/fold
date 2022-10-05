@@ -7,18 +7,15 @@
  * file that was distributed with this source code.
  */
 
+import { defineStaticProperty } from '@poppinss/utils'
+
 /**
  * Initiating the "containerInjections" property on the target, which is assumed
  * to be the class constructor.
  */
 function initiateContainerInjections(target: any, method: string | symbol) {
-  if (!target.hasOwnProperty('containerInjections')) {
-    Object.defineProperty(target, 'containerInjections', {
-      value: {},
-    })
-  }
-
-  target.containerInjections[method] = target.containerInjections[method] || []
+  defineStaticProperty(target, 'containerInjections', { initialValue: {}, strategy: 'inherit' })
+  target.containerInjections[method] = []
 }
 
 /**
@@ -53,6 +50,11 @@ function defineMethodInjections(target: any, method: string | symbol) {
   }
 }
 
+/**
+ * The "@inject" decorator uses Reflection to inspect the dependencies of a class
+ * or a method and defines them as metaData on the class for the container to
+ * discover them.
+ */
 export function inject() {
   function injectDecorator<C extends Function>(target: C): void
   function injectDecorator(target: any, propertyKey: string | symbol): void
