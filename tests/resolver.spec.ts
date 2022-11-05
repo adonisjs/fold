@@ -6,7 +6,7 @@ import { ContainerProvider } from '../src/types.js'
 test.group('Resolver', () => {
   test('give priority to resolver values over binding values', async ({ assert }) => {
     class UserService {
-      name: string
+      name?: string
     }
 
     const container = new Container()
@@ -43,7 +43,7 @@ test.group('Resolver', () => {
         assert.equal(property, '_constructor')
         return defaultProvider(binding, property, resolver, runtimeValues)
       }
-      name: string
+      name?: string
     }
 
     const container = new Container()

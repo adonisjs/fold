@@ -134,8 +134,6 @@ test.group('Container | Make class', () => {
 
   test('raise error when injecting is a primitive class', async ({ assert }) => {
     class UserService {
-      args: any[]
-
       static containerInjections = {
         _constructor: [String],
       }

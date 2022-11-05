@@ -132,10 +132,8 @@ test.group('Container | Make class | Known bindings', () => {
     assert.isUndefined(service.name)
   })
 
-  test('raise error when injecting is a primitive class', async ({ assert }) => {
+  test('raise error when injecting a primitive class', async ({ assert }) => {
     class UserService {
-      args: any[]
-
       static containerInjections = {
         _constructor: [String],
       }

@@ -9,7 +9,7 @@ test.group('Container | Hooks', () => {
     const emitter = new EventEmitter()
     const container = new Container<{ route: Route }>({ emitter })
     class Route {
-      pattern: string
+      pattern!: string
     }
 
     container.bind('route', () => {
