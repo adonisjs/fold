@@ -453,6 +453,9 @@ const service = await container.make(UserService)
 await container.call(service, 'find')
 ```
 
+### E_MISSING_DEFAULT_EXPORT
+The exception is raised when a dynamically imported module using `makeImportProvider` method is missing `export default`.
+
 ## Helpers
 Following are some of the helpers we use extensively within the AdonisJS ecosystem to lazy import modules and construct classes using the container.
 
