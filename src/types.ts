@@ -126,3 +126,14 @@ export type ContainerOptions = {
     emit(event: string | symbol, ...values: any[]): any
   }
 }
+
+/**
+ * Import provider allows lazy loading import expressions, alongside
+ * constructing the class constructor and calling methods via container.
+ */
+export type ImportProvider = {
+  importPath: string
+  method: string
+  defaultExport: any
+  handle(resolver: ContainerResolver<any>, ...args: any): Promise<any>
+}

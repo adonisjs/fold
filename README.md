@@ -453,6 +453,43 @@ const service = await container.make(UserService)
 await container.call(service, 'find')
 ```
 
+## Helpers
+Following are some of the helpers we use extensively within the AdonisJS ecosystem to lazy import modules and construct classes using the container.
+
+### parseImportExpression
+The `parseImportExpression` method accepts a string based import expression (widely used by AdonisJS framework) and parses the module path and method from it.
+
+In the following expression, the last segment after the `dot(.)` is the method a class exported by `users_controller` module.
+
+```ts
+parseImportExpression('#controllers/users_controller.index')
+// output: ['#controllers/users_controller', 'index']
+```
+
+### makeImportProvider
+The `makeImportProvider` method accepts a string based import expression and returns an object with a `handle` method. The `handle` internally encapsulates lazily importing the module and constructing an instance of it using the container.
+
+```ts
+const container = new Container()
+const resolver = container.createResolver()
+
+const provider = makeImportProvider('#controllers/users_controller.index')
+await provider.handle(resolver)
+```
+
+This is how the handle method works under the hood
+
+- It will parse the expression using the `parseImportExpression` method.
+- It will import the `#controllers/users_controller` using the dynamic import method.
+- Next, it will look for a default export. An exception is raised, if the default export is missing.
+- Finally, it will use the container to create an instance of the class and runs the method defined inside the expression.
+
+The method is invoked using `resolver.call` method and you can pass additional arguments to it as follows.
+
+```ts
+await provider.handle(resolver, [methodArg1, methodArg2])
+```
+
 [gh-workflow-image]: https://img.shields.io/github/workflow/status/adonisjs/fold/test?style=for-the-badge
 [gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/test.yml 'Github action'
 [npm-image]: https://img.shields.io/npm/v/@adonisjs/fold/latest.svg?style=for-the-badge&logo=npm
