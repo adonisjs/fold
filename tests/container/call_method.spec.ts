@@ -56,7 +56,7 @@ test.group('Container | Call method', () => {
     const container = new Container()
     const fooResult = await container.call({ foo: () => 'bar' }, 'foo')
 
-    expectTypeOf(fooResult).toEqualTypeOf<string>()
+    expectTypeOf(fooResult).toEqualTypeOf<'bar'>()
     assert.equal(fooResult, 'bar')
   })
 
