@@ -48,7 +48,7 @@ test.group('Make import provider', (group) => {
     const resolver = container.createResolver()
     const provider = makeImportProvider('#controllers/users_controller')
 
-    await provider.handle(resolver, args)
+    await provider.handle(resolver, [args])
     assert.deepEqual(args, ['invoked'])
     assert.isDefined(provider.defaultExport)
   })
