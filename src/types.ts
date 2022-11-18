@@ -7,7 +7,8 @@
  * file that was distributed with this source code.
  */
 
-import { ContainerResolver } from './resolver.js'
+import type { Container } from './container.js'
+import type { ContainerResolver } from './resolver.js'
 
 /**
  * Extract functions from a type
@@ -127,13 +128,14 @@ export type ContainerOptions = {
   }
 }
 
-/**
- * Import provider allows lazy loading import expressions, alongside
- * constructing the class constructor and calling methods via container.
- */
-export type ImportProvider = {
-  importPath: string
-  method: string
-  defaultExport: any
-  handle(resolver: ContainerResolver<any>, ...args: any): Promise<any>
-}
+export type ModuleCallable<T, Args extends any[]> = T extends undefined
+  ? (resolver: ContainerResolver<any> | Container<any>, ...args: Args) => Promise<any>
+  : (...args: Args) => Promise<any>
+
+export type ModuleHandler<T, Args extends any[]> = T extends undefined
+  ? {
+      handle(resolver: ContainerResolver<any> | Container<any>, ...args: Args): Promise<any>
+    }
+  : {
+      handle(...args: Args): Promise<any>
+    }

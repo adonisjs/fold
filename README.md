@@ -456,42 +456,114 @@ await container.call(service, 'find')
 ### E_MISSING_DEFAULT_EXPORT
 The exception is raised when a dynamically imported module using `makeImportProvider` method is missing `export default`.
 
-## Helpers
-Following are some of the helpers we use extensively within the AdonisJS ecosystem to lazy import modules and construct classes using the container.
+## Module expressions
+In AdonisJS, we allow binding methods in form of string based module expression. For example:
 
-### parseImportExpression
-The `parseImportExpression` method accepts a string based import expression (widely used by AdonisJS framework) and parses the module path and method from it.
-
-In the following expression, the last segment after the `dot(.)` is the method a class exported by `users_controller` module.
-
+**Instead of importing and using a controller as follows**
 ```ts
-parseImportExpression('#controllers/users_controller.index')
-// output: ['#controllers/users_controller', 'index']
+import UsersController from '#controllers/users'
+
+Route.get('users', (ctx) => {
+  return new UsersController().index(ctx)
+})
 ```
 
-### makeImportProvider
-The `makeImportProvider` method accepts a string based import expression and returns an object with a `handle` method. The `handle` internally encapsulates lazily importing the module and constructing an instance of it using the container.
+**You can bind the controller method as follows**
+```ts
+Route.get('users', '#controllers/users.index')
+```
+
+**Why do we do this?**
+There are a couple of reasons for using module expressions.
+
+- Performance: Lazy loading controllers ensures that we keep the application boot process quick. Otherwise, we will pull all the controllers and their imports within a single routes file and that will surely impact the boot time of the application.
+- Visual clutter: Imagine importing all the controllers within a single routes file (or maybe 2-3 different route files) and then instantiating them manually. This surely brings some visual clutter in your codebase (agree visual clutter is subjective).
+
+So given we use **module expressions** widely in the AdonisJS ecosystem. We have abstracted the logic of parsing string based expressions into dedicated helpers to re-use and ease.
+
+### Assumptions
+There is a strong assumption that every module references using module expression will have a `export default` exporting a class.
+
+```ts
+// Valid module for module expression
+export default class UsersController {}
+```
+
+### toCallable
+The `toCallable` method returns a function that internally parses the module string expression and returns a function that you can invoke like any other JavaScript function.
+
+```ts
+import { moduleExpression } from '@adonisjs/fold'
+
+const fn = moduleExpression(
+  '#controllers/users.index',
+  import.meta.url
+).toCallable()
+
+// Later call it
+const container = new Container()
+const resolver = container.createResolver()
+await fn(resolver, ctx)
+```
+
+You can also pass the container instance at the time of creating the callable function.
 
 ```ts
 const container = new Container()
-const resolver = container.createResolver()
+const fn = moduleExpression(
+  '#controllers/users.index',
+  import.meta.url
+).toCallable(container)
 
-const provider = makeImportProvider('#controllers/users_controller.index')
-await provider.handle(resolver)
+// Later call it
+await fn(ctx)
 ```
 
-This is how the handle method works under the hood
+### toHandleMethod
+The `toHandleMethod` method returns an object with the `handle` method. To the main difference between `toCallable` and `toHandleMethod` is their return output
 
-- It will parse the expression using the `parseImportExpression` method.
-- It will import the `#controllers/users_controller` using the dynamic import method.
-- Next, it will look for a default export. An exception is raised, if the default export is missing.
-- Finally, it will use the container to create an instance of the class and runs the method defined inside the expression.
-
-The method is invoked using `resolver.call` method and you can pass additional arguments to it as follows.
+- `toHandleMethod` returns `{ handle: fn }`
+- `toCallable` returns `fn`
 
 ```ts
-await provider.handle(resolver, [methodArg1, methodArg2])
+import { moduleExpression } from '@adonisjs/fold'
+
+const handler = moduleExpression(
+  '#controllers/users.index',
+  import.meta.url
+).toHandleMethod()
+
+// Later call it
+const container = new Container()
+const resolver = container.createResolver()
+await handler.handle(resolver, ctx)
 ```
+
+You can also pass the container instance at the time of creating the handle method.
+
+```ts
+const container = new Container()
+
+const handler = moduleExpression(
+  '#controllers/users.index',
+  import.meta.url
+).toHandleMethod(container)
+
+// Later call it
+await handler.handle(ctx)
+```
+
+### Bechmarks
+Following are benchmarks to see the performance loss that happens when using module expressions.
+
+**Benchmarks were performed on Apple M1 iMac, 16GB**
+
+![](./benchmarks.png)
+
+- `handler`: Calling the handle method on the output of `toHandleMethod`.
+- `callable`: Calling the function returned by the `toCallable` method.
+- `native`: Using dynamic imports to lazily import the module. This variation does not use any helpers from this package.
+- `inline`: When no lazy loading was performed. The module was importing inline using the `import` keyword.
 
 [gh-workflow-image]: https://img.shields.io/github/workflow/status/adonisjs/fold/test?style=for-the-badge
 [gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/test.yml 'Github action'

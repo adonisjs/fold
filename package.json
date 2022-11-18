@@ -9,7 +9,8 @@
     "build/index.js"
   ],
   "imports": {
-    "#controllers/*": "./tests/app/controllers/*.js"
+    "#controllers/*": "./tests/app/controllers/*.js",
+    "#services/*": "./build/benchmark/services/*.js"
   },
   "exports": {
     ".": "./build/index.js",
@@ -18,9 +19,10 @@
   "type": "module",
   "scripts": {
     "pretest": "npm run lint",
-    "vscode:test": "node --loader=ts-node/esm bin/test.ts",
+    "vscode:test": "node --loader=ts-node/esm --experimental-import-meta-resolve bin/test.ts",
     "test": "node --loader=ts-node/esm bin/test.ts",
     "clean": "del-cli build",
+    "benchmark": "npm run build && node --experimental-import-meta-resolve build/benchmark/module_expression.js",
     "compile": "npm run lint && npm run clean && tsc",
     "build": "npm run compile",
     "release": "np --message=\"chore(release): %s\"",
@@ -50,6 +52,7 @@
     "@swc/core": "^1.3.14",
     "@types/fs-extra": "^9.0.13",
     "@types/node": "^18.11.9",
+    "benchmark": "^2.1.4",
     "del-cli": "^5.0.0",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",

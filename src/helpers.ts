@@ -7,8 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import type { Constructor, ImportProvider } from './types.js'
-import { ContainerResolver } from './resolver.js'
+import type { Constructor } from './types.js'
 import { MissingDefaultExportException } from './exceptions/missing_default_export_exception.js'
 
 /**
@@ -20,62 +19,22 @@ export function isClass<T>(value: unknown): value is Constructor<T> {
 }
 
 /**
- * Parses an import expression to module path and its method.
- *
- * ```ts
- * parseImportExpression('#controllers/users_controller')
- * // ['#controllers/users_controller', 'handle']
- * ```
- *
- * With method
- * ```ts
- * parseImportExpression('#controllers/users_controller.index')
- * // ['#controllers/users_controller', 'index']
- * ```
+ * Dynamically import a module and ensure it has a default export
  */
-export function parseImportExpression(importExpression: string): [string, string] {
-  const parts = importExpression.split('.')
-  if (parts.length === 1) {
-    return [importExpression, 'handle']
+export async function importDefault(importPath: string, parentURL: URL | string) {
+  const resolvedPath = await import.meta.resolve!(importPath, parentURL)
+  const moduleExports = await import(resolvedPath)
+
+  /**
+   * Make sure a default export exists
+   */
+  if (!moduleExports.default) {
+    throw new MissingDefaultExportException(`Missing export default from "${importPath}" module`, {
+      cause: {
+        source: resolvedPath,
+      },
+    })
   }
 
-  const method = parts.pop()!
-  return [parts.join('.'), method]
-}
-
-/**
- * Import provider allows lazy loading import expressions, alongside
- * constructing the class constructor and calling methods via container.
- *
- * ```ts
- * const provider = makeImportProvider('#controllers/users_controller.index')
- * await provider.handle(resolver, ...values)
- * ```
- */
-export function makeImportProvider(importExpression: string): ImportProvider {
-  const [importPath, method] = parseImportExpression(importExpression)
-
-  return {
-    importPath,
-    method,
-    defaultExport: null,
-    async handle(resolver: ContainerResolver<any>, runtimeValues?: any[]) {
-      if (!this.defaultExport) {
-        const moduleExports = await import(importPath)
-
-        /**
-         * Make sure a default export exists
-         */
-        if (!moduleExports.default) {
-          throw new MissingDefaultExportException(
-            `Missing export default from "${this.importPath}" module`
-          )
-        }
-
-        this.defaultExport = moduleExports.default
-      }
-
-      return resolver.call(await resolver.make(this.defaultExport), this.method, runtimeValues)
-    },
-  }
+  return moduleExports.default
 }
