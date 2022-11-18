@@ -23,13 +23,8 @@ test.group('moduleExpression | toHandleMethod', (group) => {
   })
 
   test('make handle method object from module expression', async ({ assert }) => {
-    assert.containsSubset(
-      moduleExpression('#controllers/users_controller', import.meta.url).toHandleMethod(),
-      {
-        importPath: '#controllers/users_controller',
-        method: 'handle',
-        defaultExport: null,
-      }
+    assert.isFunction(
+      moduleExpression('#controllers/users_controller', import.meta.url).toHandleMethod().handle
     )
   })
 
