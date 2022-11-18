@@ -27,6 +27,7 @@ test.group('Resolver', () => {
     assert.strictEqual(resolvedService, service1)
     assert.strictEqual(resolvedService.name, 'resolver_service')
   })
+
   test('use custom containerProvider from the class constructor', async ({ assert }) => {
     assert.plan(4)
 
@@ -55,6 +56,31 @@ test.group('Resolver', () => {
     assert.instanceOf(resolvedService, UserService)
   })
 
+  test('disallow binding names other than string symbol or class constructor', async ({
+    assert,
+  }) => {
+    const container = new Container()
+    const resolver = container.createResolver()
+
+    assert.throws(
+      // @ts-expect-error
+      () => resolver.bindValue(1, 1),
+      'The container binding key must be of type "string", "symbol", or a "class constructor"'
+    )
+
+    assert.throws(
+      // @ts-expect-error
+      () => resolver.bindValue([], 1),
+      'The container binding key must be of type "string", "symbol", or a "class constructor"'
+    )
+
+    assert.throws(
+      // @ts-expect-error
+      () => resolver.bindValue({}, 1),
+      'The container binding key must be of type "string", "symbol", or a "class constructor"'
+    )
+  })
+
   test('find if a binding exists', async ({ assert }) => {
     const container = new Container()
     const resolver = container.createResolver()
@@ -70,5 +96,20 @@ test.group('Resolver', () => {
     assert.isTrue(resolver.hasBinding('route'))
     assert.isTrue(resolver.hasBinding(routeSymbol))
     assert.isFalse(resolver.hasBinding('db'))
+  })
+
+  test('find if all bindings exists', async ({ assert }) => {
+    const container = new Container()
+    const resolver = container.createResolver()
+    class Route {}
+
+    const routeSymbol = Symbol('route')
+
+    container.bind(Route, () => new Route())
+    resolver.bindValue('route', new Route())
+    container.bindValue(routeSymbol, new Route())
+
+    assert.isTrue(resolver.hasAllBindings([Route, 'route', routeSymbol]))
+    assert.isFalse(resolver.hasAllBindings([Route, 'db', routeSymbol]))
   })
 })

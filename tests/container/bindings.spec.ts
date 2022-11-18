@@ -109,6 +109,20 @@ test.group('Container | Bindings', () => {
     assert.isTrue(container.hasBinding(routeSymbol))
     assert.isFalse(container.hasBinding('db'))
   })
+
+  test('find if all the bindings exists', async ({ assert }) => {
+    const container = new Container()
+    class Route {}
+
+    const routeSymbol = Symbol('route')
+
+    container.bind(Route, () => new Route())
+    container.bind('route', () => new Route())
+    container.bind(routeSymbol, () => new Route())
+
+    assert.isTrue(container.hasAllBindings([Route, 'route', routeSymbol]))
+    assert.isFalse(container.hasAllBindings([Route, 'db', routeSymbol]))
+  })
 })
 
 test.group('Container | Bindings Singleton', () => {
@@ -337,5 +351,19 @@ test.group('Container | Binding values', () => {
     assert.isTrue(container.hasBinding('route'))
     assert.isTrue(container.hasBinding(routeSymbol))
     assert.isFalse(container.hasBinding('db'))
+  })
+
+  test('find if all bindings exists', async ({ assert }) => {
+    const container = new Container()
+    class Route {}
+
+    const routeSymbol = Symbol('route')
+
+    container.bindValue(Route, new Route())
+    container.bindValue('route', new Route())
+    container.bindValue(routeSymbol, new Route())
+
+    assert.isTrue(container.hasAllBindings([Route, 'route', routeSymbol]))
+    assert.isFalse(container.hasAllBindings([Route, 'db', routeSymbol]))
   })
 })
