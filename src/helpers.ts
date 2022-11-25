@@ -21,7 +21,27 @@ export function isClass<T>(value: unknown): value is Constructor<T> {
 /**
  * Dynamically import a module and ensure it has a default export
  */
-export async function importDefault(importPath: string, parentURL: URL | string) {
+export async function importDefault(importFn: () => Promise<{ default: any }>) {
+  const moduleExports = await importFn()
+
+  /**
+   * Make sure a default export exists
+   */
+  if (!moduleExports.default) {
+    throw new MissingDefaultExportException(`Missing export default from "${importFn}" module`, {
+      cause: {
+        source: importFn,
+      },
+    })
+  }
+
+  return moduleExports.default
+}
+
+/**
+ * Dynamically import a module and ensure it has a default export
+ */
+export async function resolveDefault(importPath: string, parentURL: URL | string) {
   const resolvedPath = await import.meta.resolve!(importPath, parentURL)
   const moduleExports = await import(resolvedPath)
 

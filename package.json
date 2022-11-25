@@ -10,6 +10,7 @@
   ],
   "imports": {
     "#controllers/*": "./tests/app/controllers/*.js",
+    "#middleware/*": "./tests/app/middleware/*.js",
     "#services/*": "./build/benchmark/services/*.js"
   },
   "exports": {
@@ -22,7 +23,7 @@
     "vscode:test": "node --loader=ts-node/esm --experimental-import-meta-resolve bin/test.ts",
     "test": "c8 npm run vscode:test",
     "clean": "del-cli build",
-    "benchmark": "npm run build && node --experimental-import-meta-resolve build/benchmark/module_expression.js",
+    "benchmark": "npm run build && node --experimental-import-meta-resolve build/benchmark/module_expression.js && node --experimental-import-meta-resolve build/benchmark/module_importer.js",
     "compile": "npm run lint && npm run clean && tsc",
     "build": "npm run compile",
     "release": "np --message=\"chore(release): %s\"",

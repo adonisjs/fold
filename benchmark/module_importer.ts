@@ -10,8 +10,8 @@
 // @ts-expect-error
 import benchmark from 'benchmark'
 import { Container } from '../index.js'
-import { resolveDefault } from '../src/helpers.js'
-import { moduleExpression } from '../src/module_expression.js'
+import { importDefault } from '../src/helpers.js'
+import { moduleImporter } from '../src/module_importer.js'
 import Thread from '#services/thread'
 
 const suite = new benchmark.Suite()
@@ -19,19 +19,19 @@ const suite = new benchmark.Suite()
 /**
  * Our implementation that returns a callable function
  */
-const fn = moduleExpression('#services/users.find', import.meta.url).toCallable()
+const fn = moduleImporter(() => import('#services/users'), 'find').toCallable()
 
 /**
  * Our implementation that returns an object with handle method.
  */
-const handler = moduleExpression('#services/posts.find', import.meta.url).toHandleMethod()
+const handler = moduleImporter(() => import('#services/posts'), 'find').toHandleMethod()
 
 /**
  * If we decided not to have cached version and rely on dynamic imports
  * all the time
  */
 const native = async (resolver: Container<any>) => {
-  const defaultExport = await resolveDefault('#services/comments', import.meta.url)
+  const defaultExport = await importDefault(() => import('#services/comments'))
   return resolver.call(await resolver.make(defaultExport), 'find')
 }
 

@@ -565,6 +565,39 @@ Following are benchmarks to see the performance loss that happens when using mod
 - `native`: Using dynamic imports to lazily import the module. This variation does not use any helpers from this package.
 - `inline`: When no lazy loading was performed. The module was importing inline using the `import` keyword.
 
+## Module importer
+The module importer is similar to module expression. However, instead of defining the import path as a string, you have to define a function that imports the module.
+
+```ts
+import { moduleImporter } from '@adonisjs/fold'
+
+const fn = moduleImporter(
+  () => import('#middleware/auth')
+  'handle'
+).toCallable()
+
+// Later call it
+const container = new Container()
+const resolver = container.createResolver()
+await fn(resolver, ctx)
+```
+
+Create handle method object
+
+```ts
+import { moduleImporter } from '@adonisjs/fold'
+
+const handler = moduleImporter(
+  () => import('#middleware/auth')
+  'handle'
+).toHandleMethod()
+
+// Later call it
+const container = new Container()
+const resolver = container.createResolver()
+await handler.handle(resolver, ctx)
+```
+
 [gh-workflow-image]: https://img.shields.io/github/workflow/status/adonisjs/fold/test?style=for-the-badge
 [gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/test.yml 'Github action'
 [npm-image]: https://img.shields.io/npm/v/@adonisjs/fold/latest.svg?style=for-the-badge&logo=npm
