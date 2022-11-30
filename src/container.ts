@@ -42,7 +42,7 @@ import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exc
  * await container.make(CLASS_CONSTRUCTOR)
  * ```
  */
-export class Container<KnownBindings extends Record<any, any>> {
+export class Container<KnownBindings extends Record<any, any> = Record<any, any>> {
   /**
    * A collection of bindings with registered swapped implementations
    */
