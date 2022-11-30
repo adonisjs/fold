@@ -47,7 +47,7 @@ test.group('moduleExpression | toHandleMethod', (group) => {
       import.meta.url
     ).toHandleMethod(container)
 
-    await handler.handle(args)
+    await handler.handle([args])
     assert.deepEqual(args, ['invoked'])
   })
 
@@ -72,7 +72,7 @@ test.group('moduleExpression | toHandleMethod', (group) => {
       import.meta.url
     ).toHandleMethod()
 
-    await handler.handle(resolver, resolver)
+    await handler.handle(resolver, [resolver])
     assert.deepEqual(await resolver.make('args'), ['invoked'])
   })
 

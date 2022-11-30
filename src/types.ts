@@ -128,14 +128,22 @@ export type ContainerOptions = {
   }
 }
 
+/**
+ * The shape of the function that imports a module expression and runs
+ * it using the container
+ */
 export type ModuleCallable<T, Args extends any[]> = T extends undefined
-  ? (resolver: ContainerResolver<any> | Container<any>, ...args: Args) => Promise<any>
-  : (...args: Args) => Promise<any>
+  ? (resolver: ContainerResolver<any> | Container<any>, args: Args) => Promise<any>
+  : (args: Args) => Promise<any>
 
+/**
+ * The shape of the handle method objects that imports a module expression
+ * and runs it using the container
+ */
 export type ModuleHandler<T, Args extends any[]> = T extends undefined
   ? {
-      handle(resolver: ContainerResolver<any> | Container<any>, ...args: Args): Promise<any>
+      handle(resolver: ContainerResolver<any> | Container<any>, args: Args): Promise<any>
     }
   : {
-      handle(...args: Args): Promise<any>
+      handle(args: Args): Promise<any>
     }

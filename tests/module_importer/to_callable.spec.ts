@@ -49,7 +49,7 @@ test.group('moduleImporter | toCallable', (group) => {
       container
     )
 
-    await fn(args)
+    await fn([args])
     assert.deepEqual(args, ['invoked'])
   })
 
@@ -73,7 +73,7 @@ test.group('moduleImporter | toCallable', (group) => {
     // @ts-expect-error
     const fn = moduleImporter(() => import('#middleware/silent_auth_v1'), 'handle').toCallable()
 
-    await fn(resolver, resolver)
+    await fn(resolver, [resolver])
     assert.deepEqual(await resolver.make('args'), ['invoked'])
   })
 
@@ -92,7 +92,6 @@ test.group('moduleImporter | toCallable', (group) => {
 
     const args: string[] = []
     const container = new Container()
-    const resolver = container.createResolver()
 
     // @ts-expect-error
     const fn = moduleImporter(() => import('#middleware/silent_auth_v2'), 'handle').toCallable(
@@ -100,7 +99,7 @@ test.group('moduleImporter | toCallable', (group) => {
     )
 
     await assert.rejects(
-      () => fn(resolver, args),
+      () => fn(args),
       'Missing export default from "()=>import(\'#middleware/silent_auth_v2\')" module'
     )
   })

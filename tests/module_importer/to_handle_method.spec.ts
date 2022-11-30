@@ -50,7 +50,7 @@ test.group('moduleImporter | toHandleMethod', (group) => {
       'handle'
     ).toHandleMethod(container)
 
-    await handler.handle(args)
+    await handler.handle([args])
     assert.deepEqual(args, ['invoked'])
   })
 
@@ -77,7 +77,7 @@ test.group('moduleImporter | toHandleMethod', (group) => {
       'handle'
     ).toHandleMethod()
 
-    await handler.handle(resolver, resolver)
+    await handler.handle(resolver, [resolver])
     assert.deepEqual(await resolver.make('args'), ['invoked'])
   })
 
@@ -96,7 +96,6 @@ test.group('moduleImporter | toHandleMethod', (group) => {
 
     const args: string[] = []
     const container = new Container()
-    const resolver = container.createResolver()
 
     const handler = moduleImporter(
       // @ts-expect-error
@@ -105,7 +104,7 @@ test.group('moduleImporter | toHandleMethod', (group) => {
     ).toHandleMethod(container)
 
     await assert.rejects(
-      () => handler.handle(resolver, args),
+      () => handler.handle(args),
       'Missing export default from "()=>import(\'#middleware/silent_auth_v5\')" module'
     )
   })

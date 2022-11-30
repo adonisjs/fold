@@ -503,7 +503,7 @@ const fn = moduleExpression(
 // Later call it
 const container = new Container()
 const resolver = container.createResolver()
-await fn(resolver, ctx)
+await fn(resolver, [ctx])
 ```
 
 You can also pass the container instance at the time of creating the callable function.
@@ -516,7 +516,7 @@ const fn = moduleExpression(
 ).toCallable(container)
 
 // Later call it
-await fn(ctx)
+await fn([ctx])
 ```
 
 ### toHandleMethod
@@ -536,7 +536,7 @@ const handler = moduleExpression(
 // Later call it
 const container = new Container()
 const resolver = container.createResolver()
-await handler.handle(resolver, ctx)
+await handler.handle(resolver, [ctx])
 ```
 
 You can also pass the container instance at the time of creating the handle method.
@@ -550,7 +550,7 @@ const handler = moduleExpression(
 ).toHandleMethod(container)
 
 // Later call it
-await handler.handle(ctx)
+await handler.handle([ctx])
 ```
 
 ### Bechmarks
@@ -579,7 +579,7 @@ const fn = moduleImporter(
 // Later call it
 const container = new Container()
 const resolver = container.createResolver()
-await fn(resolver, ctx)
+await fn(resolver, [ctx])
 ```
 
 Create handle method object
@@ -595,7 +595,7 @@ const handler = moduleImporter(
 // Later call it
 const container = new Container()
 const resolver = container.createResolver()
-await handler.handle(resolver, ctx)
+await handler.handle(resolver, [ctx])
 ```
 
 [gh-workflow-image]: https://img.shields.io/github/workflow/status/adonisjs/fold/test?style=for-the-badge
