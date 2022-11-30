@@ -9,10 +9,10 @@
 
 // @ts-expect-error
 import benchmark from 'benchmark'
+import Thread from '#services/thread'
 import { Container } from '../index.js'
 import { resolveDefault } from '../src/helpers.js'
 import { moduleExpression } from '../src/module_expression.js'
-import Thread from '#services/thread'
 
 const suite = new benchmark.Suite()
 
@@ -49,13 +49,13 @@ suite
   .add('handler', {
     defer: true,
     fn: (deferred: any) => {
-      handler.handle(container).then(() => deferred.resolve())
+      handler.handle(container, []).then(() => deferred.resolve())
     },
   })
   .add('callable', {
     defer: true,
     fn: (deferred: any) => {
-      fn(container).then(() => deferred.resolve())
+      fn(container, []).then(() => deferred.resolve())
     },
   })
   .add('native dynamic', {
