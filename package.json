@@ -21,7 +21,7 @@
   "scripts": {
     "pretest": "npm run lint",
     "vscode:test": "node --loader=ts-node/esm --experimental-import-meta-resolve bin/test.ts",
-    "test": "NODE_DEBUG=adonisjs:fold c8 npm run vscode:test",
+    "test": "cross-env NODE_DEBUG=adonisjs:fold c8 npm run vscode:test",
     "clean": "del-cli build",
     "benchmark": "npm run build && node --experimental-import-meta-resolve build/benchmark/module_expression.js && node --experimental-import-meta-resolve build/benchmark/module_importer.js",
     "compile": "npm run lint && npm run clean && tsc",
@@ -55,6 +55,7 @@
     "@types/node": "^18.11.9",
     "benchmark": "^2.1.4",
     "c8": "^7.12.0",
+    "cross-env": "^7.0.3",
     "del-cli": "^5.0.0",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
