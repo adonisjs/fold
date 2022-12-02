@@ -49,7 +49,7 @@ export async function resolveDefault(importPath: string, parentURL: URL | string
    * Make sure a default export exists
    */
   if (!moduleExports.default) {
-    throw new MissingDefaultExportException(`Missing export default from "${importPath}" module`, {
+    throw new RuntimeException(`Missing export default from "${importPath}" module`, {
       cause: {
         source: resolvedPath,
       },
