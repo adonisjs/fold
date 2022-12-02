@@ -23,6 +23,7 @@ import type {
 import { isClass } from './helpers.js'
 import { ContainerResolver } from './resolver.js'
 import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exception.js'
+import debug from './debug.js'
 
 /**
  * The container class exposes the API to register bindings, values
@@ -202,6 +203,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
       throw new InvalidBindingKeyException()
     }
 
+    debug('adding binding to container "%O"', binding)
     this.#bindings.set(binding, { resolver, isSingleton: false })
   }
 
@@ -232,6 +234,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
       throw new InvalidBindingKeyException()
     }
 
+    debug('adding value to container "%O"', binding)
     this.#bindingValues.set(binding, value)
   }
 
@@ -278,6 +281,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
       throw new InvalidBindingKeyException()
     }
 
+    debug('adding singleton to container "%O"', binding)
     this.#bindings.set(binding, { resolver, isSingleton: true })
   }
 
@@ -307,6 +311,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
       throw new InvalidBindingKeyException()
     }
 
+    debug('defining swap for "%O"', binding)
     this.#swaps.set(binding, resolver)
   }
 
@@ -317,6 +322,8 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
       throw new InvalidBindingKeyException()
     }
+
+    debug('removing swap for "%s"', binding)
     this.#swaps.delete(binding)
   }
 
@@ -326,6 +333,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
    */
   restoreAll(bindings?: (keyof KnownBindings | Constructor<any>)[]) {
     if (!bindings) {
+      debug('removing all swaps')
       this.#swaps.clear()
       return
     }

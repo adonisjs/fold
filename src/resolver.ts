@@ -21,6 +21,7 @@ import type {
   ContainerOptions,
   InspectableConstructor,
 } from './types.js'
+import debug from './debug.js'
 import { isClass } from './helpers.js'
 import { containerProvider } from './provider.js'
 import { MethodNotFoundException } from './exceptions/method_not_found_exception.js'
@@ -105,10 +106,11 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
    * Notify emitter
    */
   #emit(binding: string | symbol | Constructor<any>, value: any) {
+    debug('resolved from container. binding :%O, resolved value :%O', binding, value)
+
     if (!this.#options.emitter) {
       return
     }
-
     this.#options.emitter.emit('container:resolve', { binding, value })
   }
 
@@ -309,6 +311,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
       throw new InvalidBindingKeyException()
     }
 
+    debug('adding value to resolver "%O"', binding)
     this.#bindingValues.set(binding, value)
   }
 }

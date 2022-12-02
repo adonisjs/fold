@@ -49,7 +49,7 @@ test.group('moduleImporter | toCallable', (group) => {
       container
     )
 
-    await fn([args])
+    await fn(args)
     assert.deepEqual(args, ['invoked'])
   })
 
@@ -73,7 +73,7 @@ test.group('moduleImporter | toCallable', (group) => {
     // @ts-expect-error
     const fn = moduleImporter(() => import('#middleware/silent_auth_v1'), 'handle').toCallable()
 
-    await fn(resolver, [resolver])
+    await fn(resolver, resolver)
     assert.deepEqual(await resolver.make('args'), ['invoked'])
   })
 

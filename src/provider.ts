@@ -7,6 +7,7 @@
  * file that was distributed with this source code.
  */
 
+import debug from './debug.js'
 import { inspect } from 'node:util'
 import string from '@poppinss/utils/string'
 import { ContainerResolver } from './resolver.js'
@@ -43,6 +44,21 @@ export async function containerProvider(
    * values and fill undefined slots with container lookup
    */
   if (values.length > injections.length) {
+    if (debug.enabled) {
+      debug(
+        'created resolver plan. target: "[class %s]", property: "%s", injections: %O',
+        binding.name,
+        property,
+        values.map((value, index) => {
+          if (value !== undefined) {
+            return value
+          }
+
+          return injections[index]
+        })
+      )
+    }
+
     return Promise.all(
       values.map((value, index) => {
         if (value !== undefined) {
@@ -65,6 +81,21 @@ export async function containerProvider(
    * Otherwise, we go through the injections, giving
    * priority to the runtime values for a given index.
    */
+  if (debug.enabled) {
+    debug(
+      'created resolver plan. target: "[class %s]", property: "%s", injections: %O',
+      binding.name,
+      property,
+      injections.map((injection, index) => {
+        if (values[index] !== undefined) {
+          return values[index]
+        }
+
+        return injection
+      })
+    )
+  }
+
   return Promise.all(
     injections.map((injection, index) => {
       if (values[index] !== undefined) {

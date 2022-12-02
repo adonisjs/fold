@@ -46,7 +46,7 @@ test.group('moduleExpression | toCallable', (group) => {
       container
     )
 
-    await fn([args])
+    await fn(args)
     assert.deepEqual(args, ['invoked'])
   })
 
@@ -68,7 +68,7 @@ test.group('moduleExpression | toCallable', (group) => {
     resolver.bindValue('args', [])
     const fn = moduleExpression('#controllers/auth/admin_controller', import.meta.url).toCallable()
 
-    await fn(resolver, [resolver])
+    await fn(resolver, resolver)
     assert.deepEqual(await resolver.make('args'), ['invoked'])
   })
 
