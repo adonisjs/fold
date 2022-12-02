@@ -441,21 +441,6 @@ class UsersController {
 }
 ```
 
-### E_METHOD_NOT_FOUND
-The exception is raised when you are trying to invoke a method on a class instance and the method does not exist. For example:
-
-```ts
-class UserService {}
-
-const service = await container.make(UserService)
-
-// Exception raised. Missing method "find" on "UserService {}"
-await container.call(service, 'find')
-```
-
-### E_MISSING_DEFAULT_EXPORT
-The exception is raised when a dynamically imported module using `makeImportProvider` method is missing `export default`.
-
 ## Module expressions
 In AdonisJS, we allow binding methods in form of string based module expression. For example:
 

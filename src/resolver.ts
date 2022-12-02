@@ -8,7 +8,7 @@
  */
 
 import { inspect } from 'node:util'
-import string from '@poppinss/utils/string'
+import { RuntimeException } from '@poppinss/utils'
 
 import type {
   Make,
@@ -24,7 +24,6 @@ import type {
 import debug from './debug.js'
 import { isClass } from './helpers.js'
 import { containerProvider } from './provider.js'
-import { MethodNotFoundException } from './exceptions/method_not_found_exception.js'
 import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exception.js'
 
 /**
@@ -275,9 +274,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
     runtimeValues?: any[]
   ): Promise<ReturnType<Value[Method]>> {
     if (typeof value[method] !== 'function') {
-      throw new MethodNotFoundException(
-        string.interpolate(MethodNotFoundException.message, { method, object: inspect(value) })
-      )
+      throw new RuntimeException(`Missing method "${String(method)}" on "${inspect(value)}"`)
     }
 
     const dependencies = await containerProvider(value.constructor, method, this, runtimeValues)

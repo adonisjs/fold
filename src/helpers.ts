@@ -8,7 +8,7 @@
  */
 
 import type { Constructor } from './types.js'
-import { MissingDefaultExportException } from './exceptions/missing_default_export_exception.js'
+import { RuntimeException } from '@poppinss/utils'
 
 /**
  * Type guard and check if value is a class constructor. Plain old
@@ -28,7 +28,7 @@ export async function importDefault(importFn: () => Promise<{ default: any }>) {
    * Make sure a default export exists
    */
   if (!moduleExports.default) {
-    throw new MissingDefaultExportException(`Missing export default from "${importFn}" module`, {
+    throw new RuntimeException(`Missing export default from "${importFn}" module`, {
       cause: {
         source: importFn,
       },
