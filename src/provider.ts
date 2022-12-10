@@ -72,7 +72,7 @@ export async function containerProvider(
           )
         }
 
-        return resolver.make(injection)
+        return resolver.resolveFor(binding, injection)
       })
     )
   }
@@ -108,7 +108,7 @@ export async function containerProvider(
         )
       }
 
-      return resolver.make(injection)
+      return resolver.resolveFor(binding, injection)
     })
   )
 }

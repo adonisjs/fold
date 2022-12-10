@@ -20,6 +20,8 @@ import type {
   ExtractFunctions,
   ContainerOptions,
   InspectableConstructor,
+  BindingResolver,
+  AbstractConstructor,
 } from './types.js'
 import debug from './debug.js'
 import { isClass } from './helpers.js'
@@ -40,6 +42,14 @@ import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exc
  * ```
  */
 export class ContainerResolver<KnownBindings extends Record<any, any> = Record<any, any>> {
+  /**
+   * Pre-registered contextual bindings. They are shared between the container
+   * and resolver.
+   *
+   * We do not mutate this property within the resolver
+   */
+  #containerContextualBindings: Map<Constructor<any>, Bindings>
+
   /**
    * Pre-registered bindings. They are shared between the container
    * and resolver.
@@ -68,7 +78,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
   /**
    * Reference to the container hooks
    */
-  #containerHooks: Hooks = new Map()
+  #containerHooks: Hooks
 
   /**
    * Binding values local to the resolver
@@ -86,6 +96,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
       bindingValues: BindingValues
       swaps: Swaps
       hooks: Hooks
+      contextualBindings: Map<Constructor<any>, Bindings>
     },
     options: ContainerOptions
   ) {
@@ -93,6 +104,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
     this.#containerBindingValues = container.bindingValues
     this.#containerSwaps = container.swaps
     this.#containerHooks = container.hooks
+    this.#containerContextualBindings = container.contextualBindings
     this.#options = options
   }
 
@@ -104,9 +116,30 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
   }
 
   /**
+   * Returns the binding resolver for a parent and a binding. Returns
+   * undefined when no contextual binding exists
+   */
+  #getBindingResolver(
+    parent: Constructor<any>,
+    binding: string | symbol | Constructor<any> | AbstractConstructor<any>
+  ): BindingResolver<KnownBindings, any> | undefined {
+    const parentBindings = this.#containerContextualBindings.get(parent)
+    if (!parentBindings) {
+      return
+    }
+
+    const bindingResolver = parentBindings.get(binding)
+    if (!bindingResolver) {
+      return
+    }
+
+    return bindingResolver.resolver
+  }
+
+  /**
    * Notify emitter
    */
-  #emit(binding: string | symbol | Constructor<any>, value: any) {
+  #emit(binding: string | symbol | Constructor<any> | AbstractConstructor<any>, value: any) {
     debug('resolved from container. binding :%O, resolved value :%O', binding, value)
 
     if (!this.#options.emitter) {
@@ -118,7 +151,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
   /**
    * Execute hooks for a given binding
    */
-  async #execHooks(binding: string | symbol | Constructor<any>, value: any) {
+  async #execHooks(
+    binding: string | symbol | Constructor<any> | AbstractConstructor<any>,
+    value: any
+  ) {
     const callbacks = this.#containerHooks.get(binding)
     if (!callbacks || callbacks.size === 0) {
       return
@@ -134,7 +170,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
-  hasBinding(binding: string | symbol | Constructor<any>): boolean {
+  hasBinding(binding: string | symbol | Constructor<any> | AbstractConstructor<any>): boolean {
     return (
       this.#bindingValues.has(binding) ||
       this.#containerBindingValues.has(binding) ||
@@ -147,30 +183,22 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
-  hasAllBindings(bindings: (string | symbol | Constructor<any>)[]): boolean {
+  hasAllBindings(
+    bindings: (string | symbol | Constructor<any> | AbstractConstructor<any>)[]
+  ): boolean {
     return bindings.every((binding) => this.hasBinding(binding))
   }
 
   /**
-   * Resolves the binding or constructor a class instance as follows.
-   *
-   * - Resolve the binding from the values (if registered)
-   * - Resolve the binding from the bindings (if registered)
-   * - If binding is a class, then create a instance of it. The constructor
-   *   dependencies are further resolved as well.
-   * - All other values are returned as it is.
-   *
-   * ```ts
-   * await resolver.make('route')
-   * await resolver.make(Database)
-   * ```
+   * Resolves binding in context of a parent. The method is same as
+   * the "make" method, but instead takes a parent class
+   * constructor.
    */
-  make<Binding extends keyof KnownBindings>(
+  async resolveFor<Binding>(
+    parent: unknown,
     binding: Binding,
     runtimeValues?: any[]
-  ): Promise<Binding extends string | symbol ? KnownBindings[Binding] : Make<Binding>>
-  make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>>
-  async make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>> {
+  ): Promise<Make<Binding>> {
     const isAClass = isClass<Binding>(binding)
 
     /**
@@ -190,6 +218,23 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
 
       await this.#execHooks(binding, value)
       this.#emit(binding, value)
+      return value
+    }
+
+    /**
+     * Resolving contextual binding with the highest priority
+     * after fakes.
+     */
+    const contextualResolver = isClass(parent)
+      ? this.#getBindingResolver(parent, binding)
+      : undefined
+
+    if (contextualResolver) {
+      const value = await contextualResolver(this, runtimeValues)
+
+      await this.#execHooks(binding, value)
+      this.#emit(binding, value)
+
       return value
     }
 
@@ -262,6 +307,29 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
   }
 
   /**
+   * Resolves the binding or constructor a class instance as follows.
+   *
+   * - Resolve the binding from the values (if registered)
+   * - Resolve the binding from the bindings (if registered)
+   * - If binding is a class, then create a instance of it. The constructor
+   *   dependencies are further resolved as well.
+   * - All other values are returned as it is.
+   *
+   * ```ts
+   * await resolver.make('route')
+   * await resolver.make(Database)
+   * ```
+   */
+  make<Binding extends keyof KnownBindings>(
+    binding: Binding,
+    runtimeValues?: any[]
+  ): Promise<Binding extends string | symbol ? KnownBindings[Binding] : Make<Binding>>
+  make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>>
+  async make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>> {
+    return this.resolveFor(null, binding, runtimeValues)
+  }
+
+  /**
    * Call a method on an object by injecting its dependencies. The method
    * dependencies are resolved in the same manner as a class constructor
    * dependencies.
@@ -297,7 +365,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
     binding: Binding extends string | symbol ? Binding : never,
     value: KnownBindings[Binding]
   ): void
-  bindValue<Binding extends Constructor<any>>(binding: Binding, value: InstanceType<Binding>): void
+  bindValue<Binding extends Constructor<any> | AbstractConstructor<any>>(
+    binding: Binding,
+    value: InstanceType<Binding>
+  ): void
   bindValue<Binding>(
     binding: Binding,
     value: Binding extends Constructor<infer A>

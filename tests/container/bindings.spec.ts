@@ -367,3 +367,41 @@ test.group('Container | Binding values', () => {
     assert.isFalse(container.hasAllBindings([Route, 'db', routeSymbol]))
   })
 })
+
+test.group('Container | Contextual Bindings', () => {
+  test('raise error when "provide" method is called before "asksFor" method', async ({
+    assert,
+  }) => {
+    const container = new Container()
+    class Route {}
+
+    assert.throws(
+      () => container.when(Route).provide(() => {}),
+      'Missing value for contextual binding. Call "asksFor" method before calling the "provide" method'
+    )
+  })
+
+  test('disallow contextual bindings on anything other than classes', async ({ assert }) => {
+    const container = new Container()
+    class Hash {}
+    class Route {}
+
+    assert.throws(
+      // @ts-expect-error
+      () => container.contextualBinding('route', 'hash', () => {}),
+      'The binding value for contextual binding should be class'
+    )
+
+    assert.throws(
+      // @ts-expect-error
+      () => container.contextualBinding('route', Hash, () => {}),
+      'The parent value for contextual binding should be class'
+    )
+
+    assert.throws(
+      // @ts-expect-error
+      () => container.contextualBinding(Route, 'hash', () => {}),
+      'The binding value for contextual binding should be class'
+    )
+  })
+})

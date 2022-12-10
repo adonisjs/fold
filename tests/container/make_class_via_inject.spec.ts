@@ -4,6 +4,7 @@ import { EventEmitter } from 'node:events'
 import { expectTypeOf } from 'expect-type'
 import { Container } from '../../src/container.js'
 import { inject } from '../../src/decorators/inject.js'
+import type { BindingResolver } from '../../src/types.js'
 
 test.group('Container | Make class via inject', () => {
   test('inject constructor dependencies using @inject', async ({ assert }) => {
@@ -218,5 +219,210 @@ test.group('Container | Make class via inject', () => {
       () => container.make(UserService),
       'Cannot inject "[Function: Object]". The value cannot be constructed'
     )
+  })
+})
+
+test.group('Container | Make class with contextual bindings', () => {
+  test('resolve contextual bindings for a class constructor', async ({ assert }) => {
+    const container = new Container()
+
+    abstract class Hash {
+      abstract make(value: string): string
+    }
+
+    @inject()
+    class UsersController {
+      constructor(public hash: Hash) {}
+    }
+
+    class Argon2 {
+      make(value: string): string {
+        return value.toUpperCase()
+      }
+    }
+
+    const builder = container.when(UsersController).asksFor(Hash)
+    builder.provide(() => {
+      return new Argon2()
+    })
+
+    expectTypeOf(builder.provide).parameters.toEqualTypeOf<[BindingResolver<any, Hash>]>()
+    expectTypeOf(container.contextualBinding<typeof Hash>)
+      .parameter(2)
+      .toEqualTypeOf<BindingResolver<any, Hash>>()
+
+    const controller = await container.make(UsersController)
+    expectTypeOf(controller).toEqualTypeOf<UsersController>()
+    assert.instanceOf(controller.hash, Argon2)
+  })
+
+  test('do not resolve contextual binding when parent is registered as a binding to the container', async ({
+    assert,
+  }) => {
+    const container = new Container()
+
+    abstract class Hash {
+      abstract make(value: string): string
+    }
+
+    class BaseHasher extends Hash {
+      make(value: string): string {
+        return value.toUpperCase()
+      }
+    }
+
+    @inject()
+    class UsersController {
+      constructor(public hash: Hash) {}
+    }
+
+    class Argon2 {
+      make(value: string): string {
+        return value.toUpperCase()
+      }
+    }
+
+    const builder = container.when(UsersController).asksFor(Hash)
+    builder.provide(() => {
+      return new Argon2()
+    })
+
+    expectTypeOf(builder.provide).parameters.toEqualTypeOf<[BindingResolver<any, Hash>]>()
+    expectTypeOf(container.contextualBinding<typeof Hash>)
+      .parameter(2)
+      .toEqualTypeOf<BindingResolver<any, Hash>>()
+
+    /**
+     * As soon as a binding for the class is defined, the binding
+     * callback will be source of truth.
+     *
+     * Contextual bindings are used when container performs constructor
+     * building
+     */
+    container.bind(UsersController, () => {
+      return new UsersController(new BaseHasher())
+    })
+
+    const controller = await container.make(UsersController)
+    expectTypeOf(controller).toEqualTypeOf<UsersController>()
+    assert.instanceOf(controller.hash, BaseHasher)
+  })
+
+  test('given preference to contextual binding when binding is also registered to the container', async ({
+    assert,
+  }) => {
+    const container = new Container()
+
+    abstract class Hash {
+      abstract make(value: string): string
+    }
+
+    @inject()
+    class UsersController {
+      constructor(public hash: Hash) {}
+    }
+
+    class Argon2 {
+      make(value: string): string {
+        return value.toUpperCase()
+      }
+    }
+
+    class Bcrypt {
+      make(value: string): string {
+        return value.toUpperCase()
+      }
+    }
+
+    const builder = container.when(UsersController).asksFor(Hash)
+    builder.provide(() => {
+      return new Argon2()
+    })
+
+    expectTypeOf(builder.provide).parameters.toEqualTypeOf<[BindingResolver<any, Hash>]>()
+    expectTypeOf(container.contextualBinding<typeof Hash>)
+      .parameter(2)
+      .toEqualTypeOf<BindingResolver<any, Hash>>()
+
+    /**
+     * When the binding is registered in the container, we consider
+     * it as the default value.
+     *
+     * Therefore, the contextual binding takes preference over it.
+     */
+    container.bind(Hash, () => {
+      return new Bcrypt()
+    })
+
+    const controller = await container.make(UsersController)
+    expectTypeOf(controller).toEqualTypeOf<UsersController>()
+    assert.instanceOf(controller.hash, Argon2)
+  })
+
+  test('re-use container to resolve the same binding', async ({ assert }) => {
+    const container = new Container()
+
+    abstract class Hash {
+      abstract make(value: string): string
+    }
+
+    class BaseHasher extends Hash {
+      make(value: string): string {
+        return value.toUpperCase()
+      }
+    }
+
+    @inject()
+    class UsersController {
+      constructor(public hash: Hash) {}
+    }
+
+    container.bind(Hash, () => new BaseHasher())
+
+    const builder = container.when(UsersController).asksFor(Hash)
+    builder.provide((resolver) => {
+      return resolver.make(Hash)
+    })
+
+    expectTypeOf(builder.provide).parameters.toEqualTypeOf<[BindingResolver<any, Hash>]>()
+    expectTypeOf(container.contextualBinding<typeof Hash>)
+      .parameter(2)
+      .toEqualTypeOf<BindingResolver<any, Hash>>()
+
+    const controller = await container.make(UsersController)
+    expectTypeOf(controller).toEqualTypeOf<UsersController>()
+
+    assert.instanceOf(controller.hash, BaseHasher)
+  })
+
+  test('handle case when class has a contextual binding but not for the current binding', async ({
+    assert,
+  }) => {
+    const container = new Container()
+
+    class Foo {}
+
+    abstract class Hash {
+      abstract make(value: string): string
+    }
+
+    @inject()
+    class UsersController {
+      constructor(public hash: Hash) {}
+    }
+
+    const builder = container.when(UsersController).asksFor(Foo)
+    builder.provide(() => {
+      return new Foo()
+    })
+
+    expectTypeOf(builder.provide).parameters.toEqualTypeOf<[BindingResolver<any, Foo>]>()
+    expectTypeOf(container.contextualBinding<typeof Hash>)
+      .parameter(2)
+      .toEqualTypeOf<BindingResolver<any, Hash>>()
+
+    const controller = await container.make(UsersController)
+    expectTypeOf(controller).toEqualTypeOf<UsersController>()
+    assert.instanceOf(controller.hash, Hash)
   })
 })

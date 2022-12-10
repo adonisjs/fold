@@ -264,6 +264,44 @@ resolver.bindValue(Request, req)
 await resolve.make(SomeClass)
 ```
 
+## Contextual bindings
+Contextual bindings allows you to register custom dependency resolvers on a given class for a specific dependency. You will be mostly using contextual bindings with driver based implementations.
+
+For example: You have a `UserService` and a `BlogService` and both of them needs an instance of the Drive disk to write and read files. You want to the `UserService` to use the local disk driver and `BlogService` to use `S3DiskDriver`.
+
+> **Note**
+> Contextual bindings can be defined for class constructors and not for container bindngs
+
+```ts
+import { Disk } from '@adonisjs/core/driver'
+
+class UserService {
+  constructor(disk: Disk) {}
+}
+```
+
+```ts
+import { Disk } from '@adonisjs/core/driver'
+
+class BlogService {
+  constructor(disk: Disk) {}
+}
+```
+
+Now, let's use contextual bindings to tell the container that when `UserService` needs the `Disk` class, provide it the local driver disk.
+
+```ts
+container
+  .when(BlogService)
+  .asksFor(Disk)
+  .provide(() => drive.use('s3'))
+
+container
+  .when(UserService)
+  .asksFor(Disk)
+  .provide(() => drive.use('local'))
+```
+
 ## Swapping implementations
 When using the container to resolve a tree of dependencies, quite often you will have no control over the construction of a class and therefore you will be not able to swap/fake its dependencies when writing tests.
 

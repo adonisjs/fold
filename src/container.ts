@@ -7,6 +7,8 @@
  * file that was distributed with this source code.
  */
 
+import { RuntimeException } from '@poppinss/utils'
+
 import type {
   Make,
   Hooks,
@@ -19,11 +21,14 @@ import type {
   BindingResolver,
   ExtractFunctions,
   ContainerOptions,
+  AbstractConstructor,
 } from './types.js'
+
+import debug from './debug.js'
 import { isClass } from './helpers.js'
 import { ContainerResolver } from './resolver.js'
 import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exception.js'
-import debug from './debug.js'
+import { ContextBindingsBuilder } from './contextual_bindings_builder.js'
 
 /**
  * The container class exposes the API to register bindings, values
@@ -44,6 +49,12 @@ import debug from './debug.js'
  * ```
  */
 export class Container<KnownBindings extends Record<any, any> = Record<any, any>> {
+  /**
+   * Contextual bindings are same as binding, but instead defined
+   * for a parent class constructor.
+   */
+  #contextualBindings: Map<Constructor<any>, Bindings> = new Map()
+
   /**
    * A collection of bindings with registered swapped implementations
    */
@@ -97,6 +108,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
         bindingValues: this.#bindingValues,
         swaps: this.#swaps,
         hooks: this.#hooks,
+        contextualBindings: this.#contextualBindings,
       },
       this.#options
     )
@@ -107,7 +119,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
-  hasBinding(binding: string | symbol | Constructor<any>): boolean {
+  hasBinding(binding: string | symbol | Constructor<any> | AbstractConstructor<any>): boolean {
     return this.#bindingValues.has(binding) || this.#bindings.has(binding)
   }
 
@@ -116,7 +128,9 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
-  hasAllBindings(bindings: (string | symbol | Constructor<any>)[]): boolean {
+  hasAllBindings(
+    bindings: (string | symbol | Constructor<any> | AbstractConstructor<any>)[]
+  ): boolean {
     return bindings.every((binding) => this.hasBinding(binding))
   }
 
@@ -186,7 +200,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding extends string | symbol ? Binding : never,
     resolver: BindingResolver<KnownBindings, KnownBindings[Binding]>
   ): void
-  bind<Binding extends Constructor<any>>(
+  bind<Binding extends Constructor<any> | AbstractConstructor<any>>(
     binding: Binding,
     resolver: BindingResolver<KnownBindings, InstanceType<Binding>>
   ): void
@@ -223,7 +237,10 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding extends string | symbol ? Binding : never,
     value: KnownBindings[Binding]
   ): void
-  bindValue<Binding extends Constructor<any>>(binding: Binding, value: InstanceType<Binding>): void
+  bindValue<Binding extends Constructor<any> | AbstractConstructor<any>>(
+    binding: Binding,
+    value: InstanceType<Binding>
+  ): void
   bindValue<Binding>(
     binding: Binding,
     value: Binding extends Constructor<infer A>
@@ -264,7 +281,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding extends string | symbol ? Binding : never,
     resolver: BindingResolver<KnownBindings, KnownBindings[Binding]>
   ): void
-  singleton<Binding extends Constructor<any>>(
+  singleton<Binding extends Constructor<any> | AbstractConstructor<any>>(
     binding: Binding,
     resolver: BindingResolver<KnownBindings, InstanceType<Binding>>
   ): void
@@ -287,6 +304,11 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     this.#bindings.set(binding, { resolver, isSingleton: true })
   }
 
+  /**
+   * Define a fake implementation for a binding or a class constructor.
+   * Fakes have the highest priority when resolving dependencies
+   * from the container.
+   */
   swap<Binding extends keyof KnownBindings>(
     /**
      * Need to narrow down the "Binding" for the case where "KnownBindings" are <any, any>
@@ -294,7 +316,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding extends string | symbol ? Binding : never,
     resolver: BindingResolver<KnownBindings, KnownBindings[Binding]>
   ): void
-  swap<Binding extends Constructor<any>>(
+  swap<Binding extends Constructor<any> | AbstractConstructor<any>>(
     binding: Binding,
     resolver: BindingResolver<KnownBindings, InstanceType<Binding>>
   ): void
@@ -320,7 +342,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
   /**
    * Restore binding by removing its swap
    */
-  restore(binding: keyof KnownBindings | Constructor<any>) {
+  restore(binding: keyof KnownBindings | Constructor<any> | AbstractConstructor<any>) {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
       throw new InvalidBindingKeyException()
     }
@@ -333,7 +355,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
    * Restore mentioned or all bindings by removing
    * their swaps
    */
-  restoreAll(bindings?: (keyof KnownBindings | Constructor<any>)[]) {
+  restoreAll(bindings?: (keyof KnownBindings | Constructor<any> | AbstractConstructor<any>)[]) {
     if (!bindings) {
       debug('removing all swaps')
       this.#swaps.clear()
@@ -362,7 +384,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding extends string | symbol ? Binding : never,
     callback: HookCallback<KnownBindings, KnownBindings[Binding]>
   ): void
-  resolving<Binding extends Constructor<any>>(
+  resolving<Binding extends Constructor<any> | AbstractConstructor<any>>(
     binding: Binding,
     callback: HookCallback<KnownBindings, InstanceType<Binding>>
   ): void
@@ -380,5 +402,49 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
 
     const callbacks = this.#hooks.get(binding)!
     callbacks.add(callback)
+  }
+
+  /**
+   * Create a contextual builder to define contextual bindings
+   */
+  when(
+    parent: Constructor<any>
+  ): ContextBindingsBuilder<KnownBindings, Constructor<any> | AbstractConstructor<any>> {
+    return new ContextBindingsBuilder(parent, this)
+  }
+
+  /**
+   * Add a contextual binding for a given class constructor. A
+   * contextual takes a parent, parent's dependency and a callback
+   * to self resolve the dependency.
+   *
+   * For example:
+   * - When "UsersController"
+   * - Asks for "Hash class"
+   * - Provide "Argon2" implementation
+   */
+  contextualBinding<Binding extends Constructor<any> | AbstractConstructor<any>>(
+    parent: Constructor<any>,
+    binding: Binding,
+    resolver: BindingResolver<KnownBindings, Make<Binding>>
+  ): void {
+    if (!isClass(binding)) {
+      throw new RuntimeException('The binding value for contextual binding should be class')
+    }
+    if (!isClass(parent)) {
+      throw new RuntimeException('The parent value for contextual binding should be class')
+    }
+
+    debug('adding contextual binding "%O" to "%O"', binding, parent)
+
+    /**
+     * Create map for the parent if doesn't already exists
+     */
+    if (!this.#contextualBindings.has(parent)) {
+      this.#contextualBindings.set(parent, new Map())
+    }
+
+    const parentBindings = this.#contextualBindings.get(parent)!
+    parentBindings.set(binding, { resolver, isSingleton: false })
   }
 }

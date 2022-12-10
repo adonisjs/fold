@@ -24,6 +24,7 @@ function initiateContainerInjections(target: any, method: string | symbol) {
  */
 function defineConstructorInjections(target: any) {
   const params = Reflect.getMetadata('design:paramtypes', target)
+  /* c8 ignore next 3 */
   if (!params) {
     return
   }
@@ -40,6 +41,7 @@ function defineConstructorInjections(target: any) {
 function defineMethodInjections(target: any, method: string | symbol) {
   const constructor = target.constructor
   const params = Reflect.getMetadata('design:paramtypes', target, method)
+  /* c8 ignore next 3 */
   if (!params) {
     return
   }

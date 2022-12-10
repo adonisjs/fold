@@ -13,6 +13,7 @@ import { expectTypeOf } from 'expect-type'
 
 import { inject } from '../../index.js'
 import { Container } from '../../src/container.js'
+import type { BindingResolver } from '../../src/types.js'
 
 test.group('Container | swap', () => {
   test('swap a class implementation', async ({ assert }) => {
@@ -236,5 +237,46 @@ test.group('Container | swap', () => {
 
     assert.instanceOf(route3, Route)
     assert.notInstanceOf(route3, FakedRoute)
+  })
+
+  test('use swap over contextual binding', async ({ assert }) => {
+    const container = new Container()
+
+    abstract class Hash {
+      abstract make(value: string): string
+    }
+
+    class Argon2 {
+      make(value: string): string {
+        return value.toUpperCase()
+      }
+    }
+
+    class FakedHash {
+      make(_: string): string {
+        return 'fake'
+      }
+    }
+
+    @inject()
+    class UsersController {
+      constructor(public hash: Hash) {}
+    }
+
+    container.contextualBinding(UsersController, Hash, () => {
+      return new Argon2()
+    })
+    container.swap(Hash, () => {
+      return new FakedHash()
+    })
+
+    expectTypeOf(container.contextualBinding<typeof Hash>)
+      .parameter(2)
+      .toEqualTypeOf<BindingResolver<any, Hash>>()
+
+    const controller = await container.make(UsersController)
+    expectTypeOf(controller).toEqualTypeOf<UsersController>()
+    assert.instanceOf(controller.hash, FakedHash)
+    assert.equal(controller.hash.make('foo'), 'fake')
   })
 })

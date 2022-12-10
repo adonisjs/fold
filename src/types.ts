@@ -23,6 +23,11 @@ export type ExtractFunctions<T> = {
 export type Constructor<T> = new (...args: any[]) => T
 
 /**
+ * Shape of a abstract class constructor
+ */
+export type AbstractConstructor<T> = abstract new (...args: any[]) => T
+
+/**
  * Shape of a class constructor with injections
  */
 export type InspectableConstructor = Function & {
@@ -33,12 +38,16 @@ export type InspectableConstructor = Function & {
 /**
  * Returns the inferred value for the make method
  */
-export type Make<T> = T extends Constructor<infer A> ? A : T
+export type Make<T> = T extends Constructor<infer A>
+  ? A
+  : T extends AbstractConstructor<infer B>
+  ? B
+  : T
 
 /**
  * Accepted values for the binding key
  */
-export type BindingKey = string | symbol | Constructor<any>
+export type BindingKey = string | symbol | Constructor<any> | AbstractConstructor<any>
 
 /**
  * Shape of the binding resolver
