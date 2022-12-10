@@ -38,16 +38,12 @@ export type InspectableConstructor = Function & {
 /**
  * Returns the inferred value for the make method
  */
-export type Make<T> = T extends Constructor<infer A>
-  ? A
-  : T extends AbstractConstructor<infer B>
-  ? B
-  : T
+export type Make<T> = T extends AbstractConstructor<infer A> ? A : T
 
 /**
  * Accepted values for the binding key
  */
-export type BindingKey = string | symbol | Constructor<any> | AbstractConstructor<any>
+export type BindingKey = string | symbol | AbstractConstructor<any>
 
 /**
  * Shape of the binding resolver
@@ -82,7 +78,7 @@ export type BindingValues = Map<BindingKey, any>
  */
 export type ContainerResolveEventData<KnownBindings> =
   | {
-      binding: Constructor<unknown>
+      binding: AbstractConstructor<unknown>
       value: unknown
     }
   | {

@@ -48,7 +48,7 @@ import { ContextBindingsBuilder } from './contextual_bindings_builder.js'
  * await container.make(CLASS_CONSTRUCTOR)
  * ```
  */
-export class Container<KnownBindings extends Record<any, any> = Record<any, any>> {
+export class Container<KnownBindings extends Record<any, any>> {
   /**
    * Contextual bindings are same as binding, but instead defined
    * for a parent class constructor.
@@ -119,7 +119,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
-  hasBinding(binding: string | symbol | Constructor<any> | AbstractConstructor<any>): boolean {
+  hasBinding(binding: BindingKey): boolean {
     return this.#bindingValues.has(binding) || this.#bindings.has(binding)
   }
 
@@ -128,9 +128,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
-  hasAllBindings(
-    bindings: (string | symbol | Constructor<any> | AbstractConstructor<any>)[]
-  ): boolean {
+  hasAllBindings(bindings: BindingKey[]): boolean {
     return bindings.every((binding) => this.hasBinding(binding))
   }
 
@@ -200,7 +198,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding extends string | symbol ? Binding : never,
     resolver: BindingResolver<KnownBindings, KnownBindings[Binding]>
   ): void
-  bind<Binding extends Constructor<any> | AbstractConstructor<any>>(
+  bind<Binding extends AbstractConstructor<any>>(
     binding: Binding,
     resolver: BindingResolver<KnownBindings, InstanceType<Binding>>
   ): void
@@ -208,7 +206,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding,
     resolver: BindingResolver<
       KnownBindings,
-      Binding extends Constructor<infer A>
+      Binding extends AbstractConstructor<infer A>
         ? A
         : Binding extends keyof KnownBindings
         ? KnownBindings[Binding]
@@ -237,13 +235,13 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding extends string | symbol ? Binding : never,
     value: KnownBindings[Binding]
   ): void
-  bindValue<Binding extends Constructor<any> | AbstractConstructor<any>>(
+  bindValue<Binding extends AbstractConstructor<any>>(
     binding: Binding,
     value: InstanceType<Binding>
   ): void
   bindValue<Binding>(
     binding: Binding,
-    value: Binding extends Constructor<infer A>
+    value: Binding extends AbstractConstructor<infer A>
       ? A
       : Binding extends keyof KnownBindings
       ? KnownBindings[Binding]
@@ -281,7 +279,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding extends string | symbol ? Binding : never,
     resolver: BindingResolver<KnownBindings, KnownBindings[Binding]>
   ): void
-  singleton<Binding extends Constructor<any> | AbstractConstructor<any>>(
+  singleton<Binding extends AbstractConstructor<any>>(
     binding: Binding,
     resolver: BindingResolver<KnownBindings, InstanceType<Binding>>
   ): void
@@ -289,7 +287,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding,
     resolver: BindingResolver<
       KnownBindings,
-      Binding extends Constructor<infer A>
+      Binding extends AbstractConstructor<infer A>
         ? A
         : Binding extends keyof KnownBindings
         ? KnownBindings[Binding]
@@ -316,7 +314,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding extends string | symbol ? Binding : never,
     resolver: BindingResolver<KnownBindings, KnownBindings[Binding]>
   ): void
-  swap<Binding extends Constructor<any> | AbstractConstructor<any>>(
+  swap<Binding extends AbstractConstructor<any>>(
     binding: Binding,
     resolver: BindingResolver<KnownBindings, InstanceType<Binding>>
   ): void
@@ -324,7 +322,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding,
     resolver: BindingResolver<
       KnownBindings,
-      Binding extends Constructor<infer A>
+      Binding extends AbstractConstructor<infer A>
         ? A
         : Binding extends keyof KnownBindings
         ? KnownBindings[Binding]
@@ -342,7 +340,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
   /**
    * Restore binding by removing its swap
    */
-  restore(binding: keyof KnownBindings | Constructor<any> | AbstractConstructor<any>) {
+  restore(binding: keyof KnownBindings | AbstractConstructor<any>) {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
       throw new InvalidBindingKeyException()
     }
@@ -355,7 +353,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
    * Restore mentioned or all bindings by removing
    * their swaps
    */
-  restoreAll(bindings?: (keyof KnownBindings | Constructor<any> | AbstractConstructor<any>)[]) {
+  restoreAll(bindings?: (keyof KnownBindings | AbstractConstructor<any>)[]) {
     if (!bindings) {
       debug('removing all swaps')
       this.#swaps.clear()
@@ -384,13 +382,13 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
     binding: Binding extends string | symbol ? Binding : never,
     callback: HookCallback<KnownBindings, KnownBindings[Binding]>
   ): void
-  resolving<Binding extends Constructor<any> | AbstractConstructor<any>>(
+  resolving<Binding extends AbstractConstructor<any>>(
     binding: Binding,
     callback: HookCallback<KnownBindings, InstanceType<Binding>>
   ): void
   resolving<Binding extends BindingKey>(
     binding: Binding,
-    callback: Binding extends Constructor<infer A>
+    callback: Binding extends AbstractConstructor<infer A>
       ? HookCallback<KnownBindings, A>
       : Binding extends keyof KnownBindings
       ? HookCallback<KnownBindings, KnownBindings[Binding]>
@@ -407,9 +405,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
   /**
    * Create a contextual builder to define contextual bindings
    */
-  when(
-    parent: Constructor<any>
-  ): ContextBindingsBuilder<KnownBindings, Constructor<any> | AbstractConstructor<any>> {
+  when(parent: Constructor<any>): ContextBindingsBuilder<KnownBindings, AbstractConstructor<any>> {
     return new ContextBindingsBuilder(parent, this)
   }
 
@@ -423,7 +419,7 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
    * - Asks for "Hash class"
    * - Provide "Argon2" implementation
    */
-  contextualBinding<Binding extends Constructor<any> | AbstractConstructor<any>>(
+  contextualBinding<Binding extends AbstractConstructor<any>>(
     parent: Constructor<any>,
     binding: Binding,
     resolver: BindingResolver<KnownBindings, Make<Binding>>

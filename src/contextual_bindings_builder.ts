@@ -17,7 +17,7 @@ import type { AbstractConstructor, BindingResolver, Constructor, Make } from './
  */
 export class ContextBindingsBuilder<
   KnownBindings extends Record<any, any>,
-  PinnedBinding extends Constructor<any> | AbstractConstructor<any>
+  PinnedBinding extends AbstractConstructor<any>
 > {
   /**
    * The parent for whom to define the contextual

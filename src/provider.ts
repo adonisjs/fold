@@ -10,7 +10,7 @@
 import debug from './debug.js'
 import { inspect } from 'node:util'
 import string from '@poppinss/utils/string'
-import { ContainerResolver } from './resolver.js'
+import type { ContainerResolver } from './resolver.js'
 import type { InspectableConstructor } from './types.js'
 import { InvalidDependencyException } from './exceptions/invalid_dependency_exception.js'
 

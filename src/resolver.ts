@@ -22,6 +22,7 @@ import type {
   InspectableConstructor,
   BindingResolver,
   AbstractConstructor,
+  BindingKey,
 } from './types.js'
 import debug from './debug.js'
 import { isClass } from './helpers.js'
@@ -121,7 +122,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
    */
   #getBindingResolver(
     parent: Constructor<any>,
-    binding: string | symbol | Constructor<any> | AbstractConstructor<any>
+    binding: string | symbol | AbstractConstructor<any>
   ): BindingResolver<KnownBindings, any> | undefined {
     const parentBindings = this.#containerContextualBindings.get(parent)
     if (!parentBindings) {
@@ -139,7 +140,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
   /**
    * Notify emitter
    */
-  #emit(binding: string | symbol | Constructor<any> | AbstractConstructor<any>, value: any) {
+  #emit(binding: BindingKey, value: any) {
     debug('resolved from container. binding :%O, resolved value :%O', binding, value)
 
     if (!this.#options.emitter) {
@@ -151,10 +152,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
   /**
    * Execute hooks for a given binding
    */
-  async #execHooks(
-    binding: string | symbol | Constructor<any> | AbstractConstructor<any>,
-    value: any
-  ) {
+  async #execHooks(binding: BindingKey, value: any) {
     const callbacks = this.#containerHooks.get(binding)
     if (!callbacks || callbacks.size === 0) {
       return
@@ -170,7 +168,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
-  hasBinding(binding: string | symbol | Constructor<any> | AbstractConstructor<any>): boolean {
+  hasBinding(binding: BindingKey): boolean {
     return (
       this.#bindingValues.has(binding) ||
       this.#containerBindingValues.has(binding) ||
@@ -183,9 +181,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
-  hasAllBindings(
-    bindings: (string | symbol | Constructor<any> | AbstractConstructor<any>)[]
-  ): boolean {
+  hasAllBindings(bindings: BindingKey[]): boolean {
     return bindings.every((binding) => this.hasBinding(binding))
   }
 
@@ -365,13 +361,13 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
     binding: Binding extends string | symbol ? Binding : never,
     value: KnownBindings[Binding]
   ): void
-  bindValue<Binding extends Constructor<any> | AbstractConstructor<any>>(
+  bindValue<Binding extends AbstractConstructor<any>>(
     binding: Binding,
     value: InstanceType<Binding>
   ): void
   bindValue<Binding>(
     binding: Binding,
-    value: Binding extends Constructor<infer A>
+    value: Binding extends AbstractConstructor<infer A>
       ? A
       : Binding extends keyof KnownBindings
       ? KnownBindings[Binding]
