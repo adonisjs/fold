@@ -42,7 +42,7 @@ import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exc
  * await resolver.make(CLASS_CONSTRUCTOR)
  * ```
  */
-export class ContainerResolver<KnownBindings extends Record<any, any> = Record<any, any>> {
+export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
    * Pre-registered contextual bindings. They are shared between the container
    * and resolver.
