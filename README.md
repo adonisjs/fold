@@ -267,7 +267,7 @@ await resolve.make(SomeClass)
 ## Contextual bindings
 Contextual bindings allows you to register custom dependency resolvers on a given class for a specific dependency. You will be mostly using contextual bindings with driver based implementations.
 
-For example: You have a `UserService` and a `BlogService` and both of them needs an instance of the Drive disk to write and read files. You want to the `UserService` to use the local disk driver and `BlogService` to use `S3DiskDriver`.
+For example: You have a `UserService` and a `BlogService` and both of them needs an instance of the Drive disk to write and read files. You want the `UserService` to use the local disk driver and `BlogService` to use the s3 disk driver.
 
 > **Note**
 > Contextual bindings can be defined for class constructors and not for container bindngs
