@@ -91,11 +91,13 @@ export class Container<KnownBindings extends Record<any, any> = Record<any, any>
    * ```
    */
   createResolver() {
-    return new ContainerResolver(
-      this.#bindings,
-      this.#bindingValues,
-      this.#swaps,
-      this.#hooks,
+    return new ContainerResolver<KnownBindings>(
+      {
+        bindings: this.#bindings,
+        bindingValues: this.#bindingValues,
+        swaps: this.#swaps,
+        hooks: this.#hooks,
+      },
       this.#options
     )
   }

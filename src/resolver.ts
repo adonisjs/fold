@@ -81,16 +81,18 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
   #options: ContainerOptions
 
   constructor(
-    bindings: Bindings,
-    bindingValues: BindingValues,
-    swaps: Swaps,
-    hooks: Hooks,
+    container: {
+      bindings: Bindings
+      bindingValues: BindingValues
+      swaps: Swaps
+      hooks: Hooks
+    },
     options: ContainerOptions
   ) {
-    this.#containerBindings = bindings
-    this.#containerBindingValues = bindingValues
-    this.#containerSwaps = swaps
-    this.#containerHooks = hooks
+    this.#containerBindings = container.bindings
+    this.#containerBindingValues = container.bindingValues
+    this.#containerSwaps = container.swaps
+    this.#containerHooks = container.hooks
     this.#options = options
   }
 
@@ -163,10 +165,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any> = Record<a
    * await resolver.make(Database)
    * ```
    */
-  make<Binding extends keyof string | symbol>(
+  make<Binding extends keyof KnownBindings>(
     binding: Binding,
     runtimeValues?: any[]
-  ): Promise<Binding extends keyof KnownBindings ? KnownBindings[Binding] : Binding>
+  ): Promise<Binding extends string | symbol ? KnownBindings[Binding] : Make<Binding>>
   make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>>
   async make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>> {
     const isAClass = isClass<Binding>(binding)

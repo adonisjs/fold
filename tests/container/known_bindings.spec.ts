@@ -16,6 +16,21 @@ test.group('Container | Bindings', () => {
     assert.instanceOf(route, Route)
   })
 
+  test('resolve binding using the resolver', async ({ assert }) => {
+    const container = new Container<{ route: Route }>()
+    class Route {}
+
+    container.bind('route', () => {
+      return new Route()
+    })
+
+    const resolver = container.createResolver()
+    const route = await resolver.make('route')
+
+    expectTypeOf(route).toEqualTypeOf<Route>()
+    assert.instanceOf(route, Route)
+  })
+
   test('use symbol for the binding name', async ({ assert }) => {
     class Route {}
     const routeSymbol = Symbol('route')
@@ -77,6 +92,21 @@ test.group('Container | Bindings Singleton', () => {
     assert.instanceOf(route, Route)
   })
 
+  test('resolve singleton using the resolver', async ({ assert }) => {
+    class Route {}
+    const container = new Container<{ route: Route }>()
+
+    container.singleton('route', () => {
+      return new Route()
+    })
+
+    const resolver = container.createResolver()
+    const route = await resolver.make('route')
+
+    expectTypeOf(route).toEqualTypeOf<Route>()
+    assert.instanceOf(route, Route)
+  })
+
   test('use symbol for the singleton name', async ({ assert }) => {
     class Route {}
     const routeSymbol = Symbol('route')
@@ -133,6 +163,19 @@ test.group('Container | Binding values', () => {
     container.bindValue('route', new Route())
 
     const route = await container.make('route')
+
+    expectTypeOf(route).toEqualTypeOf<Route>()
+    assert.instanceOf(route, Route)
+  })
+
+  test('resolve value using the container resolver', async ({ assert }) => {
+    class Route {}
+    const container = new Container<{ route: Route }>()
+
+    container.bindValue('route', new Route())
+
+    const resolver = container.createResolver()
+    const route = await resolver.make('route')
 
     expectTypeOf(route).toEqualTypeOf<Route>()
     assert.instanceOf(route, Route)
