@@ -154,7 +154,7 @@ test.group('Container | Make class', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      `Cannot construct value "{ foo: 'bar' }" using container`
+      `Cannot inject "{ foo: 'bar' }" in "[class: UserService]". The value cannot be constructed`
     )
   })
 
@@ -187,7 +187,7 @@ test.group('Container | Make class', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct value "[Function: String]" using container'
+      'Cannot inject "[Function: String]" in "[class: UserService]". The value cannot be constructed'
     )
   })
 

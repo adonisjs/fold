@@ -36,7 +36,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct value "[Function: Array]" using container'
+      'Cannot inject "[Function: Array]" in "[class: UserService]". The value cannot be constructed'
     )
   })
 
@@ -186,7 +186,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct value "[Function: String]" using container'
+      'Cannot inject "[Function: String]" in "[class: UserService]". The value cannot be constructed'
     )
   })
 
@@ -201,7 +201,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct value "[Function: Object]" using container'
+      'Cannot inject "[Function: Object]" in "[class: UserService]". The value cannot be constructed'
     )
   })
 
@@ -216,7 +216,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct value "[Function: Object]" using container'
+      'Cannot inject "[Function: Object]" in "[class: UserService]". The value cannot be constructed'
     )
   })
 })

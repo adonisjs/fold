@@ -110,7 +110,7 @@ test.group('Container | Call method', () => {
     const container = new Container()
     await assert.rejects(
       () => container.call(new UserService(), 'foo'),
-      `Cannot construct value "{ foo: 'bar' }" using container`
+      `Cannot inject "{ foo: 'bar' }" in "[class: UserService]". The value cannot be constructed`
     )
   })
 

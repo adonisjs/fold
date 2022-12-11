@@ -110,6 +110,22 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   }
 
   /**
+   * Raises exception when uanble to construct a data type using
+   * container.
+   */
+  #disallowUnsupportValues(parent: any, binding: any): never {
+    if (parent) {
+      throw new RuntimeException(
+        `Cannot inject "${inspect(binding)}" in "[class: ${
+          parent.name
+        }]". The value cannot be constructed`
+      )
+    }
+
+    throw new RuntimeException(`Cannot construct value "${inspect(binding)}" using container`)
+  }
+
+  /**
    * Returns the provider for the class constructor
    */
   #getBindingProvider(binding: InspectableConstructor) {
@@ -202,7 +218,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      * or a symbol.
      */
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isAClass) {
-      throw new RuntimeException(`Cannot construct value "${inspect(binding)}" using container`)
+      this.#disallowUnsupportValues(parent, binding)
     }
 
     /**
