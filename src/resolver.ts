@@ -157,8 +157,6 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * Notify emitter
    */
   #emit(binding: BindingKey, value: any) {
-    debug('resolved from container. binding :%O, resolved value :%O', binding, value)
-
     if (!this.#options.emitter) {
       return
     }
@@ -228,6 +226,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       const resolver = this.#containerSwaps.get(binding)!
       const value = await resolver(this, runtimeValues)
 
+      if (debug.enabled) {
+        debug('resolved swap for binding %O, resolved value :%O', binding, value)
+      }
+
       await this.#execHooks(binding, value)
       this.#emit(binding, value)
       return value
@@ -244,6 +246,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     if (contextualResolver) {
       const value = await contextualResolver(this, runtimeValues)
 
+      if (debug.enabled) {
+        debug('resolved using contextual resolver binding %O, resolved value :%O', binding, value)
+      }
+
       await this.#execHooks(binding, value)
       this.#emit(binding, value)
 
@@ -255,6 +261,11 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      */
     if (this.#bindingValues.has(binding)) {
       const value = this.#bindingValues.get(binding)
+
+      if (debug.enabled) {
+        debug('resolved from resolver values %O, resolved value :%O', binding, value)
+      }
+
       this.#emit(binding, value)
       return value
     }
@@ -264,6 +275,11 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      */
     if (this.#containerBindingValues.has(binding)) {
       const value = this.#containerBindingValues.get(binding)
+
+      if (debug.enabled) {
+        debug('resolved from container values %O, resolved value :%O', binding, value)
+      }
+
       this.#emit(binding, value)
       return value
     }
@@ -280,6 +296,15 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
        */
       if (isSingleton) {
         this.#containerBindingValues.set(binding, value)
+      }
+
+      if (debug.enabled) {
+        debug(
+          'resolved %s %O, resolved value :%O',
+          isSingleton ? 'singleton' : 'binding',
+          binding,
+          value
+        )
       }
 
       await this.#execHooks(binding, value)
@@ -308,6 +333,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       }
 
       const value = new binding(...dependencies) as Promise<Make<Binding>>
+
+      if (debug.enabled) {
+        debug('constructed class %O, resolved value :%O', binding, value)
+      }
 
       await this.#execHooks(binding, value)
       this.#emit(binding, value)
@@ -357,6 +386,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   ): Promise<ReturnType<Value[Method]>> {
     if (typeof value[method] !== 'function') {
       throw new RuntimeException(`Missing method "${String(method)}" on "${inspect(value)}"`)
+    }
+
+    if (debug.enabled) {
+      debug('calling method %s, on value :%O', method, value)
     }
 
     const dependencies = await containerProvider(value.constructor, method, this, runtimeValues)
