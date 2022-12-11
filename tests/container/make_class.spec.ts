@@ -7,45 +7,90 @@ test.group('Container | Make class', () => {
     assert.instanceOf(new Container(), Container)
   })
 
-  test('return non classes values as it is', async ({ assert }) => {
+  test('throw error when unsupported data type is given to the container', async ({ assert }) => {
     const container = new Container()
 
-    const obj = await container.make({ foo: 'bar' })
-    expectTypeOf(obj).toEqualTypeOf<{ foo: string }>()
-    assert.deepEqual(obj, { foo: 'bar' })
+    try {
+      const obj = await container.make({ foo: 'bar' })
+      expectTypeOf(obj).toEqualTypeOf<never>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot construct value "{ foo: 'bar' }" using container`)
+    }
 
-    const numeric = await container.make(1)
-    expectTypeOf(numeric).toEqualTypeOf<number>()
-    assert.deepEqual(numeric, 1)
+    try {
+      const numeric = await container.make(1)
+      expectTypeOf(numeric).toEqualTypeOf<never>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot construct value "1" using container`)
+    }
 
-    const bool = await container.make(false)
-    expectTypeOf(bool).toEqualTypeOf<boolean>()
-    assert.deepEqual(bool, false)
+    try {
+      const bool = await container.make(false)
+      expectTypeOf(bool).toEqualTypeOf<never>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot construct value "false" using container`)
+    }
 
-    const notDefined = await container.make(undefined)
-    expectTypeOf(notDefined).toEqualTypeOf<undefined>()
-    assert.deepEqual(notDefined, undefined)
+    try {
+      const notDefined = await container.make(undefined)
+      expectTypeOf(notDefined).toEqualTypeOf<never>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot construct value "undefined" using container`)
+    }
 
-    const nullValue = await container.make(null)
-    expectTypeOf(nullValue).toEqualTypeOf<null>()
-    assert.deepEqual(nullValue, null)
+    try {
+      const nullValue = await container.make(null)
+      expectTypeOf(nullValue).toEqualTypeOf<never>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot construct value "null" using container`)
+    }
 
-    const mapValue = await container.make(new Map([[1, 1]]))
-    expectTypeOf(mapValue).toEqualTypeOf<Map<number, number>>()
-    assert.deepEqual(mapValue, new Map([[1, 1]]))
+    try {
+      const mapValue = await container.make(new Map([[1, 1]]))
+      expectTypeOf(mapValue).toEqualTypeOf<never>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot construct value "Map(1) { 1 => 1 }" using container`)
+    }
 
-    const setValue = await container.make(new Set([1]))
-    expectTypeOf(setValue).toEqualTypeOf<Set<number>>()
-    assert.deepEqual(setValue, new Set([1]))
+    try {
+      const setValue = await container.make(new Set([1]))
+      expectTypeOf(setValue).toEqualTypeOf<never>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot construct value "Set(1) { 1 }" using container`)
+    }
 
-    const arrayValue = await container.make(['foo'])
-    expectTypeOf(arrayValue).toEqualTypeOf<string[]>()
-    assert.deepEqual(arrayValue, ['foo'])
+    try {
+      const arrayValue = await container.make(['foo'])
+      expectTypeOf(arrayValue).toEqualTypeOf<never>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot construct value "[ 'foo' ]" using container`)
+    }
 
     function foo() {}
-    const func = await container.make(foo)
-    expectTypeOf(func).toEqualTypeOf<() => void>()
-    assert.deepEqual(func, foo)
+    try {
+      const func = await container.make(foo)
+      expectTypeOf(func).toEqualTypeOf<never>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot construct value "[Function: foo]" using container`)
+    }
+  })
+
+  test('throw error when unable to resolve a binding by name', async ({ assert }) => {
+    const container = new Container<any>()
+
+    try {
+      const obj = await container.make('bar')
+      expectTypeOf(obj).toEqualTypeOf<any>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot resolve binding "bar" from the container`)
+    }
+
+    try {
+      const obj = await container.make(Symbol('bar'))
+      expectTypeOf(obj).toEqualTypeOf<any>()
+    } catch (error) {
+      assert.equal(error.message, `Cannot resolve binding "Symbol(bar)" from the container`)
+    }
   })
 
   test('make instance of a class using the container', async ({ assert }) => {
@@ -94,7 +139,7 @@ test.group('Container | Make class', () => {
     assert.instanceOf(service.db, Database)
   })
 
-  test('inject non class dependencies as it is', async ({ assert }) => {
+  test('throw error when injecting non-class values to the constructor', async ({ assert }) => {
     class UserService {
       args: any[]
 
@@ -107,11 +152,10 @@ test.group('Container | Make class', () => {
     }
 
     const container = new Container()
-    const service = await container.make(UserService)
-
-    assert.instanceOf(service, UserService)
-    expectTypeOf(service).toEqualTypeOf<UserService>()
-    assert.deepEqual(service.args, [{ foo: 'bar' }, 1, ['foo'], false, undefined, null, false])
+    await assert.rejects(
+      () => container.make(UserService),
+      `Cannot construct value "{ foo: 'bar' }" using container`
+    )
   })
 
   test('do not inject constructor dependencies when containerInjections are empty', async ({
@@ -143,15 +187,16 @@ test.group('Container | Make class', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot inject "[Function: String]". The value cannot be constructed'
+      'Cannot construct value "[Function: String]" using container'
     )
   })
 
-  test('return primitive constructor as it is', async ({ assert }) => {
+  test('throw error when constructing primitive values', async ({ assert }) => {
     const container = new Container()
 
-    const stringPrimitive = await container.make(String)
-    expectTypeOf(stringPrimitive).toEqualTypeOf<String>()
-    assert.deepEqual(stringPrimitive, String)
+    await assert.rejects(
+      () => container.make(String),
+      'Cannot construct value "[Function: String]" using container'
+    )
   })
 })

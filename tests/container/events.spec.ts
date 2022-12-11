@@ -85,38 +85,6 @@ test.group('Container | Events', () => {
     assert.deepEqual(event, { binding: 'route', value: route })
   })
 
-  test('do not emit when non class value is resolved', async ({ assert }) => {
-    const emitter = new EventEmitter()
-    const container = new Container({ emitter })
-
-    await assert.rejects(
-      async () =>
-        await Promise.all([
-          pEvent(emitter, 'container:resolve', { timeout: 100 }),
-          container.make('route'),
-        ]),
-      'Promise timed out after 100 milliseconds'
-    )
-
-    await assert.rejects(
-      async () =>
-        await Promise.all([
-          pEvent(emitter, 'container:resolve', { timeout: 100 }),
-          container.make({ foo: 'bar' }),
-        ]),
-      'Promise timed out after 100 milliseconds'
-    )
-
-    await assert.rejects(
-      async () =>
-        await Promise.all([
-          pEvent(emitter, 'container:resolve', { timeout: 100 }),
-          container.make([]),
-        ]),
-      'Promise timed out after 100 milliseconds'
-    )
-  })
-
   test('emit event when class is constructed', async ({ assert }) => {
     const emitter = new EventEmitter()
     const container = new Container({ emitter })

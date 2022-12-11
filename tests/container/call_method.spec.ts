@@ -94,7 +94,7 @@ test.group('Container | Call method', () => {
     assert.instanceOf(fooResult, Database)
   })
 
-  test('inject non class dependencies to class method', async ({ assert }) => {
+  test('throw error when injecting non class dependencies to the container', async ({ assert }) => {
     class Database {}
 
     class UserService {
@@ -108,10 +108,10 @@ test.group('Container | Call method', () => {
     }
 
     const container = new Container()
-    const fooResult = await container.call(new UserService(), 'foo')
-
-    expectTypeOf(fooResult).toEqualTypeOf<number>()
-    assert.equal(fooResult, 1)
+    await assert.rejects(
+      () => container.call(new UserService(), 'foo'),
+      `Cannot construct value "{ foo: 'bar' }" using container`
+    )
   })
 
   test('merge runtime values with container dependencies', async ({ assert }) => {

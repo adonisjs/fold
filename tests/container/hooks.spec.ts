@@ -92,10 +92,6 @@ test.group('Container | Hooks', () => {
       route.invocations++
     })
 
-    await container.make('route')
-    await container.make('route')
-    await container.make('route')
-
     const route = await container.make(Route)
     expectTypeOf(route).toEqualTypeOf<Route>()
 
@@ -119,10 +115,6 @@ test.group('Container | Hooks', () => {
     container.swap(Route, () => {
       return new FakedRoute()
     })
-
-    await container.make('route')
-    await container.make('route')
-    await container.make('route')
 
     const route = await container.make(Route)
     expectTypeOf(route).toEqualTypeOf<Route>()

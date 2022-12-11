@@ -38,7 +38,7 @@ export type InspectableConstructor = Function & {
 /**
  * Returns the inferred value for the make method
  */
-export type Make<T> = T extends AbstractConstructor<infer A> ? A : T
+export type Make<T> = T extends AbstractConstructor<infer A> ? A : never
 
 /**
  * Accepted values for the binding key

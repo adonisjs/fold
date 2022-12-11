@@ -198,15 +198,15 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     const isAClass = isClass<Binding>(binding)
 
     /**
-     * Return binding as it is, when the binding type is not a string, symbol
-     * or a class constructor.
+     * Raise exception when the binding is not a string, a class constructor
+     * or a symbol.
      */
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isAClass) {
-      return binding as Promise<Make<Binding>>
+      throw new RuntimeException(`Cannot construct value "${inspect(binding)}" using container`)
     }
 
     /**
-     * Entertain swaps when registered
+     * Entertain swaps with highest priority.
      */
     if (this.#containerSwaps.has(binding)) {
       const resolver = this.#containerSwaps.get(binding)!
@@ -218,8 +218,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     }
 
     /**
-     * Resolving contextual binding with the highest priority
-     * after fakes.
+     * Resolving contextual binding. Contextual bindings have more
+     * priority over bindings or binding values.
      */
     const contextualResolver = isClass(parent)
       ? this.#getBindingResolver(parent, binding)
@@ -299,7 +299,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       return value
     }
 
-    return binding as unknown as Promise<Make<Binding>>
+    throw new RuntimeException(`Cannot resolve binding "${String(binding)}" from the container`)
   }
 
   /**

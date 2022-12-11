@@ -23,7 +23,7 @@ test.group('Container | Make class via inject', () => {
     assert.instanceOf(service.db, Database)
   })
 
-  test('inject primitive values as it is', async ({ assert }) => {
+  test('throw error when injecting primitive values', async ({ assert }) => {
     @inject()
     class UserService {
       args: any[]
@@ -34,11 +34,10 @@ test.group('Container | Make class via inject', () => {
     }
 
     const container = new Container()
-    const service = await container.make(UserService)
-
-    assert.instanceOf(service, UserService)
-    expectTypeOf(service).toEqualTypeOf<UserService>()
-    assert.deepEqual(service.args, [Array])
+    await assert.rejects(
+      () => container.make(UserService),
+      'Cannot construct value "[Function: Array]" using container'
+    )
   })
 
   test('construct nested dependencies', async ({ assert }) => {
@@ -187,7 +186,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot inject "[Function: String]". The value cannot be constructed'
+      'Cannot construct value "[Function: String]" using container'
     )
   })
 
@@ -202,7 +201,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot inject "[Function: Object]". The value cannot be constructed'
+      'Cannot construct value "[Function: Object]" using container'
     )
   })
 
@@ -217,7 +216,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot inject "[Function: Object]". The value cannot be constructed'
+      'Cannot construct value "[Function: Object]" using container'
     )
   })
 })

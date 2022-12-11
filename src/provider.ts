@@ -8,13 +8,8 @@
  */
 
 import debug from './debug.js'
-import { inspect } from 'node:util'
-import string from '@poppinss/utils/string'
 import type { ContainerResolver } from './resolver.js'
 import type { InspectableConstructor } from './types.js'
-import { InvalidDependencyException } from './exceptions/invalid_dependency_exception.js'
-
-const primitiveConstructors = [String, Function, Object, Date, Number, Boolean]
 
 /**
  * The default provider for resolving dependencies. It uses the resolver
@@ -66,12 +61,6 @@ export async function containerProvider(
         }
 
         const injection = injections[index]
-        if (primitiveConstructors.includes(injection)) {
-          throw new InvalidDependencyException(
-            string.interpolate(InvalidDependencyException.message, { value: inspect(injection) })
-          )
-        }
-
         return resolver.resolveFor(binding, injection)
       })
     )
@@ -100,12 +89,6 @@ export async function containerProvider(
     injections.map((injection, index) => {
       if (values[index] !== undefined) {
         return values[index]
-      }
-
-      if (primitiveConstructors.includes(injection)) {
-        throw new InvalidDependencyException(
-          string.interpolate(InvalidDependencyException.message, { value: inspect(injection) })
-        )
       }
 
       return resolver.resolveFor(binding, injection)
