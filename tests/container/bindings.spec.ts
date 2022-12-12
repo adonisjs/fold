@@ -232,6 +232,58 @@ test.group('Container | Bindings Singleton', () => {
     assert.isTrue(container.hasBinding(routeSymbol))
     assert.isFalse(container.hasBinding('db'))
   })
+
+  test('parallel calls to make should resolve the same singleton', async ({ assert }) => {
+    const container = new Container()
+    class Route {}
+
+    container.singleton('route', () => {
+      return new Route()
+    })
+
+    const [route, route1] = await Promise.all([container.make('route'), container.make('route')])
+
+    assert.instanceOf(route, Route)
+    assert.instanceOf(route1, Route)
+    assert.strictEqual(route, route1)
+  })
+
+  test('fail when parallel calls to singleton fails', async ({ assert }) => {
+    const container = new Container()
+    container.singleton('route', () => {
+      throw new Error('Rejected')
+    })
+
+    const results = await Promise.allSettled([container.make('route'), container.make('route')])
+
+    assert.deepEqual(
+      results.map((result) => result.status),
+      ['rejected', 'rejected']
+    )
+  })
+
+  test('fail when parallel calls to async singleton fails', async ({ assert }) => {
+    const container = new Container()
+    container.singleton('route', async () => {
+      throw new Error('Rejected')
+    })
+
+    const results = await Promise.allSettled([container.make('route'), container.make('route')])
+
+    assert.deepEqual(
+      results.map((result) => result.status),
+      ['rejected', 'rejected']
+    )
+  })
+
+  test('fail when single call to async singleton fails', async ({ assert }) => {
+    const container = new Container()
+    container.singleton('route', async () => {
+      throw new Error('Rejected')
+    })
+
+    await assert.rejects(() => container.make('route'), 'Rejected')
+  })
 })
 
 test.group('Container | Binding values', () => {

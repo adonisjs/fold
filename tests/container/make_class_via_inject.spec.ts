@@ -219,6 +219,55 @@ test.group('Container | Make class via inject', () => {
       'Cannot inject "[Function: Object]" in "[class: UserService]". The value cannot be constructed'
     )
   })
+
+  test('parallel calls to singleton injection should return the same value', async ({ assert }) => {
+    class Encryption {}
+
+    @inject()
+    class UserService {
+      constructor(public encryption: Encryption) {}
+    }
+
+    const container = new Container()
+    container.singleton(Encryption, () => new Encryption())
+
+    const [service, service1] = await Promise.all([
+      container.make(UserService),
+      container.make(UserService),
+    ])
+
+    expectTypeOf(service).toEqualTypeOf<UserService>()
+    expectTypeOf(service1).toEqualTypeOf<UserService>()
+    assert.instanceOf(service, UserService)
+    assert.instanceOf(service1, UserService)
+
+    assert.notStrictEqual(service1, service)
+    assert.strictEqual(service1.encryption, service.encryption)
+  })
+
+  test('fail when singleton binding resolver fails', async ({ assert }) => {
+    class Encryption {}
+
+    @inject()
+    class UserService {
+      constructor(public encryption: Encryption) {}
+    }
+
+    const container = new Container()
+    container.singleton(Encryption, () => {
+      throw new Error('Cannot resolve')
+    })
+
+    const results = await Promise.allSettled([
+      container.make(UserService),
+      container.make(UserService),
+    ])
+
+    assert.deepEqual(
+      results.map((result) => result.status),
+      ['rejected', 'rejected']
+    )
+  })
 })
 
 test.group('Container | Make class with contextual bindings', () => {

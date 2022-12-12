@@ -25,7 +25,7 @@ import type {
 } from './types.js'
 
 import debug from './debug.js'
-import { isClass } from './helpers.js'
+import { enqueue, isClass } from './helpers.js'
 import { ContainerResolver } from './resolver.js'
 import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exception.js'
 import { ContextBindingsBuilder } from './contextual_bindings_builder.js'
@@ -218,7 +218,7 @@ export class Container<KnownBindings extends Record<any, any>> {
     }
 
     debug('adding binding to container "%O"', binding)
-    this.#bindings.set(binding, { resolver, isSingleton: false })
+    this.#bindings.set(binding, { resolver })
   }
 
   /**
@@ -299,7 +299,7 @@ export class Container<KnownBindings extends Record<any, any>> {
     }
 
     debug('adding singleton to container "%O"', binding)
-    this.#bindings.set(binding, { resolver, isSingleton: true })
+    this.#bindings.set(binding, { resolver: enqueue(resolver) })
   }
 
   /**
@@ -441,6 +441,6 @@ export class Container<KnownBindings extends Record<any, any>> {
     }
 
     const parentBindings = this.#contextualBindings.get(parent)!
-    parentBindings.set(binding, { resolver, isSingleton: false })
+    parentBindings.set(binding, { resolver })
   }
 }

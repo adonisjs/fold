@@ -56,10 +56,7 @@ export type BindingResolver<KnownBindings extends Record<any, any>, Value> = (
 /**
  * Shape of the registered bindings
  */
-export type Bindings = Map<
-  BindingKey,
-  { resolver: BindingResolver<Record<any, any>, any>; isSingleton: boolean }
->
+export type Bindings = Map<BindingKey, { resolver: BindingResolver<Record<any, any>, any> }>
 
 /**
  * Shape of the registered swaps

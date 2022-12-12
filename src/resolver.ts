@@ -137,7 +137,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * undefined when no contextual binding exists
    */
   #getBindingResolver(
-    parent: Constructor<any>,
+    parent: any,
     binding: string | symbol | AbstractConstructor<any>
   ): BindingResolver<KnownBindings, any> | undefined {
     const parentBindings = this.#containerContextualBindings.get(parent)
@@ -239,10 +239,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      * Resolving contextual binding. Contextual bindings have more
      * priority over bindings or binding values.
      */
-    const contextualResolver = isClass(parent)
-      ? this.#getBindingResolver(parent, binding)
-      : undefined
-
+    const contextualResolver = this.#getBindingResolver(parent, binding)
     if (contextualResolver) {
       const value = await contextualResolver(this, runtimeValues)
 
@@ -288,27 +285,20 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      * Followed by the CONTAINER bindings
      */
     if (this.#containerBindings.has(binding)) {
-      const { resolver, isSingleton } = this.#containerBindings.get(binding)!
-      const value = await resolver(this, runtimeValues)
+      const { resolver } = this.#containerBindings.get(binding)!
 
       /**
-       * Caching singletons
+       * Invoke binding resolver to get the value.
        */
-      if (isSingleton) {
-        this.#containerBindingValues.set(binding, value)
-      }
+      const value = await resolver(this, runtimeValues)
 
       if (debug.enabled) {
-        debug(
-          'resolved %s %O, resolved value :%O',
-          isSingleton ? 'singleton' : 'binding',
-          binding,
-          value
-        )
+        debug('resolved binding %O, resolved value :%O', binding, value)
       }
 
       await this.#execHooks(binding, value)
       this.#emit(binding, value)
+
       return value
     }
 
