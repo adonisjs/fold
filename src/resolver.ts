@@ -15,14 +15,15 @@ import type {
   Hooks,
   Swaps,
   Bindings,
+  BindingKey,
   Constructor,
   BindingValues,
+  BindingResolver,
   ExtractFunctions,
   ContainerOptions,
-  InspectableConstructor,
-  BindingResolver,
+  ContextualBindings,
   AbstractConstructor,
-  BindingKey,
+  InspectableConstructor,
 } from './types.js'
 import debug from './debug.js'
 import { isClass } from './helpers.js'
@@ -60,7 +61,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    *
    * We do not mutate this property within the resolver
    */
-  #containerContextualBindings: Map<Constructor<any>, Bindings>
+  #containerContextualBindings: Map<Constructor<any>, ContextualBindings>
 
   /**
    * Pre-registered bindings. They are shared between the container
@@ -109,7 +110,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       swaps: Swaps
       hooks: Hooks
       aliases: Map<Partial<keyof KnownBindings>, keyof KnownBindings | AbstractConstructor<any>>
-      contextualBindings: Map<Constructor<any>, Bindings>
+      contextualBindings: Map<Constructor<any>, ContextualBindings>
     },
     options: ContainerOptions
   ) {
@@ -151,7 +152,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    */
   #getBindingResolver(
     parent: any,
-    binding: string | symbol | AbstractConstructor<any>
+    binding: AbstractConstructor<any>
   ): BindingResolver<KnownBindings, any> | undefined {
     const parentBindings = this.#containerContextualBindings.get(parent)
     if (!parentBindings) {
@@ -236,9 +237,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     }
 
     /**
-     * Entertain swaps with highest priority.
+     * Entertain swaps with highest priority. The swaps can only exists for
+     * class constructors.
      */
-    if (this.#containerSwaps.has(binding)) {
+    if (isAClass && this.#containerSwaps.has(binding)) {
       const resolver = this.#containerSwaps.get(binding)!
       const value = await resolver(this, runtimeValues)
 
@@ -246,6 +248,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
         debug('resolved swap for binding %O, resolved value :%O', binding, value)
       }
 
+      /**
+       * Executing hooks and emitting events for the swaps is
+       * debatable for now
+       */
       await this.#execHooks(binding, value)
       this.#emit(binding, value)
       return value
@@ -255,7 +261,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      * Resolving contextual binding. Contextual bindings have more
      * priority over bindings or binding values.
      */
-    const contextualResolver = this.#getBindingResolver(parent, binding)
+    const contextualResolver = isAClass && this.#getBindingResolver(parent, binding)
     if (contextualResolver) {
       const value = await contextualResolver(this, runtimeValues)
 

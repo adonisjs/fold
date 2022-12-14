@@ -59,9 +59,17 @@ export type BindingResolver<KnownBindings extends Record<any, any>, Value> = (
 export type Bindings = Map<BindingKey, { resolver: BindingResolver<Record<any, any>, any> }>
 
 /**
+ * Shape of the registered contextual bindings
+ */
+export type ContextualBindings = Map<
+  AbstractConstructor<any>,
+  { resolver: BindingResolver<Record<any, any>, any> }
+>
+
+/**
  * Shape of the registered swaps
  */
-export type Swaps = Map<BindingKey, BindingResolver<Record<any, any>, any>>
+export type Swaps = Map<AbstractConstructor<any>, BindingResolver<Record<any, any>, any>>
 
 /**
  * Shape of the registered binding values

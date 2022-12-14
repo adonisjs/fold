@@ -22,6 +22,7 @@ import type {
   ExtractFunctions,
   ContainerOptions,
   AbstractConstructor,
+  ContextualBindings,
 } from './types.js'
 
 import debug from './debug.js'
@@ -59,11 +60,17 @@ export class Container<KnownBindings extends Record<any, any>> {
   /**
    * Contextual bindings are same as binding, but instead defined
    * for a parent class constructor.
+   *
+   * The contextual bindings can only be registered for class constructors, because
+   * that is what gets injected to the class.
    */
-  #contextualBindings: Map<Constructor<any>, Bindings> = new Map()
+  #contextualBindings: Map<Constructor<any>, ContextualBindings> = new Map()
 
   /**
-   * A collection of bindings with registered swapped implementations
+   * A collection of bindings with registered swapped implementations. Swaps can only
+   * be define for a class, because the goal is swap the dependency tree defined
+   * using the Inject decorator and inject decorator does not take anything
+   * other than a class.
    */
   #swaps: Swaps = new Map()
 
@@ -346,30 +353,12 @@ export class Container<KnownBindings extends Record<any, any>> {
    * Fakes have the highest priority when resolving dependencies
    * from the container.
    */
-  swap<Binding extends keyof KnownBindings>(
-    /**
-     * Need to narrow down the "Binding" for the case where "KnownBindings" are <any, any>
-     */
-    binding: Binding extends string | symbol ? Binding : never,
-    resolver: BindingResolver<KnownBindings, KnownBindings[Binding]>
-  ): void
   swap<Binding extends AbstractConstructor<any>>(
     binding: Binding,
     resolver: BindingResolver<KnownBindings, InstanceType<Binding>>
-  ): void
-  swap<Binding>(
-    binding: Binding,
-    resolver: BindingResolver<
-      KnownBindings,
-      Binding extends AbstractConstructor<infer A>
-        ? A
-        : Binding extends keyof KnownBindings
-        ? KnownBindings[Binding]
-        : never
-    >
   ): void {
-    if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new InvalidBindingKeyException()
+    if (!isClass(binding)) {
+      throw new RuntimeException('The binding value for a swap should be a class')
     }
 
     debug('defining swap for "%O"', binding)
@@ -379,9 +368,9 @@ export class Container<KnownBindings extends Record<any, any>> {
   /**
    * Restore binding by removing its swap
    */
-  restore(binding: keyof KnownBindings | AbstractConstructor<any>) {
-    if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new InvalidBindingKeyException()
+  restore(binding: AbstractConstructor<any>) {
+    if (!isClass(binding)) {
+      throw new RuntimeException('The binding value for a restore should be a class')
     }
 
     debug('removing swap for "%s"', binding)
@@ -392,7 +381,7 @@ export class Container<KnownBindings extends Record<any, any>> {
    * Restore mentioned or all bindings by removing
    * their swaps
    */
-  restoreAll(bindings?: (keyof KnownBindings | AbstractConstructor<any>)[]) {
+  restoreAll(bindings?: AbstractConstructor<any>[]) {
     if (!bindings) {
       debug('removing all swaps')
       this.#swaps.clear()

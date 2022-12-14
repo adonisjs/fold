@@ -105,138 +105,129 @@ test.group('Container | swap', () => {
     assert.deepEqual(user1, { id: 1, username: 'virk' })
   })
 
-  test('swap a binding', async ({ assert }) => {
-    const container = new Container<{ route: Route }>()
-    class Route {}
-    class FakedRoute extends Route {}
+  test('restore multiple implementations', async ({ assert }) => {
+    class UserService {
+      get() {
+        return {
+          id: 1,
+          username: 'virk',
+        }
+      }
+    }
 
-    container.bind('route', () => {
-      return new Route()
+    class UsersController {
+      constructor() {}
+
+      @inject()
+      show(user: UserService) {
+        return user.get()
+      }
+    }
+
+    class FakedUserService extends UserService {
+      get() {
+        return {
+          id: 1,
+          username: 'faked-virk',
+        }
+      }
+    }
+
+    const container = new Container()
+    container.swap(UserService, () => {
+      return new FakedUserService()
     })
 
-    container.swap('route', () => {
-      return new FakedRoute()
-    })
+    const controller = await container.make(UsersController)
+    expectTypeOf(controller).toEqualTypeOf<UsersController>()
 
-    const route = await container.make('route')
-    expectTypeOf(route).toEqualTypeOf<Route>()
+    const user = await container.call(controller, 'show')
+    expectTypeOf(user).toEqualTypeOf<{ id: number; username: string }>()
+    assert.deepEqual(user, { id: 1, username: 'faked-virk' })
 
-    assert.instanceOf(route, Route)
-    assert.instanceOf(route, FakedRoute)
+    container.restoreAll([UserService])
+
+    const user1 = await container.call(controller, 'show')
+    expectTypeOf(user1).toEqualTypeOf<{ id: number; username: string }>()
+    assert.deepEqual(user1, { id: 1, username: 'virk' })
   })
 
-  test('restore swapped binding', async ({ assert }) => {
-    const container = new Container<{ route: Route }>()
-    class Route {}
-    class FakedRoute extends Route {}
+  test('restore all implementations', async ({ assert }) => {
+    class UserService {
+      get() {
+        return {
+          id: 1,
+          username: 'virk',
+        }
+      }
+    }
 
-    container.bind('route', () => {
-      return new Route()
+    class UsersController {
+      constructor() {}
+
+      @inject()
+      show(user: UserService) {
+        return user.get()
+      }
+    }
+
+    class FakedUserService extends UserService {
+      get() {
+        return {
+          id: 1,
+          username: 'faked-virk',
+        }
+      }
+    }
+
+    const container = new Container()
+    container.swap(UserService, () => {
+      return new FakedUserService()
     })
 
-    container.swap('route', () => {
-      return new FakedRoute()
-    })
+    const controller = await container.make(UsersController)
+    expectTypeOf(controller).toEqualTypeOf<UsersController>()
 
-    const route = await container.make('route')
-    expectTypeOf(route).toEqualTypeOf<Route>()
-
-    assert.instanceOf(route, Route)
-    assert.instanceOf(route, FakedRoute)
+    const user = await container.call(controller, 'show')
+    expectTypeOf(user).toEqualTypeOf<{ id: number; username: string }>()
+    assert.deepEqual(user, { id: 1, username: 'faked-virk' })
 
     container.restoreAll()
 
-    const route1 = await container.make('route')
-    expectTypeOf(route1).toEqualTypeOf<Route>()
-
-    assert.instanceOf(route1, Route)
-    assert.notInstanceOf(route1, FakedRoute)
+    const user1 = await container.call(controller, 'show')
+    expectTypeOf(user1).toEqualTypeOf<{ id: number; username: string }>()
+    assert.deepEqual(user1, { id: 1, username: 'virk' })
   })
 
-  test('disallow swap names other than string symbol or class constructor', async ({ assert }) => {
+  test('disallow swap names other than class constructor', async ({ assert }) => {
     const container = new Container()
 
     assert.throws(
       // @ts-expect-error
       () => container.swap(1, () => {}),
-      'The container binding key must be of type "string", "symbol", or a "class constructor"'
+      'The binding value for a swap should be a class'
     )
 
     assert.throws(
       // @ts-expect-error
       () => container.swap([], () => {}),
-      'The container binding key must be of type "string", "symbol", or a "class constructor"'
+      'The binding value for a swap should be a class'
     )
 
     assert.throws(
       // @ts-expect-error
       () => container.swap({}, () => {}),
-      'The container binding key must be of type "string", "symbol", or a "class constructor"'
+      'The binding value for a swap should be a class'
     )
 
-    assert.throws(
-      () => container.restore(1),
-      'The container binding key must be of type "string", "symbol", or a "class constructor"'
-    )
+    // @ts-expect-error
+    assert.throws(() => container.restore(1), 'The binding value for a restore should be a class')
 
-    assert.throws(
-      () => container.restore([]),
-      'The container binding key must be of type "string", "symbol", or a "class constructor"'
-    )
+    // @ts-expect-error
+    assert.throws(() => container.restore([]), 'The binding value for a restore should be a class')
 
-    assert.throws(
-      () => container.restore({}),
-      'The container binding key must be of type "string", "symbol", or a "class constructor"'
-    )
-  })
-
-  test('restore multiple swapped bindings', async ({ assert }) => {
-    const container = new Container<{ route: Route; route1: Route }>()
-    class Route {}
-    class FakedRoute extends Route {}
-
-    container.bind('route', () => {
-      return new Route()
-    })
-    container.bind('route1', () => {
-      return new Route()
-    })
-
-    container.swap('route', () => {
-      return new FakedRoute()
-    })
-    container.swap('route1', () => {
-      return new FakedRoute()
-    })
-
-    const route = await container.make('route')
-    expectTypeOf(route).toEqualTypeOf<Route>()
-
-    assert.instanceOf(route, Route)
-    assert.instanceOf(route, FakedRoute)
-
-    const route1 = await container.make('route1')
-    expectTypeOf(route1).toEqualTypeOf<Route>()
-
-    assert.instanceOf(route1, Route)
-    assert.instanceOf(route1, FakedRoute)
-
-    /**
-     * Restoring multiple
-     */
-    container.restoreAll(['route', 'route1'])
-
-    const route2 = await container.make('route')
-    expectTypeOf(route2).toEqualTypeOf<Route>()
-
-    assert.instanceOf(route2, Route)
-    assert.notInstanceOf(route2, FakedRoute)
-
-    const route3 = await container.make('route1')
-    expectTypeOf(route3).toEqualTypeOf<Route>()
-
-    assert.instanceOf(route3, Route)
-    assert.notInstanceOf(route3, FakedRoute)
+    // @ts-expect-error
+    assert.throws(() => container.restore({}), 'The binding value for a restore should be a class')
   })
 
   test('use swap over contextual binding', async ({ assert }) => {
