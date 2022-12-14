@@ -264,6 +264,23 @@ resolver.bindValue(Request, req)
 await resolve.make(SomeClass)
 ```
 
+## Aliases
+Container aliases allows defining aliases for an existing binding. The alias should be either a `string` or a `symbol`.
+
+```ts
+container.singleton(Database, () => {
+  return new Database()
+})
+
+container.alias('db', Database)
+
+/**
+ * Make using the alias
+ */
+const db = await container.make('db')
+assert.instanceOf(db, Database)
+```
+
 ## Contextual bindings
 Contextual bindings allows you to register custom dependency resolvers on a given class for a specific dependency. You will be mostly using contextual bindings with driver based implementations.
 

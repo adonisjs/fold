@@ -27,8 +27,9 @@ import type {
 import debug from './debug.js'
 import { enqueue, isClass } from './helpers.js'
 import { ContainerResolver } from './resolver.js'
-import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exception.js'
 import { ContextBindingsBuilder } from './contextual_bindings_builder.js'
+import { InvalidAliasKeyException } from './exceptions/invalid_alias_key_exception.js'
+import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exception.js'
 
 /**
  * The container class exposes the API to register bindings, values
@@ -49,6 +50,12 @@ import { ContextBindingsBuilder } from './contextual_bindings_builder.js'
  * ```
  */
 export class Container<KnownBindings extends Record<any, any>> {
+  /**
+   * A set of defined aliases for the bindings
+   */
+  #aliases: Map<Partial<keyof KnownBindings>, keyof KnownBindings | AbstractConstructor<any>> =
+    new Map()
+
   /**
    * Contextual bindings are same as binding, but instead defined
    * for a parent class constructor.
@@ -108,6 +115,7 @@ export class Container<KnownBindings extends Record<any, any>> {
         bindingValues: this.#bindingValues,
         swaps: this.#swaps,
         hooks: this.#hooks,
+        aliases: this.#aliases,
         contextualBindings: this.#contextualBindings,
       },
       this.#options
@@ -119,8 +127,11 @@ export class Container<KnownBindings extends Record<any, any>> {
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
+  hasBinding(binding: BindingKey): boolean
   hasBinding(binding: BindingKey): boolean {
-    return this.#bindingValues.has(binding) || this.#bindings.has(binding)
+    return (
+      this.#aliases.has(binding) || this.#bindingValues.has(binding) || this.#bindings.has(binding)
+    )
   }
 
   /**
@@ -128,6 +139,7 @@ export class Container<KnownBindings extends Record<any, any>> {
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
+  hasAllBindings(binding: BindingKey[]): boolean
   hasAllBindings(bindings: BindingKey[]): boolean {
     return bindings.every((binding) => this.hasBinding(binding))
   }
@@ -170,6 +182,33 @@ export class Container<KnownBindings extends Record<any, any>> {
     runtimeValues?: any[]
   ): Promise<ReturnType<Value[Method]>> {
     return this.createResolver().call(value, method, runtimeValues)
+  }
+
+  alias<Alias extends keyof KnownBindings>(
+    /**
+     * An alias must always be defined as a string or a symbol. Classes cannot be
+     * aliases
+     */
+    alias: Alias extends string | symbol ? Alias : never,
+
+    /**
+     * The value should either be the constructor point to the alias value
+     * or reference to binding that has the same value as the alias
+     */
+    value:
+      | AbstractConstructor<KnownBindings[Alias]>
+      | Exclude<
+          {
+            [K in keyof KnownBindings]: KnownBindings[K] extends KnownBindings[Alias] ? K : never
+          }[keyof KnownBindings],
+          Alias
+        >
+  ): void {
+    if (typeof alias !== 'string' && typeof alias !== 'symbol') {
+      throw new InvalidAliasKeyException()
+    }
+
+    this.#aliases.set(alias, value)
   }
 
   /**

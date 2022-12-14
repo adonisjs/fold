@@ -457,3 +457,88 @@ test.group('Container | Contextual Bindings', () => {
     )
   })
 })
+
+test.group('Container | Aliases', () => {
+  test('register an alias that point to an existing binding', async ({ assert }) => {
+    const container = new Container()
+    class Route {}
+
+    container.bind('route', () => {
+      return new Route()
+    })
+    container.alias('adonisjs.route', 'route')
+
+    const route = await container.make('adonisjs.route')
+    expectTypeOf(route).toBeAny()
+    assert.instanceOf(route, Route)
+  })
+
+  test('use symbol for the alias name', async ({ assert }) => {
+    const container = new Container()
+    class Route {}
+
+    container.bind('route', () => {
+      return new Route()
+    })
+    container.alias(Symbol.for('adonisjs.route'), 'route')
+
+    const route = await container.make(Symbol.for('adonisjs.route'))
+    expectTypeOf(route).toBeAny()
+    assert.instanceOf(route, Route)
+  })
+
+  test('disallow values other than string or symbol for the alias name', async ({ assert }) => {
+    const container = new Container()
+
+    assert.throws(
+      // @ts-expect-error
+      () => container.alias(1, 'router'),
+      'The container alias key must be of type "string" or "symbol"'
+    )
+
+    assert.throws(
+      // @ts-expect-error
+      () => container.alias([], 'router'),
+      'The container alias key must be of type "string" or "symbol"'
+    )
+
+    assert.throws(
+      // @ts-expect-error
+      () => container.alias({}, 'router'),
+      'The container alias key must be of type "string" or "symbol"'
+    )
+  })
+
+  test('return true from hasBinding when checking for alias', async ({ assert }) => {
+    const container = new Container()
+    class Route {}
+
+    const routeSymbol = Symbol('route')
+
+    container.bind(Route, () => new Route())
+    container.bind('route', () => new Route())
+    container.bind(routeSymbol, () => new Route())
+    container.alias('adonisjs.router', 'route')
+
+    assert.isTrue(container.hasBinding(Route))
+    assert.isTrue(container.hasBinding('route'))
+    assert.isTrue(container.hasBinding(routeSymbol))
+    assert.isTrue(container.hasBinding('adonisjs.router'))
+    assert.isFalse(container.hasBinding('db'))
+  })
+
+  test('return true from hasAllBindings when checking for alias', async ({ assert }) => {
+    const container = new Container()
+    class Route {}
+
+    const routeSymbol = Symbol('route')
+
+    container.bind(Route, () => new Route())
+    container.bind('route', () => new Route())
+    container.bind(routeSymbol, () => new Route())
+    container.alias('adonisjs.router', 'route')
+
+    assert.isTrue(container.hasAllBindings([Route, 'route', routeSymbol, 'adonisjs.router']))
+    assert.isFalse(container.hasAllBindings([Route, 'db', routeSymbol]))
+  })
+})

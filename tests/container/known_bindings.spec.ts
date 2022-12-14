@@ -241,3 +241,129 @@ test.group('Container | Binding values', () => {
     assert.strictEqual(route, route1)
   })
 })
+
+test.group('Container | Aliases', () => {
+  test('register an alias that point to an existing binding', async ({ assert }) => {
+    const container = new Container<{ 'route': Route; 'adonisjs.route': Route; 'foo': Foo }>()
+
+    class Route {
+      makeUrl() {}
+    }
+    class Foo {}
+
+    container.bind('route', () => {
+      return new Route()
+    })
+    // @ts-expect-error
+    container.alias('adonisjs.route', 'foo')
+    container.alias('adonisjs.route', 'route')
+
+    const route = await container.make('adonisjs.route')
+    expectTypeOf(route).toEqualTypeOf<Route>()
+    assert.instanceOf(route, Route)
+  })
+
+  test('use symbol for the alias name', async ({ assert }) => {
+    const aliasSymbol = Symbol('adonisjs.route')
+    const container = new Container<{ route: Route; [aliasSymbol]: Route }>()
+    class Route {
+      makeUrl() {}
+    }
+
+    container.bind('route', () => {
+      return new Route()
+    })
+
+    container.alias(aliasSymbol, 'route')
+
+    const route = await container.make(aliasSymbol)
+    expectTypeOf(route).toEqualTypeOf<Route>()
+    assert.instanceOf(route, Route)
+  })
+
+  test('make alias point to class constructor', async ({ assert }) => {
+    const container = new Container<{ 'adonisjs.route': Route }>()
+    class Route {
+      makeUrl() {}
+    }
+    class Foo {}
+
+    container.bind(Route, () => {
+      return new Route()
+    })
+
+    // @ts-expect-error
+    container.alias('adonisjs.route', Foo)
+    container.alias('adonisjs.route', Route)
+
+    const route = await container.make('adonisjs.route')
+    expectTypeOf(route).toEqualTypeOf<Route>()
+    assert.instanceOf(route, Route)
+  })
+
+  test('disallow values other than string or symbol for the alias name', async ({ assert }) => {
+    const container = new Container<{ 'route': Route; 'adonisjs.route': Route }>()
+    class Route {
+      makeUrl() {}
+    }
+
+    assert.throws(
+      // @ts-expect-error
+      () => container.alias(1, 'route'),
+      'The container alias key must be of type "string" or "symbol"'
+    )
+
+    assert.throws(
+      // @ts-expect-error
+      () => container.alias([], 'route'),
+      'The container alias key must be of type "string" or "symbol"'
+    )
+
+    assert.throws(
+      // @ts-expect-error
+      () => container.alias({}, 'route'),
+      'The container alias key must be of type "string" or "symbol"'
+    )
+  })
+
+  test('return true from hasBinding when checking for alias', async ({ assert }) => {
+    const routeSymbol = Symbol('route')
+
+    const container = new Container<{
+      [routeSymbol]: Route
+      'route': Route
+      'adonisjs.router': Route
+    }>()
+    class Route {}
+
+    container.bind(Route, () => new Route())
+    container.bind('route', () => new Route())
+    container.bind(routeSymbol, () => new Route())
+    container.alias('adonisjs.router', 'route')
+
+    assert.isTrue(container.hasBinding(Route))
+    assert.isTrue(container.hasBinding('route'))
+    assert.isTrue(container.hasBinding(routeSymbol))
+    assert.isTrue(container.hasBinding('adonisjs.router'))
+    assert.isFalse(container.hasBinding('db'))
+  })
+
+  test('return true from hasAllBindings when checking for alias', async ({ assert }) => {
+    const routeSymbol = Symbol('route')
+
+    const container = new Container<{
+      [routeSymbol]: Route
+      'route': Route
+      'adonisjs.router': Route
+    }>()
+    class Route {}
+
+    container.bind(Route, () => new Route())
+    container.bind('route', () => new Route())
+    container.bind(routeSymbol, () => new Route())
+    container.alias('adonisjs.router', 'route')
+
+    assert.isTrue(container.hasAllBindings([Route, 'route', routeSymbol, 'adonisjs.router']))
+    assert.isFalse(container.hasAllBindings([Route, 'db', routeSymbol]))
+  })
+})

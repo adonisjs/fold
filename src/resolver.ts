@@ -44,6 +44,17 @@ import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exc
  */
 export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
+   * Reference to the container aliases. They are shared between the container
+   * and resolver.
+   *
+   * We do not mutate this property within the resolver
+   */
+  #containerAliases: Map<
+    Partial<keyof KnownBindings>,
+    keyof KnownBindings | AbstractConstructor<any>
+  >
+
+  /**
    * Pre-registered contextual bindings. They are shared between the container
    * and resolver.
    *
@@ -97,6 +108,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       bindingValues: BindingValues
       swaps: Swaps
       hooks: Hooks
+      aliases: Map<Partial<keyof KnownBindings>, keyof KnownBindings | AbstractConstructor<any>>
       contextualBindings: Map<Constructor<any>, Bindings>
     },
     options: ContainerOptions
@@ -105,6 +117,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     this.#containerBindingValues = container.bindingValues
     this.#containerSwaps = container.swaps
     this.#containerHooks = container.hooks
+    this.#containerAliases = container.aliases
     this.#containerContextualBindings = container.contextualBindings
     this.#options = options
   }
@@ -182,8 +195,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
+  hasBinding(binding: BindingKey): boolean
   hasBinding(binding: BindingKey): boolean {
     return (
+      this.#containerAliases.has(binding) ||
       this.#bindingValues.has(binding) ||
       this.#containerBindingValues.has(binding) ||
       this.#containerBindings.has(binding)
@@ -195,6 +210,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * "bind", the "singleton", or the "bindValue" methods.
    */
   hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
+  hasAllBindings(bindings: BindingKey[]): boolean
   hasAllBindings(bindings: BindingKey[]): boolean {
     return bindings.every((binding) => this.hasBinding(binding))
   }
@@ -357,6 +373,13 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   ): Promise<Binding extends string | symbol ? KnownBindings[Binding] : Make<Binding>>
   make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>>
   async make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>> {
+    /**
+     * Make alias
+     */
+    if (this.#containerAliases.has(binding)) {
+      return this.resolveFor(null, this.#containerAliases.get(binding), runtimeValues)
+    }
+
     return this.resolveFor(null, binding, runtimeValues)
   }
 
