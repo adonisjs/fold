@@ -22,14 +22,14 @@ test.group('moduleImporter | toHandleMethod', (group) => {
     return () => remove(BASE_PATH)
   })
 
-  test('make callable from module importer', async ({ assert }) => {
+  test('make handle method object from module importer', async ({ assert }) => {
     assert.isFunction(
       // @ts-expect-error
       moduleImporter(() => import('#middleware/auth'), 'handle').toHandleMethod().handle
     )
   })
 
-  test('pass fixed container instance to the callable', async ({ assert }) => {
+  test('pass fixed container instance to the handle method object', async ({ assert }) => {
     await outputFile(
       join(BASE_PATH, 'middleware/silent_auth_v3.ts'),
       `
@@ -54,7 +54,7 @@ test.group('moduleImporter | toHandleMethod', (group) => {
     assert.deepEqual(args, ['invoked'])
   })
 
-  test('pass runtime resolver to the callable', async ({ assert }) => {
+  test('pass runtime resolver to the handle method object', async ({ assert }) => {
     await outputFile(
       join(BASE_PATH, 'middleware/silent_auth_v4.ts'),
       `

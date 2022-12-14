@@ -621,6 +621,47 @@ const resolver = container.createResolver()
 await handler.handle(resolver, [ctx])
 ```
 
+## Module caller
+The module caller is similar to module importer. However, instead of lazy loading a class, you pass the class constructor to this method.
+
+```ts
+import { moduleCaller } from '@adonisjs/fold'
+
+class AuthMiddleware {
+  handle() {}
+}
+
+const fn = moduleCaller(
+  AuthMiddleware,
+  'handle'
+).toCallable()
+
+// Later call it
+const container = new Container()
+const resolver = container.createResolver()
+await fn(resolver, [ctx])
+```
+
+Create handle method object
+
+```ts
+import { moduleCaller } from '@adonisjs/fold'
+
+class AuthMiddleware {
+  handle() {}
+}
+
+const handler = moduleImporter(
+  AuthMiddleware,
+  'handle'
+).toHandleMethod()
+
+// Later call it
+const container = new Container()
+const resolver = container.createResolver()
+await handler.handle(resolver, [ctx])
+```
+
 [gh-workflow-image]: https://img.shields.io/github/workflow/status/adonisjs/fold/test?style=for-the-badge
 [gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/test.yml 'Github action'
 [npm-image]: https://img.shields.io/npm/v/@adonisjs/fold/latest.svg?style=for-the-badge&logo=npm
