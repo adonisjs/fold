@@ -422,6 +422,8 @@ export class Container<KnownBindings extends Record<any, any>> {
       ? HookCallback<KnownBindings, KnownBindings[Binding]>
       : never
   ): void {
+    binding = (this.#aliases.get(binding) as Binding) || binding
+
     if (!this.#hooks.has(binding)) {
       this.#hooks.set(binding, new Set())
     }

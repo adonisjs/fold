@@ -5,7 +5,7 @@ import { expectTypeOf } from 'expect-type'
 import { Container } from '../../src/container.js'
 
 test.group('Container | Hooks', () => {
-  test('run hook when a binding a resolved', async ({ assert }) => {
+  test('run hook when a binding is resolved', async ({ assert }) => {
     const emitter = new EventEmitter()
     const container = new Container<{ route: Route }>({ emitter })
     class Route {
@@ -17,6 +17,78 @@ test.group('Container | Hooks', () => {
     })
 
     container.resolving('route', (route) => {
+      expectTypeOf(route).toEqualTypeOf<Route>()
+      route.pattern = '/'
+    })
+
+    const route = await container.make('route')
+    expectTypeOf(route).toEqualTypeOf<Route>()
+
+    assert.instanceOf(route, Route)
+    assert.equal(route.pattern, '/')
+  })
+
+  test('run hook when an alias is resolved', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container<{ 'route': Route; 'adonisjs.route': Route }>({ emitter })
+    class Route {
+      pattern!: string
+    }
+
+    container.bind('route', () => {
+      return new Route()
+    })
+    container.alias('adonisjs.route', 'route')
+
+    container.resolving('adonisjs.route', (route) => {
+      expectTypeOf(route).toEqualTypeOf<Route>()
+      route.pattern = '/'
+    })
+
+    const route = await container.make('adonisjs.route')
+    expectTypeOf(route).toEqualTypeOf<Route>()
+
+    assert.instanceOf(route, Route)
+    assert.equal(route.pattern, '/')
+  })
+
+  test('run hook listening for binding when an alias is resolved', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container<{ 'route': Route; 'adonisjs.route': Route }>({ emitter })
+    class Route {
+      pattern!: string
+    }
+
+    container.bind('route', () => {
+      return new Route()
+    })
+    container.alias('adonisjs.route', 'route')
+
+    container.resolving('route', (route) => {
+      expectTypeOf(route).toEqualTypeOf<Route>()
+      route.pattern = '/'
+    })
+
+    const route = await container.make('adonisjs.route')
+    expectTypeOf(route).toEqualTypeOf<Route>()
+
+    assert.instanceOf(route, Route)
+    assert.equal(route.pattern, '/')
+  })
+
+  test('run hook listening for alias when binding is resolved', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container<{ 'route': Route; 'adonisjs.route': Route }>({ emitter })
+    class Route {
+      pattern!: string
+    }
+
+    container.bind('route', () => {
+      return new Route()
+    })
+    container.alias('adonisjs.route', 'route')
+
+    container.resolving('adonisjs.route', (route) => {
       expectTypeOf(route).toEqualTypeOf<Route>()
       route.pattern = '/'
     })
