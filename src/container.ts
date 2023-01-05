@@ -7,7 +7,8 @@
  * file that was distributed with this source code.
  */
 
-import { RuntimeException } from '@poppinss/utils'
+import { inspect } from 'node:util'
+import { InvalidArgumentsException } from '@poppinss/utils'
 
 import type {
   Make,
@@ -29,8 +30,6 @@ import debug from './debug.js'
 import { enqueue, isClass } from './helpers.js'
 import { ContainerResolver } from './resolver.js'
 import { ContextBindingsBuilder } from './contextual_bindings_builder.js'
-import { InvalidAliasKeyException } from './exceptions/invalid_alias_key_exception.js'
-import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exception.js'
 
 /**
  * The container class exposes the API to register bindings, values
@@ -212,7 +211,9 @@ export class Container<KnownBindings extends Record<any, any>> {
         >
   ): void {
     if (typeof alias !== 'string' && typeof alias !== 'symbol') {
-      throw new InvalidAliasKeyException()
+      throw new InvalidArgumentsException(
+        'The container alias key must be of type "string" or "symbol"'
+      )
     }
 
     this.#aliases.set(alias, value)
@@ -260,7 +261,9 @@ export class Container<KnownBindings extends Record<any, any>> {
     >
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new InvalidBindingKeyException()
+      throw new InvalidArgumentsException(
+        'The container binding key must be of type "string", "symbol", or a "class constructor"'
+      )
     }
 
     debug('adding binding to container "%O"', binding)
@@ -294,7 +297,9 @@ export class Container<KnownBindings extends Record<any, any>> {
       : never
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new InvalidBindingKeyException()
+      throw new InvalidArgumentsException(
+        'The container binding key must be of type "string", "symbol", or a "class constructor"'
+      )
     }
 
     debug('adding value to container "%O"', binding)
@@ -341,7 +346,9 @@ export class Container<KnownBindings extends Record<any, any>> {
     >
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new InvalidBindingKeyException()
+      throw new InvalidArgumentsException(
+        'The container binding key must be of type "string", "symbol", or a "class constructor"'
+      )
     }
 
     debug('adding singleton to container "%O"', binding)
@@ -358,7 +365,9 @@ export class Container<KnownBindings extends Record<any, any>> {
     resolver: BindingResolver<KnownBindings, InstanceType<Binding>>
   ): void {
     if (!isClass(binding)) {
-      throw new RuntimeException('The binding value for a swap should be a class')
+      throw new InvalidArgumentsException(
+        `Cannot call swap on value "${inspect(binding)}". Only classes can be swapped`
+      )
     }
 
     debug('defining swap for "%O"', binding)
@@ -369,10 +378,6 @@ export class Container<KnownBindings extends Record<any, any>> {
    * Restore binding by removing its swap
    */
   restore(binding: AbstractConstructor<any>) {
-    if (!isClass(binding)) {
-      throw new RuntimeException('The binding value for a restore should be a class')
-    }
-
     debug('removing swap for "%s"', binding)
     this.#swaps.delete(binding)
   }
@@ -455,10 +460,12 @@ export class Container<KnownBindings extends Record<any, any>> {
     resolver: BindingResolver<KnownBindings, Make<Binding>>
   ): void {
     if (!isClass(binding)) {
-      throw new RuntimeException('The binding value for contextual binding should be class')
+      throw new InvalidArgumentsException(
+        `The binding value for contextual binding should be class`
+      )
     }
     if (!isClass(parent)) {
-      throw new RuntimeException('The parent value for contextual binding should be class')
+      throw new InvalidArgumentsException(`The parent value for contextual binding should be class`)
     }
 
     debug('adding contextual binding "%O" to "%O"', binding, parent)

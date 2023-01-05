@@ -8,7 +8,7 @@
  */
 
 import { inspect } from 'node:util'
-import { RuntimeException } from '@poppinss/utils'
+import { InvalidArgumentsException } from '@poppinss/utils'
 
 import type {
   Make,
@@ -28,7 +28,6 @@ import type {
 import debug from './debug.js'
 import { isClass } from './helpers.js'
 import { containerProvider } from './provider.js'
-import { InvalidBindingKeyException } from './exceptions/invalid_binding_key_exception.js'
 
 /**
  * Container resolver exposes the APIs to resolve bindings. You can think
@@ -124,19 +123,20 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   }
 
   /**
-   * Raises exception when uanble to construct a data type using
-   * container.
+   * Constructs exception for invalid binding value
    */
-  #disallowUnsupportValues(parent: any, binding: any): never {
+  #invalidBindingException(parent: any, binding: any): InvalidArgumentsException {
     if (parent) {
-      throw new RuntimeException(
+      return new InvalidArgumentsException(
         `Cannot inject "${inspect(binding)}" in "[class: ${
           parent.name
         }]". The value cannot be constructed`
       )
     }
 
-    throw new RuntimeException(`Cannot construct value "${inspect(binding)}" using container`)
+    return new InvalidArgumentsException(
+      `Cannot construct value "${inspect(binding)}" using container`
+    )
   }
 
   /**
@@ -233,7 +233,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      * or a symbol.
      */
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isAClass) {
-      this.#disallowUnsupportValues(parent, binding)
+      throw this.#invalidBindingException(parent, binding)
     }
 
     /**
@@ -258,8 +258,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     }
 
     /**
-     * Resolving contextual binding. Contextual bindings have more
-     * priority over bindings or binding values.
+     * Resolving contextual binding. Contextual bindings can only exists for
+     * class constructors
      */
     const contextualResolver = isAClass && this.#getBindingResolver(parent, binding)
     if (contextualResolver) {
@@ -356,7 +356,9 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       return value
     }
 
-    throw new RuntimeException(`Cannot resolve binding "${String(binding)}" from the container`)
+    throw new InvalidArgumentsException(
+      `Cannot resolve binding "${String(binding)}" from the container`
+    )
   }
 
   /**
@@ -404,7 +406,9 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     runtimeValues?: any[]
   ): Promise<ReturnType<Value[Method]>> {
     if (typeof value[method] !== 'function') {
-      throw new RuntimeException(`Missing method "${String(method)}" on "${inspect(value)}"`)
+      throw new InvalidArgumentsException(
+        `Missing method "${String(method)}" on "${inspect(value)}"`
+      )
     }
 
     if (debug.enabled) {
@@ -442,7 +446,9 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       : never
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
-      throw new InvalidBindingKeyException()
+      throw new InvalidArgumentsException(
+        'The container binding key must be of type "string", "symbol", or a "class constructor"'
+      )
     }
 
     debug('adding value to resolver "%O"', binding)

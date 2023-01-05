@@ -205,29 +205,20 @@ test.group('Container | swap', () => {
     assert.throws(
       // @ts-expect-error
       () => container.swap(1, () => {}),
-      'The binding value for a swap should be a class'
+      'Cannot call swap on value "1". Only classes can be swapped'
     )
 
     assert.throws(
       // @ts-expect-error
       () => container.swap([], () => {}),
-      'The binding value for a swap should be a class'
+      'Cannot call swap on value "[]". Only classes can be swapped'
     )
 
     assert.throws(
       // @ts-expect-error
       () => container.swap({}, () => {}),
-      'The binding value for a swap should be a class'
+      'Cannot call swap on value "{}". Only classes can be swapped'
     )
-
-    // @ts-expect-error
-    assert.throws(() => container.restore(1), 'The binding value for a restore should be a class')
-
-    // @ts-expect-error
-    assert.throws(() => container.restore([]), 'The binding value for a restore should be a class')
-
-    // @ts-expect-error
-    assert.throws(() => container.restore({}), 'The binding value for a restore should be a class')
   })
 
   test('use swap over contextual binding', async ({ assert }) => {

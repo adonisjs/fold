@@ -460,28 +460,14 @@ container.bind('db', () => new Database())
 const db = await container.make('db')
 ```
 
-## Exceptions
-The following known exceptions are raised by the container.
+## Common errors
 
-### E_INVALID_BINDING_KEY
-The exception is raised, when you try to bind a value/factory function to the container and the binding key is not a `string`, a `symbol` or a `class constructor`.
-
-For example:
-
-```ts
-// Exception will raised
-container.bind(123, () => { })
-
-// Works fine
-container.bind('123', () => { })
-```
-
-### E_INVALID_CONTAINER_DEPENDENCY
-The exception is raised, when you are trying to inject a value that cannot be constructed. A common source of issue is within TypeScript project, when using an `interface` or a `type` for dependency injection.
+### Cannot inject "xxxxx" in "[class: xxxxx]". The value cannot be constructed
+The error occurs, when you are trying to inject a value that cannot be constructed. A common source of issue is within TypeScript project, when using an `interface` or a `type` for dependency injection.
 
 In the following example, the `User` is a TypeScript type and there is no way for the container to construct a runtime value from this type (types are removed after transpiling the TypeScript code).
 
-Therefore, the container will raise an exception saying `Cannot inject "[Function: Object]". The value cannot be constructed`.
+Therefore, the container will raise an exception saying `Cannot inject "[Function: Object]" in "[class: UsersController]". The value cannot be constructed`.
 
 ```ts
 type User = {
