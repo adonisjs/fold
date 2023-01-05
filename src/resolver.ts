@@ -415,7 +415,16 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       debug('calling method %s, on value :%O', method, value)
     }
 
-    const dependencies = await containerProvider(value.constructor, method, this, runtimeValues)
+    let dependencies: any[] = []
+    const binding = value.constructor
+
+    const bindingProvider = this.#getBindingProvider(binding)
+    if (bindingProvider) {
+      dependencies = await bindingProvider(binding, method, this, containerProvider, runtimeValues)
+    } else {
+      dependencies = await containerProvider(binding, method, this, runtimeValues)
+    }
+
     return value[method](...dependencies)
   }
 

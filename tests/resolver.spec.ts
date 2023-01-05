@@ -28,7 +28,7 @@ test.group('Resolver', () => {
     assert.strictEqual(resolvedService.name, 'resolver_service')
   })
 
-  test('use custom containerProvider from the class constructor', async ({ assert }) => {
+  test('use static containerProvider to construct a class', async ({ assert }) => {
     assert.plan(4)
 
     class UserService {
@@ -54,6 +54,34 @@ test.group('Resolver', () => {
 
     expectTypeOf(resolvedService).toEqualTypeOf<UserService>()
     assert.instanceOf(resolvedService, UserService)
+  })
+
+  test('use static containerProvider to call a method', async ({ assert }) => {
+    assert.plan(3)
+
+    class UserService {
+      static containerProvider: ContainerProvider = (
+        binding,
+        property,
+        resolver,
+        defaultProvider,
+        runtimeValues
+      ) => {
+        assert.deepEqual(binding, UserService)
+        assert.deepEqual(this, UserService)
+        assert.equal(property, 'store')
+        return defaultProvider(binding, property, resolver, runtimeValues)
+      }
+
+      name?: string
+
+      store() {}
+    }
+
+    const container = new Container()
+    const resolver = container.createResolver()
+
+    await resolver.call(new UserService(), 'store')
   })
 
   test('disallow binding names other than string symbol or class constructor', async ({
