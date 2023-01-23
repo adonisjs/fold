@@ -28,7 +28,6 @@ import type {
 import debug from './debug.js'
 import { isClass } from './helpers.js'
 import { containerProvider } from './provider.js'
-import { exec } from 'node:child_process'
 
 /**
  * Container resolver exposes the APIs to resolve bindings. You can think
