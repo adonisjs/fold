@@ -174,7 +174,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     if (!this.#options.emitter) {
       return
     }
-    this.#options.emitter.emit('container:resolve', { binding, value })
+    this.#options.emitter.emit('container:resolved', { binding, value })
   }
 
   /**

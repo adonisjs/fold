@@ -1,4 +1,4 @@
-# AdonisJS Fold
+ # AdonisJS Fold
 
 > Simplest, straightforward implementation for IoC container in JavaScript
 
@@ -364,7 +364,7 @@ You can pass an instance of the [EventEmitter](https://nodejs.org/dist/latest-v1
 import { EventEmitter } from 'node:events'
 const emitter = new EventEmitter()
 
-emitter.on('container:resolve', ({ value, binding }) => {
+emitter.on('container:resolved', ({ value, binding }) => {
   // value is the resolved value
   // binding name can be a mix of string, class constructor, or a symbol.
 })

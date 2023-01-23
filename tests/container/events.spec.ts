@@ -16,7 +16,7 @@ test.group('Container | Events', () => {
     })
 
     const [event, route] = await Promise.all([
-      pEvent(emitter, 'container:resolve'),
+      pEvent(emitter, 'container:resolved'),
       container.make('route'),
     ])
 
@@ -35,7 +35,7 @@ test.group('Container | Events', () => {
     })
 
     const [event, route] = await Promise.all([
-      pEvent(emitter, 'container:resolve'),
+      pEvent(emitter, 'container:resolved'),
       container.make('route'),
     ])
 
@@ -54,11 +54,11 @@ test.group('Container | Events', () => {
     })
 
     const [event, route] = await Promise.all([
-      pEvent(emitter, 'container:resolve'),
+      pEvent(emitter, 'container:resolved'),
       container.make('route'),
     ])
     const [event1, route1] = await Promise.all([
-      pEvent(emitter, 'container:resolve'),
+      pEvent(emitter, 'container:resolved'),
       container.make('route'),
     ])
 
@@ -76,7 +76,7 @@ test.group('Container | Events', () => {
     container.bindValue('route', new Route())
 
     const [event, route] = await Promise.all([
-      pEvent(emitter, 'container:resolve'),
+      pEvent(emitter, 'container:resolved'),
       container.make('route'),
     ])
 
@@ -91,7 +91,7 @@ test.group('Container | Events', () => {
     class Route {}
 
     const [event, route] = await Promise.all([
-      pEvent(emitter, 'container:resolve'),
+      pEvent(emitter, 'container:resolved'),
       container.make(Route),
     ])
 
@@ -117,7 +117,7 @@ test.group('Container | Events', () => {
     }
 
     const [events, route] = await Promise.all([
-      pEventMultiple(emitter, 'container:resolve', { count: 3 }),
+      pEventMultiple(emitter, 'container:resolved', { count: 3 }),
       container.make(Route),
     ])
 
@@ -139,7 +139,7 @@ test.group('Container | Events', () => {
     container.swap(Route, () => new FakedRoute())
 
     const [event, route] = await Promise.all([
-      pEvent(emitter, 'container:resolve'),
+      pEvent(emitter, 'container:resolved'),
       container.make(Route),
     ])
 
