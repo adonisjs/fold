@@ -100,33 +100,6 @@ test.group('Container | Hooks', () => {
     assert.equal(route.pattern, '/')
   })
 
-  test('run hook only once when a singleton resolved', async ({ assert }) => {
-    const emitter = new EventEmitter()
-    const container = new Container<{ route: Route }>({ emitter })
-    class Route {
-      invocations: number = 0
-    }
-
-    container.bind('route', () => {
-      return new Route()
-    })
-
-    container.resolving('route', (route) => {
-      expectTypeOf(route).toEqualTypeOf<Route>()
-      route.invocations++
-    })
-
-    await container.make('route')
-    await container.make('route')
-    await container.make('route')
-
-    const route = await container.make('route')
-    expectTypeOf(route).toEqualTypeOf<Route>()
-
-    assert.instanceOf(route, Route)
-    assert.equal(route.invocations, 1)
-  })
-
   test('do not run hooks when values are resolved', async ({ assert }) => {
     const emitter = new EventEmitter()
     const container = new Container<{ route: Route }>({ emitter })
@@ -193,6 +166,58 @@ test.group('Container | Hooks', () => {
 
     assert.instanceOf(route, Route)
     assert.instanceOf(route, FakedRoute)
+    assert.equal(route.invocations, 1)
+  })
+
+  test('run hook once when a singleton resolved', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container<{ route: Route }>({ emitter })
+    class Route {
+      invocations: number = 0
+    }
+
+    container.singleton('route', () => {
+      return new Route()
+    })
+
+    container.resolving('route', (route) => {
+      expectTypeOf(route).toEqualTypeOf<Route>()
+      route.invocations++
+    })
+
+    await container.make('route')
+    await container.make('route')
+    await container.make('route')
+
+    const route = await container.make('route')
+    expectTypeOf(route).toEqualTypeOf<Route>()
+
+    assert.instanceOf(route, Route)
+    assert.equal(route.invocations, 1)
+  })
+
+  test('call hook once when a singleton is resolved parallely', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container<{ route: Route }>({ emitter })
+    class Route {
+      invocations: number = 0
+    }
+
+    container.singleton('route', () => {
+      return new Route()
+    })
+
+    container.resolving('route', (route) => {
+      expectTypeOf(route).toEqualTypeOf<Route>()
+      route.invocations++
+    })
+
+    await Promise.all([container.make('route'), container.make('route'), container.make('route')])
+
+    const route = await container.make('route')
+    expectTypeOf(route).toEqualTypeOf<Route>()
+
+    assert.instanceOf(route, Route)
     assert.equal(route.invocations, 1)
   })
 })

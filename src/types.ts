@@ -56,7 +56,17 @@ export type BindingResolver<KnownBindings extends Record<any, any>, Value> = (
 /**
  * Shape of the registered bindings
  */
-export type Bindings = Map<BindingKey, { resolver: BindingResolver<Record<any, any>, any> }>
+export type Bindings = Map<
+  BindingKey,
+  | { resolver: BindingResolver<Record<any, any>, any>; isSingleton: false }
+  | {
+      resolver: (
+        containerResolver: ContainerResolver<Record<any, any>>,
+        runtimeValues?: any[]
+      ) => Promise<{ value: any; cached: boolean }>
+      isSingleton: true
+    }
+>
 
 /**
  * Shape of the registered contextual bindings

@@ -267,7 +267,7 @@ export class Container<KnownBindings extends Record<any, any>> {
     }
 
     debug('adding binding to container "%O"', binding)
-    this.#bindings.set(binding, { resolver })
+    this.#bindings.set(binding, { resolver, isSingleton: false })
   }
 
   /**
@@ -352,7 +352,7 @@ export class Container<KnownBindings extends Record<any, any>> {
     }
 
     debug('adding singleton to container "%O"', binding)
-    this.#bindings.set(binding, { resolver: enqueue(resolver) })
+    this.#bindings.set(binding, { resolver: enqueue(resolver), isSingleton: true })
   }
 
   /**

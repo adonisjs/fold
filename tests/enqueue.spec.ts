@@ -28,8 +28,8 @@ test.group('Enqueue', () => {
 
     const times = await Promise.all([fn(), fn(), fn()])
     assert.lengthOf(times, 3)
-    assert.strictEqual(times[0], times[1])
-    assert.strictEqual(times[1], times[2])
+    assert.strictEqual(times[0].value, times[1].value)
+    assert.strictEqual(times[1].value, times[2].value)
   })
 
   test('get return value from the async underlying method', async ({ assert }) => {
@@ -39,8 +39,8 @@ test.group('Enqueue', () => {
 
     const times = await Promise.all([fn(), fn(), fn()])
     assert.lengthOf(times, 3)
-    assert.strictEqual(times[0], times[1])
-    assert.strictEqual(times[1], times[2])
+    assert.strictEqual(times[0].value, times[1].value)
+    assert.strictEqual(times[1].value, times[2].value)
   })
 
   test('get error from the underlying method', async ({ assert }) => {
@@ -59,7 +59,7 @@ test.group('Enqueue', () => {
     await assert.rejects(() => Promise.all([fn(), fn(), fn()]), 'failed')
   })
 
-  test('get error from all the under method calls', async ({ assert }) => {
+  test('get error for all underlying method calls', async ({ assert }) => {
     const fn = enqueue(() => {
       throw new Error('failed')
     })
@@ -71,7 +71,7 @@ test.group('Enqueue', () => {
     )
   })
 
-  test('get error from all the under async method calls', async ({ assert }) => {
+  test('get error for all underlying async method calls', async ({ assert }) => {
     const fn = enqueue(async () => {
       throw new Error('failed')
     })
@@ -91,8 +91,8 @@ test.group('Enqueue', () => {
     const date = await fn()
     const date1 = await fn()
     const date2 = await fn()
-    assert.strictEqual(date, date1)
-    assert.strictEqual(date1, date2)
+    assert.strictEqual(date.value, date1.value)
+    assert.strictEqual(date1.value, date2.value)
   })
 
   test('cache error in sequential calls', async ({ assert }) => {
@@ -182,5 +182,78 @@ test.group('Enqueue', () => {
 
     await Promise.allSettled([firstWrapper(), secondWrapper(), thirdWrapper()])
     assert.deepEqual(stack, ['invoked', 'first', 'second', 'third'])
+  })
+
+  test('reject parallel queue promises in the order they are registered', async ({ assert }) => {
+    const stack: string[] = []
+    const fn = enqueue(async () => {
+      throw new Error('Failed')
+    })
+
+    const firstWrapper = async () => {
+      try {
+        await fn()
+      } catch {
+        stack.push('handled by first')
+      }
+    }
+
+    const secondWrapper = async () => {
+      try {
+        await fn()
+      } catch {
+        stack.push('handled by second')
+      }
+    }
+
+    const thirdWrapper = async () => {
+      try {
+        await fn()
+      } catch {
+        stack.push('handled by third')
+      }
+    }
+
+    await Promise.all([firstWrapper(), secondWrapper(), thirdWrapper()])
+    assert.deepEqual(stack, ['handled by first', 'handled by second', 'handled by third'])
+  })
+
+  test('reject parallel queue promises in the order they are registered with allSettled', async ({
+    assert,
+  }) => {
+    const stack: string[] = []
+    const fn = enqueue(async () => {
+      throw new Error('Failed')
+    })
+
+    const firstWrapper = async () => {
+      try {
+        await fn()
+      } catch (error) {
+        stack.push('handled by first')
+        throw error
+      }
+    }
+
+    const secondWrapper = async () => {
+      try {
+        await fn()
+      } catch (error) {
+        stack.push('handled by second')
+        throw error
+      }
+    }
+
+    const thirdWrapper = async () => {
+      try {
+        await fn()
+      } catch (error) {
+        stack.push('handled by third')
+        throw error
+      }
+    }
+
+    await Promise.allSettled([firstWrapper(), secondWrapper(), thirdWrapper()])
+    assert.deepEqual(stack, ['handled by first', 'handled by second', 'handled by third'])
   })
 })

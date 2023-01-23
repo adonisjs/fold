@@ -41,6 +41,14 @@ export async function importDefault(importFn: () => Promise<{ default: any }>) {
 }
 
 /**
+ * Runs a function inside an async function. This ensure that syncrohonous
+ * errors are handled in the same way rejected promise is handled
+ */
+async function runAsAsync(callback: Function, args: any[]) {
+  return callback(...args)
+}
+
+/**
  * Converts a function to a self contained queue, where each call to
  * the function is queued until the first call resolves or rejects.
  *
@@ -90,7 +98,7 @@ export function enqueue(callback: Function) {
     queue = []
   }
 
-  return async function (...args: any) {
+  return function (...args: any): Promise<{ value: any; cached: boolean }> {
     /**
      * Already has value
      */
@@ -109,21 +117,30 @@ export function enqueue(callback: Function) {
      * In process, returning a deferred promise
      */
     if (isComputingValue) {
-      const promise = new Deferred()
+      const promise = new Deferred<{ value: any; cached: true }>()
       queue.push(promise)
       return promise.promise
     }
 
     isComputingValue = true
 
-    try {
-      const value = await callback(...args)
-      resolvePromises(value)
-      return value
-    } catch (error) {
-      rejectPromises(error)
-      throw error
-    }
+    /**
+     * We could have removed this promise in favor of async/await. But then
+     * we will have to call "resolvePromises" before returning the value.
+     * However, we want the following promise to resolve first and
+     * then resolve all other deferred promises.
+     */
+    return new Promise((resolve, reject) => {
+      runAsAsync(callback, args)
+        .then((value) => {
+          resolve({ value, cached: false })
+          resolvePromises({ value, cached: true })
+        })
+        .catch((error) => {
+          reject(error)
+          rejectPromises(error)
+        })
+    })
   }
 }
 

@@ -28,6 +28,7 @@ import type {
 import debug from './debug.js'
 import { isClass } from './helpers.js'
 import { containerProvider } from './provider.js'
+import { exec } from 'node:child_process'
 
 /**
  * Container resolver exposes the APIs to resolve bindings. You can think
@@ -307,18 +308,30 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      * Followed by the CONTAINER bindings
      */
     if (this.#containerBindings.has(binding)) {
-      const { resolver } = this.#containerBindings.get(binding)!
+      const { resolver, isSingleton } = this.#containerBindings.get(binding)!
+      let value
+      let executeHooks = isSingleton ? false : true
 
       /**
-       * Invoke binding resolver to get the value.
+       * Invoke binding resolver to get the value. In case of singleton,
+       * the "enqueue" method returns an object with the value and a
+       * boolean telling if a cached value is resolved.
        */
-      const value = await resolver(this, runtimeValues)
+      if (isSingleton) {
+        const result = await resolver(this, runtimeValues)
+        value = result.value
+        executeHooks = !result.cached
+      } else {
+        value = await resolver(this, runtimeValues)
+      }
 
       if (debug.enabled) {
         debug('resolved binding %O, resolved value :%O', binding, value)
       }
 
-      await this.#execHooks(binding, value)
+      if (executeHooks) {
+        await this.#execHooks(binding, value)
+      }
       this.#emit(binding, value)
 
       return value
