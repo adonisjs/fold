@@ -665,7 +665,7 @@ const resolver = container.createResolver()
 await handler.handle(resolver, [ctx])
 ```
 
-[gh-workflow-image]: https://img.shields.io/github/workflow/status/adonisjs/fold/test?style=for-the-badge
+[gh-workflow-image]: https://img.shields.io/github/actions/workflow/status/adonisjs/fold/test.yml?style=for-the-badge
 [gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/test.yml 'Github action'
 [npm-image]: https://img.shields.io/npm/v/@adonisjs/fold/latest.svg?style=for-the-badge&logo=npm
 [npm-url]: https://www.npmjs.com/package/@adonisjs/fold/v/latest 'npm'
