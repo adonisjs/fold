@@ -4,11 +4,7 @@
 
 <br />
 
-<div align="center">
-
 [![gh-workflow-image]][gh-workflow-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url] [![snyk-image]][snyk-url]
-
-</div>
 
 ## Why this project exists?
 
