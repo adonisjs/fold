@@ -8,6 +8,7 @@
  */
 
 import { defineStaticProperty } from '@poppinss/utils'
+import debug from '../debug.js'
 
 /**
  * Initiating the "containerInjections" property on the target, which is assumed
@@ -30,6 +31,9 @@ function defineConstructorInjections(target: any) {
   }
 
   initiateContainerInjections(target, '_constructor')
+  if (debug.enabled) {
+    debug('defining constructor injections for %O, params %O', `[class: ${target.name}]`, params)
+  }
   for (const param of params) {
     target.containerInjections._constructor.push(param)
   }
@@ -47,6 +51,14 @@ function defineMethodInjections(target: any, method: string | symbol) {
   }
 
   initiateContainerInjections(constructor, method)
+  if (debug.enabled) {
+    debug(
+      'defining method injections for %O, method %O, params %O',
+      `[class ${constructor.name}]`,
+      method,
+      params
+    )
+  }
   for (const param of params) {
     constructor.containerInjections[method].push(param)
   }

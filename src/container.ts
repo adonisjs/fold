@@ -302,7 +302,7 @@ export class Container<KnownBindings extends Record<any, any>> {
       )
     }
 
-    debug('adding value to container "%O"', binding)
+    debug('adding value to container %O', binding)
     this.#bindingValues.set(binding, value)
   }
 
@@ -351,7 +351,7 @@ export class Container<KnownBindings extends Record<any, any>> {
       )
     }
 
-    debug('adding singleton to container "%O"', binding)
+    debug('adding singleton to container %O', binding)
     this.#bindings.set(binding, { resolver: enqueue(resolver), isSingleton: true })
   }
 
@@ -370,7 +370,7 @@ export class Container<KnownBindings extends Record<any, any>> {
       )
     }
 
-    debug('defining swap for "%O"', binding)
+    debug('defining swap for %O', binding)
     this.#swaps.set(binding, resolver)
   }
 
@@ -378,7 +378,7 @@ export class Container<KnownBindings extends Record<any, any>> {
    * Restore binding by removing its swap
    */
   restore(binding: AbstractConstructor<any>) {
-    debug('removing swap for "%s"', binding)
+    debug('removing swap for %s', binding)
     this.#swaps.delete(binding)
   }
 
@@ -468,7 +468,7 @@ export class Container<KnownBindings extends Record<any, any>> {
       throw new InvalidArgumentsException(`The parent value for contextual binding should be class`)
     }
 
-    debug('adding contextual binding "%O" to "%O"', binding, parent)
+    debug('adding contextual binding %O to %O', binding, parent)
 
     /**
      * Create map for the parent if doesn't already exists
