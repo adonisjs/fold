@@ -21,26 +21,6 @@ export function isClass<T>(value: unknown): value is Constructor<T> {
 }
 
 /**
- * Dynamically import a module and ensure it has a default export
- */
-export async function importDefault(importFn: () => Promise<{ default: any }>) {
-  const moduleExports = await importFn()
-
-  /**
-   * Make sure a default export exists
-   */
-  if (!moduleExports.default) {
-    throw new RuntimeException(`Missing export default from "${importFn}" module`, {
-      cause: {
-        source: importFn,
-      },
-    })
-  }
-
-  return moduleExports.default
-}
-
-/**
  * Runs a function inside an async function. This ensure that syncrohonous
  * errors are handled in the same way rejected promise is handled
  */

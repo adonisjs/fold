@@ -9,9 +9,10 @@
 
 // @ts-expect-error
 import benchmark from 'benchmark'
+import { importDefault } from '@poppinss/utils'
+
 import Thread from '#services/thread'
 import { Container } from '../index.js'
-import { importDefault } from '../src/helpers.js'
 import { moduleImporter } from '../src/module_importer.js'
 
 const suite = new benchmark.Suite()

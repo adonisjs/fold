@@ -7,8 +7,9 @@
  * file that was distributed with this source code.
  */
 
+import { importDefault } from '@poppinss/utils'
+
 import { Container } from './container.js'
-import { importDefault } from './helpers.js'
 import { ContainerResolver } from './resolver.js'
 import type { ModuleHandler, ModuleCallable, Constructor } from './types.js'
 

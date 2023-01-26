@@ -105,7 +105,7 @@ test.group('moduleImporter | toHandleMethod', (group) => {
 
     await assert.rejects(
       () => handler.handle(args),
-      'Missing export default from "()=>import(\'#middleware/silent_auth_v5\')" module'
+      `Missing "export default" from lazy import "()=>import('#middleware/silent_auth_v5')"`
     )
   })
 })

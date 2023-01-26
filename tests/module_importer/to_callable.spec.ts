@@ -100,7 +100,7 @@ test.group('moduleImporter | toCallable', (group) => {
 
     await assert.rejects(
       () => fn(args),
-      'Missing export default from "()=>import(\'#middleware/silent_auth_v2\')" module'
+      `Missing "export default" from lazy import "()=>import('#middleware/silent_auth_v2')"`
     )
   })
 })
