@@ -190,6 +190,11 @@ export class Container<KnownBindings extends Record<any, any>> {
     return this.createResolver().call(value, method, runtimeValues)
   }
 
+  /**
+   * Register an alias for a binding. The value can be a reference
+   * to an existing binding or to a class constructor that will
+   * instantiate to the same value as the alias.
+   */
   alias<Alias extends keyof KnownBindings>(
     /**
      * An alias must always be defined as a string or a symbol. Classes cannot be
