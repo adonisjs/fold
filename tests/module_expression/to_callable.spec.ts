@@ -7,10 +7,8 @@
  * file that was distributed with this source code.
  */
 
-import { join } from 'node:path'
 import { test } from '@japa/runner'
 import { fileURLToPath } from 'node:url'
-import { outputFile, remove } from 'fs-extra'
 import { Container } from '../../src/container.js'
 import { moduleExpression } from '../../src/module_expression.js'
 
@@ -18,8 +16,9 @@ const BASE_URL = new URL('../app/', import.meta.url)
 const BASE_PATH = fileURLToPath(BASE_URL)
 
 test.group('moduleExpression | toCallable', (group) => {
-  group.each.setup(() => {
-    return () => remove(BASE_PATH)
+  group.each.setup(({ context }) => {
+    context.fs.baseUrl = BASE_URL
+    context.fs.basePath = BASE_PATH
   })
 
   test('make callable from module expression', async ({ assert }) => {
@@ -28,9 +27,9 @@ test.group('moduleExpression | toCallable', (group) => {
     )
   })
 
-  test('pass fixed container instance to the callable', async ({ assert }) => {
-    await outputFile(
-      join(BASE_PATH, 'controllers/auth/users_controller.ts'),
+  test('pass fixed container instance to the callable', async ({ assert, fs }) => {
+    await fs.create(
+      'controllers/auth/users_controller.ts',
       `
       export default class UsersController {
         handle(args) {
@@ -50,9 +49,9 @@ test.group('moduleExpression | toCallable', (group) => {
     assert.deepEqual(args, ['invoked'])
   })
 
-  test('pass runtime resolver to the callable', async ({ assert }) => {
-    await outputFile(
-      join(BASE_PATH, 'controllers/auth/admin_controller.ts'),
+  test('pass runtime resolver to the callable', async ({ assert, fs }) => {
+    await fs.create(
+      'controllers/auth/admin_controller.ts',
       `
       export default class AdminController {
         async handle(resolver) {
@@ -72,9 +71,9 @@ test.group('moduleExpression | toCallable', (group) => {
     assert.deepEqual(await resolver.make('args'), ['invoked'])
   })
 
-  test('raise exception when module is missing default export', async ({ assert }) => {
-    await outputFile(
-      join(BASE_PATH, 'controllers/auth/posts_controller.ts'),
+  test('raise exception when module is missing default export', async ({ assert, fs }) => {
+    await fs.create(
+      'controllers/auth/posts_controller.ts',
       `
       export class PostsController {
         handle(args) {

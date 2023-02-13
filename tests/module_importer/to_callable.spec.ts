@@ -7,10 +7,8 @@
  * file that was distributed with this source code.
  */
 
-import { join } from 'node:path'
 import { test } from '@japa/runner'
 import { fileURLToPath } from 'node:url'
-import { outputFile, remove } from 'fs-extra'
 import { Container } from '../../src/container.js'
 import { moduleImporter } from '../../src/module_importer.js'
 
@@ -18,8 +16,9 @@ const BASE_URL = new URL('../app/', import.meta.url)
 const BASE_PATH = fileURLToPath(BASE_URL)
 
 test.group('moduleImporter | toCallable', (group) => {
-  group.each.setup(() => {
-    return () => remove(BASE_PATH)
+  group.each.setup(({ context }) => {
+    context.fs.baseUrl = BASE_URL
+    context.fs.basePath = BASE_PATH
   })
 
   test('make callable from module importer', async ({ assert }) => {
@@ -29,9 +28,9 @@ test.group('moduleImporter | toCallable', (group) => {
     )
   })
 
-  test('pass fixed container instance to the callable', async ({ assert }) => {
-    await outputFile(
-      join(BASE_PATH, 'middleware/silent_auth.ts'),
+  test('pass fixed container instance to the callable', async ({ assert, fs }) => {
+    await fs.create(
+      'middleware/silent_auth.ts',
       `
       export default class SilentAuthMiddleware {
         handle(args) {
@@ -53,9 +52,9 @@ test.group('moduleImporter | toCallable', (group) => {
     assert.deepEqual(args, ['invoked'])
   })
 
-  test('pass runtime resolver to the callable', async ({ assert }) => {
-    await outputFile(
-      join(BASE_PATH, 'middleware/silent_auth_v1.ts'),
+  test('pass runtime resolver to the callable', async ({ assert, fs }) => {
+    await fs.create(
+      'middleware/silent_auth_v1.ts',
       `
       export default class SilentAuthMiddleware {
         async handle(resolver) {
@@ -77,9 +76,9 @@ test.group('moduleImporter | toCallable', (group) => {
     assert.deepEqual(await resolver.make('args'), ['invoked'])
   })
 
-  test('raise exception when module is missing default export', async ({ assert }) => {
-    await outputFile(
-      join(BASE_PATH, 'middleware/silent_auth_v2.ts'),
+  test('raise exception when module is missing default export', async ({ assert, fs }) => {
+    await fs.create(
+      'middleware/silent_auth_v2.ts',
       `
       export class SilentAuthMiddleware {
         async handle(resolver) {

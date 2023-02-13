@@ -7,10 +7,8 @@
  * file that was distributed with this source code.
  */
 
-import { join } from 'node:path'
 import { test } from '@japa/runner'
 import { fileURLToPath } from 'node:url'
-import { outputFile, remove } from 'fs-extra'
 import { Container } from '../../src/container.js'
 import { moduleExpression } from '../../src/module_expression.js'
 
@@ -18,8 +16,9 @@ const BASE_URL = new URL('../app/', import.meta.url)
 const BASE_PATH = fileURLToPath(BASE_URL)
 
 test.group('moduleExpression | toHandleMethod', (group) => {
-  group.each.setup(() => {
-    return () => remove(BASE_PATH)
+  group.each.setup(({ context }) => {
+    context.fs.baseUrl = BASE_URL
+    context.fs.basePath = BASE_PATH
   })
 
   test('make handle method object from module expression', async ({ assert }) => {
@@ -28,9 +27,9 @@ test.group('moduleExpression | toHandleMethod', (group) => {
     )
   })
 
-  test('pass fixed container instance to the handle method object', async ({ assert }) => {
-    await outputFile(
-      join(BASE_PATH, 'controllers/users_controller.ts'),
+  test('pass fixed container instance to the handle method object', async ({ assert, fs }) => {
+    await fs.create(
+      'controllers/users_controller.ts',
       `
       export default class UsersController {
         handle(args) {
@@ -51,9 +50,9 @@ test.group('moduleExpression | toHandleMethod', (group) => {
     assert.deepEqual(args, ['invoked'])
   })
 
-  test('pass runtime resolver to the handle method object', async ({ assert }) => {
-    await outputFile(
-      join(BASE_PATH, 'controllers/admin_controller.ts'),
+  test('pass runtime resolver to the handle method object', async ({ assert, fs }) => {
+    await fs.create(
+      'controllers/admin_controller.ts',
       `
       export default class AdminController {
         async handle(resolver) {
@@ -76,9 +75,9 @@ test.group('moduleExpression | toHandleMethod', (group) => {
     assert.deepEqual(await resolver.make('args'), ['invoked'])
   })
 
-  test('raise exception when module is missing default export', async ({ assert }) => {
-    await outputFile(
-      join(BASE_PATH, 'controllers/posts_controller.ts'),
+  test('raise exception when module is missing default export', async ({ assert, fs }) => {
+    await fs.create(
+      'controllers/posts_controller.ts',
       `
       export class PostsController {
         handle(args) {
