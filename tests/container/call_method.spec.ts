@@ -117,10 +117,7 @@ test.group('Container | Call method', () => {
       await container.call(new UserService(), 'foo')
     } catch (error) {
       assert.match(error.stack, /at createError \(.*call_method/)
-      assert.equal(
-        error.message,
-        `Cannot inject "{ foo: 'bar' }" in "[class: UserService]". The value cannot be constructed`
-      )
+      assert.equal(error.message, `Cannot inject "{ foo: 'bar' }" in "[class UserService]"`)
     }
   })
 

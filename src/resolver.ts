@@ -132,14 +132,29 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     createError: ErrorCreator
   ): InvalidArgumentsException {
     if (parent) {
-      return createError(
-        `Cannot inject "${inspect(binding)}" in "[class: ${
-          parent.name
-        }]". The value cannot be constructed`
-      )
+      const error = createError(`Cannot inject "${inspect(binding)}" in "[class ${parent.name}]"`)
+      error.help = 'The value is not a valid class'
+      return error
     }
 
     return createError(`Cannot construct value "${inspect(binding)}" using container`)
+  }
+
+  /**
+   * Constructs exception for binding with missing dependencies
+   */
+  #missingDependenciesException(parent: any, binding: any, createError: ErrorCreator) {
+    if (parent) {
+      const error = createError(
+        `Cannot inject "[class ${binding.name}]" in "[class ${parent.name}]"`
+      )
+      error.help = `Container is not able to resolve "${parent.name}" class dependencies`
+      return error
+    }
+
+    return createError(
+      `Cannot construct "[class ${binding.name}]" class. Container is not able to resolve its dependencies`
+    )
   }
 
   /**
@@ -371,9 +386,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
        * we have typehints. Therefore we throw an exception
        */
       if (dependencies.length < classConstructor.length) {
-        throw createError(
-          `Cannot construct "${binding.name}" class. Container is not able to resolve its dependencies`
-        )
+        throw this.#missingDependenciesException(parent, binding, createError)
       }
 
       const value = new binding(...dependencies) as Promise<Make<Binding>>

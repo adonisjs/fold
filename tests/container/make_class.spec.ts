@@ -163,10 +163,7 @@ test.group('Container | Make class', () => {
       await container.make(UserService)
     } catch (error) {
       assert.match(error.stack, /at createError \(.*make_class/)
-      assert.equal(
-        error.message,
-        `Cannot inject "{ foo: 'bar' }" in "[class: UserService]". The value cannot be constructed`
-      )
+      assert.equal(error.message, `Cannot inject "{ foo: 'bar' }" in "[class UserService]"`)
     }
   })
 
@@ -185,7 +182,7 @@ test.group('Container | Make class', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct "UserService" class. Container is not able to resolve its dependencies'
+      'Cannot construct "[class UserService]" class. Container is not able to resolve its dependencies'
     )
   })
 
@@ -207,10 +204,7 @@ test.group('Container | Make class', () => {
       await container.make(UserService)
     } catch (error) {
       assert.match(error.stack, /at createError \(.*make_class/)
-      assert.equal(
-        error.message,
-        'Cannot inject "[Function: String]" in "[class: UserService]". The value cannot be constructed'
-      )
+      assert.equal(error.message, 'Cannot inject "[Function: String]" in "[class UserService]"')
     }
   })
 
@@ -231,7 +225,7 @@ test.group('Container | Make class', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct "UserService" class. Container is not able to resolve its dependencies'
+      'Cannot construct "[class UserService]" class. Container is not able to resolve its dependencies'
     )
   })
 

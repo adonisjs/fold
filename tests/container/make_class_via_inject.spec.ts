@@ -36,7 +36,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot inject "[Function: Array]" in "[class: UserService]". The value cannot be constructed'
+      'Cannot inject "[Function: Array]" in "[class UserService]"'
     )
   })
 
@@ -186,7 +186,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot inject "[Function: String]" in "[class: UserService]". The value cannot be constructed'
+      'Cannot inject "[Function: String]" in "[class UserService]"'
     )
   })
 
@@ -201,7 +201,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot inject "[Function: Object]" in "[class: UserService]". The value cannot be constructed'
+      'Cannot inject "[Function: Object]" in "[class UserService]"'
     )
   })
 
@@ -216,7 +216,7 @@ test.group('Container | Make class via inject', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot inject "[Function: Object]" in "[class: UserService]". The value cannot be constructed'
+      'Cannot inject "[Function: Object]" in "[class UserService]"'
     )
   })
 
@@ -472,5 +472,22 @@ test.group('Container | Make class with contextual bindings', () => {
     const controller = await container.make(UsersController)
     expectTypeOf(controller).toEqualTypeOf<UsersController>()
     assert.instanceOf(controller.hash, Hash)
+  })
+
+  test('raise error when unable to constructor class dependency', async ({ assert }) => {
+    class UserService {
+      constructor(public config: { foo: string }) {}
+    }
+
+    @inject()
+    class UsersController {
+      constructor(_: UserService) {}
+    }
+
+    const container = new Container<{ foo: 'bar' }>()
+    await assert.rejects(
+      () => container.make(UsersController),
+      'Cannot inject "[class UserService]" in "[class UsersController]"'
+    )
   })
 })
