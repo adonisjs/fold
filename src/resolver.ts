@@ -17,6 +17,7 @@ import type {
   Bindings,
   BindingKey,
   Constructor,
+  ErrorCreator,
   BindingValues,
   BindingResolver,
   ExtractFunctions,
@@ -125,18 +126,20 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
    * Constructs exception for invalid binding value
    */
-  #invalidBindingException(parent: any, binding: any): InvalidArgumentsException {
+  #invalidBindingException(
+    parent: any,
+    binding: any,
+    createError: ErrorCreator
+  ): InvalidArgumentsException {
     if (parent) {
-      return new InvalidArgumentsException(
+      return createError(
         `Cannot inject "${inspect(binding)}" in "[class: ${
           parent.name
         }]". The value cannot be constructed`
       )
     }
 
-    return new InvalidArgumentsException(
-      `Cannot construct value "${inspect(binding)}" using container`
-    )
+    return createError(`Cannot construct value "${inspect(binding)}" using container`)
   }
 
   /**
@@ -224,7 +227,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   async resolveFor<Binding>(
     parent: unknown,
     binding: Binding,
-    runtimeValues?: any[]
+    runtimeValues?: any[],
+    createError: ErrorCreator = (message) => new RuntimeException(message)
   ): Promise<Make<Binding>> {
     const isAClass = isClass<Binding>(binding)
 
@@ -233,7 +237,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      * or a symbol.
      */
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isAClass) {
-      throw this.#invalidBindingException(parent, binding)
+      throw this.#invalidBindingException(parent, binding, createError)
     }
 
     /**
@@ -342,26 +346,32 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      */
     if (isAClass) {
       let dependencies: any[] = []
+      const classConstructor: InspectableConstructor = binding
 
-      const bindingProvider = this.#getBindingProvider(binding)
+      const bindingProvider = this.#getBindingProvider(classConstructor)
       if (bindingProvider) {
         dependencies = await bindingProvider(
-          binding,
+          classConstructor,
           '_constructor',
           this,
           containerProvider,
           runtimeValues
         )
       } else {
-        dependencies = await containerProvider(binding, '_constructor', this, runtimeValues)
+        dependencies = await containerProvider(
+          classConstructor,
+          '_constructor',
+          this,
+          runtimeValues
+        )
       }
 
       /**
        * Class has dependencies for which we do not have runtime values and neither
        * we have typehints. Therefore we throw an exception
        */
-      if (dependencies.length < binding.length) {
-        throw new RuntimeException(
+      if (dependencies.length < classConstructor.length) {
+        throw createError(
           `Cannot construct "${binding.name}" class. Container is not able to resolve its dependencies`
         )
       }
@@ -378,9 +388,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       return value
     }
 
-    throw new InvalidArgumentsException(
-      `Cannot resolve binding "${String(binding)}" from the container`
-    )
+    throw createError(`Cannot resolve binding "${String(binding)}" from the container`)
   }
 
   /**
@@ -399,18 +407,27 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    */
   make<Binding extends keyof KnownBindings>(
     binding: Binding,
-    runtimeValues?: any[]
+    runtimeValues?: any[],
+    createError?: ErrorCreator
   ): Promise<Binding extends string | symbol ? KnownBindings[Binding] : Make<Binding>>
-  make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>>
-  async make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>> {
+  make<Binding>(
+    binding: Binding,
+    runtimeValues?: any[],
+    createError?: ErrorCreator
+  ): Promise<Make<Binding>>
+  async make<Binding>(
+    binding: Binding,
+    runtimeValues?: any[],
+    createError?: ErrorCreator
+  ): Promise<Make<Binding>> {
     /**
      * Make alias
      */
     if (this.#containerAliases.has(binding)) {
-      return this.resolveFor(null, this.#containerAliases.get(binding), runtimeValues)
+      return this.resolveFor(null, this.#containerAliases.get(binding), runtimeValues, createError)
     }
 
-    return this.resolveFor(null, binding, runtimeValues)
+    return this.resolveFor(null, binding, runtimeValues, createError)
   }
 
   /**
@@ -425,12 +442,11 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   async call<Value extends Record<any, any>, Method extends ExtractFunctions<Value>>(
     value: Value,
     method: Method,
-    runtimeValues?: any[]
+    runtimeValues?: any[],
+    createError: ErrorCreator = (message) => new RuntimeException(message)
   ): Promise<ReturnType<Value[Method]>> {
     if (typeof value[method] !== 'function') {
-      throw new InvalidArgumentsException(
-        `Missing method "${String(method)}" on "${inspect(value)}"`
-      )
+      throw createError(`Missing method "${String(method)}" on "${inspect(value)}"`)
     }
 
     if (debug.enabled) {
@@ -452,7 +468,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      * we have typehints. Therefore we throw an exception
      */
     if (dependencies.length < value[method].length) {
-      throw new RuntimeException(
+      throw createError(
         `Cannot call "${binding.name}.${String(
           method
         )}" method. Container is not able to resolve its dependencies`

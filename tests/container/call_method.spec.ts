@@ -79,7 +79,9 @@ test.group('Container | Call method', () => {
 
     class UserService {
       static containerInjections = {
-        foo: [Database],
+        foo: {
+          dependencies: [Database],
+        },
       }
 
       foo(db: Database) {
@@ -99,7 +101,10 @@ test.group('Container | Call method', () => {
 
     class UserService {
       static containerInjections = {
-        foo: [Database, { foo: 'bar' }, 1],
+        foo: {
+          dependencies: [Database, { foo: 'bar' }, 1],
+          createError: (message: string) => new Error(message),
+        },
       }
 
       foo(_: any, __: any, id: number) {
@@ -108,10 +113,15 @@ test.group('Container | Call method', () => {
     }
 
     const container = new Container()
-    await assert.rejects(
-      () => container.call(new UserService(), 'foo'),
-      `Cannot inject "{ foo: 'bar' }" in "[class: UserService]". The value cannot be constructed`
-    )
+    try {
+      await container.call(new UserService(), 'foo')
+    } catch (error) {
+      assert.match(error.stack, /at createError \(.*call_method/)
+      assert.equal(
+        error.message,
+        `Cannot inject "{ foo: 'bar' }" in "[class: UserService]". The value cannot be constructed`
+      )
+    }
   })
 
   test('merge runtime values with container dependencies', async ({ assert }) => {
@@ -119,7 +129,9 @@ test.group('Container | Call method', () => {
 
     class UserService {
       static containerInjections = {
-        foo: [Database, String, Number],
+        foo: {
+          dependencies: [Database, String, Number],
+        },
       }
 
       foo(db: Database, name: string, id: number) {

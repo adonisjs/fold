@@ -31,7 +31,8 @@ export async function containerProvider(
     return values
   }
 
-  const injections = binding.containerInjections[property]
+  const injections = binding.containerInjections[property].dependencies
+  const createError = binding.containerInjections[property].createError
 
   /**
    * If the length of runtime values is more than the injections
@@ -61,7 +62,7 @@ export async function containerProvider(
         }
 
         const injection = injections[index]
-        return resolver.resolveFor(binding, injection)
+        return resolver.resolveFor(binding, injection, undefined, createError)
       })
     )
   }
@@ -91,7 +92,7 @@ export async function containerProvider(
         return values[index]
       }
 
-      return resolver.resolveFor(binding, injection)
+      return resolver.resolveFor(binding, injection, undefined, createError)
     })
   )
 }

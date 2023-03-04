@@ -17,6 +17,7 @@ import type {
   Bindings,
   BindingKey,
   Constructor,
+  ErrorCreator,
   HookCallback,
   BindingValues,
   BindingResolver,
@@ -166,11 +167,20 @@ export class Container<KnownBindings extends Record<any, any>> {
    */
   make<Binding extends keyof KnownBindings>(
     binding: Binding,
-    runtimeValues?: any[]
+    runtimeValues?: any[],
+    createError?: ErrorCreator
   ): Promise<Binding extends string | symbol ? KnownBindings[Binding] : Make<Binding>>
-  make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>>
-  make<Binding>(binding: Binding, runtimeValues?: any[]): Promise<Make<Binding>> {
-    return this.createResolver().make<Binding>(binding, runtimeValues)
+  make<Binding>(
+    binding: Binding,
+    runtimeValues?: any[],
+    createError?: ErrorCreator
+  ): Promise<Make<Binding>>
+  make<Binding>(
+    binding: Binding,
+    runtimeValues?: any[],
+    createError?: ErrorCreator
+  ): Promise<Make<Binding>> {
+    return this.createResolver().make<Binding>(binding, runtimeValues, createError)
   }
 
   /**
@@ -185,9 +195,10 @@ export class Container<KnownBindings extends Record<any, any>> {
   call<Value extends Record<any, any>, Method extends ExtractFunctions<Value>>(
     value: Value,
     method: Method,
-    runtimeValues?: any[]
+    runtimeValues?: any[],
+    createError?: ErrorCreator
   ): Promise<ReturnType<Value[Method]>> {
-    return this.createResolver().call(value, method, runtimeValues)
+    return this.createResolver().call(value, method, runtimeValues, createError)
   }
 
   /**

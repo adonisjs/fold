@@ -126,7 +126,10 @@ test.group('Container | Make class | Known bindings', () => {
 
     class UserService {
       static containerInjections = {
-        _constructor: [Database],
+        _constructor: {
+          dependencies: [Database],
+          createError: (message: string) => new Error(message),
+        },
       }
       constructor(public db: Database) {}
     }
@@ -140,11 +143,16 @@ test.group('Container | Make class | Known bindings', () => {
   })
 
   test('throw error when injecting non-class values to the constructor', async ({ assert }) => {
+    assert.plan(2)
+
     class UserService {
       args: any[]
 
       static containerInjections = {
-        _constructor: [{ foo: 'bar' }, 1, ['foo'], false, undefined, null, false],
+        _constructor: {
+          dependencies: [{ foo: 'bar' }, 1, ['foo'], false, undefined, null, false],
+          createError: (message: string) => new Error(message),
+        },
       }
       constructor(...args: any[]) {
         this.args = args
@@ -152,10 +160,15 @@ test.group('Container | Make class | Known bindings', () => {
     }
 
     const container = new Container<{ foo: 'bar' }>()
-    await assert.rejects(
-      () => container.make(UserService),
-      `Cannot inject "{ foo: 'bar' }" in "[class: UserService]". The value cannot be constructed`
-    )
+    try {
+      await container.make(UserService)
+    } catch (error) {
+      assert.match(error.stack, /at createError \(.*known_make_class/)
+      assert.equal(
+        error.message,
+        `Cannot inject "{ foo: 'bar' }" in "[class: UserService]". The value cannot be constructed`
+      )
+    }
   })
 
   test('fail when class has dependencies when containerInjections are empty', async ({
@@ -163,13 +176,16 @@ test.group('Container | Make class | Known bindings', () => {
   }) => {
     class UserService {
       static containerInjections = {
-        _constructor: [],
+        _constructor: {
+          dependencies: [],
+          createError: (message: string) => new Error(message),
+        },
       }
       constructor(public name: string) {}
     }
 
     const container = new Container()
-    assert.rejects(
+    await assert.rejects(
       () => container.make(UserService),
       'Cannot construct "UserService" class. Container is not able to resolve its dependencies'
     )
@@ -178,16 +194,24 @@ test.group('Container | Make class | Known bindings', () => {
   test('raise error when injecting a primitive class', async ({ assert }) => {
     class UserService {
       static containerInjections = {
-        _constructor: [String],
+        _constructor: {
+          dependencies: [String],
+          createError: (message: string) => new Error(message),
+        },
       }
       constructor() {}
     }
 
     const container = new Container<{ foo: 'bar' }>()
-    await assert.rejects(
-      () => container.make(UserService),
-      'Cannot inject "[Function: String]" in "[class: UserService]". The value cannot be constructed'
-    )
+    try {
+      await container.make(UserService)
+    } catch (error) {
+      assert.match(error.stack, /at createError \(.*known_make_class/)
+      assert.equal(
+        error.message,
+        'Cannot inject "[Function: String]" in "[class: UserService]". The value cannot be constructed'
+      )
+    }
   })
 
   test('throw error when constructing primitive values', async ({ assert }) => {

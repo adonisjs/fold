@@ -7,8 +7,16 @@
  * file that was distributed with this source code.
  */
 
+import type { Exception } from '@poppinss/utils'
+
 import type { Container } from './container.js'
 import type { ContainerResolver } from './resolver.js'
+
+/**
+ * A function to create custom errors when container fails. It can be
+ * used to point errors to the original source
+ */
+export type ErrorCreator = (message: string) => Exception
 
 /**
  * Extract functions from a type
@@ -31,7 +39,13 @@ export type AbstractConstructor<T> = abstract new (...args: any[]) => T
  * Shape of a class constructor with injections
  */
 export type InspectableConstructor = Function & {
-  containerInjections?: Record<string | number | symbol, any[]>
+  containerInjections?: Record<
+    string | number | symbol,
+    {
+      dependencies: any[]
+      createError?: ErrorCreator
+    }
+  >
   containerProvider?: ContainerProvider
 }
 

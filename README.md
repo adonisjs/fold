@@ -64,7 +64,9 @@ class Database {}
 
 class UserService {
   static containerInjections = {
-    _constructor: [Database],
+    _constructor: {
+      dependencies: [Database]
+    },
   }
 
   constructor(db) {
@@ -156,7 +158,9 @@ class Database {}
 
 class UserService {
   static containerInjections = {
-    find: [Database],
+    find: {
+      dependencies: [Database],
+    },
   }
 
   async find(db) {

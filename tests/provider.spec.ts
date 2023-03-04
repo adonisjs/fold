@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import { RuntimeException } from '@poppinss/utils'
 import { expectTypeOf } from 'expect-type'
 import { Container } from '../src/container.js'
 import { containerProvider } from '../src/provider.js'
@@ -33,7 +34,10 @@ test.group('Provider', () => {
     class Database {}
     class UserService {
       static containerInjections = {
-        constructor: [Database],
+        constructor: {
+          dependencies: [Database],
+          createError: (message: string) => new RuntimeException(message),
+        },
       }
     }
 
@@ -50,7 +54,10 @@ test.group('Provider', () => {
     class Database {}
     class UserService {
       static containerInjections = {
-        constructor: [Database],
+        constructor: {
+          dependencies: [Database],
+          createError: (message: string) => new RuntimeException(message),
+        },
       }
     }
 
@@ -69,7 +76,10 @@ test.group('Provider', () => {
     class Database {}
     class UserService {
       static containerInjections = {
-        constructor: [Database],
+        constructor: {
+          dependencies: [Database],
+          createError: (message: string) => new RuntimeException(message),
+        },
       }
     }
 
@@ -88,7 +98,10 @@ test.group('Provider', () => {
   test('dis-allow primitive constructors', async ({ assert }) => {
     class UserService {
       static containerInjections = {
-        constructor: [String],
+        constructor: {
+          dependencies: [String],
+          createError: (message: string) => new RuntimeException(message),
+        },
       }
     }
 
