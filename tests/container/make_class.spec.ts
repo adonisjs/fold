@@ -158,7 +158,7 @@ test.group('Container | Make class', () => {
     )
   })
 
-  test('do not inject constructor dependencies when containerInjections are empty', async ({
+  test('fail when class has dependencies when containerInjections are empty', async ({
     assert,
   }) => {
     class UserService {
@@ -169,11 +169,10 @@ test.group('Container | Make class', () => {
     }
 
     const container = new Container()
-    const service = await container.make(UserService)
-
-    assert.instanceOf(service, UserService)
-    expectTypeOf(service).toEqualTypeOf<UserService>()
-    assert.isUndefined(service.name)
+    assert.rejects(
+      () => container.make(UserService),
+      'Cannot construct "UserService" class. Container is not able to resolve its dependencies'
+    )
   })
 
   test('raise error when injecting is a primitive class', async ({ assert }) => {
@@ -198,5 +197,37 @@ test.group('Container | Make class', () => {
       () => container.make(String),
       'Cannot construct value "[Function: String]" using container'
     )
+  })
+
+  test('raise error when class has dependencies but no hints', async ({ assert }) => {
+    class UserService {
+      constructor(public config: { foo: string }) {}
+    }
+
+    const container = new Container()
+    await assert.rejects(
+      () => container.make(UserService),
+      'Cannot construct "UserService" class. Container is not able to resolve its dependencies'
+    )
+  })
+
+  test('work fine when runtime values satisfies dependencies', async ({ assert }) => {
+    class UserService {
+      constructor(public config: { foo: string }) {}
+    }
+
+    const container = new Container()
+    const service = await container.make(UserService, [{ foo: 'bar' }])
+    assert.equal(service.config.foo, 'bar')
+  })
+
+  test('work fine when constructor parameter has a default value', async ({ assert }) => {
+    class UserService {
+      constructor(public config: { foo: string } = { foo: 'baz' }) {}
+    }
+
+    const container = new Container()
+    const service = await container.make(UserService)
+    assert.equal(service.config.foo, 'baz')
   })
 })

@@ -1,4 +1,4 @@
- # AdonisJS Fold
+# AdonisJS Fold
 
 > Simplest, straightforward implementation for IoC container in JavaScript
 
@@ -261,6 +261,7 @@ await resolve.make(SomeClass)
 ```
 
 ## Aliases
+
 Container aliases allows defining aliases for an existing binding. The alias should be either a `string` or a `symbol`.
 
 ```ts
@@ -278,6 +279,7 @@ assert.instanceOf(db, Database)
 ```
 
 ## Contextual bindings
+
 Contextual bindings allows you to register custom dependency resolvers on a given class for a specific dependency. You will be mostly using contextual bindings with driver based implementations.
 
 For example: You have a `UserService` and a `BlogService` and both of them needs an instance of the Drive disk to write and read files. You want the `UserService` to use the local disk driver and `BlogService` to use the s3 disk driver.
@@ -316,6 +318,7 @@ container
 ```
 
 ## Swapping implementations
+
 When using the container to resolve a tree of dependencies, quite often you will have no control over the construction of a class and therefore you will be not able to swap/fake its dependencies when writing tests.
 
 In the following example, the `UsersController` needs an instance of the `UserService` class.
@@ -323,7 +326,7 @@ In the following example, the `UsersController` needs an instance of the `UserSe
 ```ts
 @inject()
 class UsersController {
-  constructor (service: UserService) {}
+  constructor(service: UserService) {}
 }
 ```
 
@@ -459,6 +462,7 @@ const db = await container.make('db')
 ## Common errors
 
 ### Cannot inject "xxxxx" in "[class: xxxxx]". The value cannot be constructed
+
 The error occurs, when you are trying to inject a value that cannot be constructed. A common source of issue is within TypeScript project, when using an `interface` or a `type` for dependency injection.
 
 In the following example, the `User` is a TypeScript type and there is no way for the container to construct a runtime value from this type (types are removed after transpiling the TypeScript code).
@@ -474,14 +478,16 @@ type User = {
 
 @inject()
 class UsersController {
-  constructor (user: User)
+  constructor(user: User)
 }
 ```
 
 ## Module expressions
+
 In AdonisJS, we allow binding methods in form of string based module expression. For example:
 
 **Instead of importing and using a controller as follows**
+
 ```ts
 import UsersController from '#controllers/users'
 
@@ -491,6 +497,7 @@ Route.get('users', (ctx) => {
 ```
 
 **You can bind the controller method as follows**
+
 ```ts
 Route.get('users', '#controllers/users.index')
 ```
@@ -504,6 +511,7 @@ There are a couple of reasons for using module expressions.
 So given we use **module expressions** widely in the AdonisJS ecosystem. We have abstracted the logic of parsing string based expressions into dedicated helpers to re-use and ease.
 
 ### Assumptions
+
 There is a strong assumption that every module references using module expression will have a `export default` exporting a class.
 
 ```ts
@@ -512,15 +520,13 @@ export default class UsersController {}
 ```
 
 ### toCallable
+
 The `toCallable` method returns a function that internally parses the module string expression and returns a function that you can invoke like any other JavaScript function.
 
 ```ts
 import { moduleExpression } from '@adonisjs/fold'
 
-const fn = moduleExpression(
-  '#controllers/users.index',
-  import.meta.url
-).toCallable()
+const fn = moduleExpression('#controllers/users.index', import.meta.url).toCallable()
 
 // Later call it
 const container = new Container()
@@ -532,16 +538,14 @@ You can also pass the container instance at the time of creating the callable fu
 
 ```ts
 const container = new Container()
-const fn = moduleExpression(
-  '#controllers/users.index',
-  import.meta.url
-).toCallable(container)
+const fn = moduleExpression('#controllers/users.index', import.meta.url).toCallable(container)
 
 // Later call it
 await fn([ctx])
 ```
 
 ### toHandleMethod
+
 The `toHandleMethod` method returns an object with the `handle` method. To the main difference between `toCallable` and `toHandleMethod` is their return output
 
 - `toHandleMethod` returns `{ handle: fn }`
@@ -550,10 +554,7 @@ The `toHandleMethod` method returns an object with the `handle` method. To the m
 ```ts
 import { moduleExpression } from '@adonisjs/fold'
 
-const handler = moduleExpression(
-  '#controllers/users.index',
-  import.meta.url
-).toHandleMethod()
+const handler = moduleExpression('#controllers/users.index', import.meta.url).toHandleMethod()
 
 // Later call it
 const container = new Container()
@@ -566,16 +567,16 @@ You can also pass the container instance at the time of creating the handle meth
 ```ts
 const container = new Container()
 
-const handler = moduleExpression(
-  '#controllers/users.index',
-  import.meta.url
-).toHandleMethod(container)
+const handler = moduleExpression('#controllers/users.index', import.meta.url).toHandleMethod(
+  container
+)
 
 // Later call it
 await handler.handle([ctx])
 ```
 
 ### Bechmarks
+
 Following are benchmarks to see the performance loss that happens when using module expressions.
 
 **Benchmarks were performed on Apple M1 iMac, 16GB**
@@ -588,6 +589,7 @@ Following are benchmarks to see the performance loss that happens when using mod
 - `inline`: When no lazy loading was performed. The module was importing inline using the `import` keyword.
 
 ## Module importer
+
 The module importer is similar to module expression. However, instead of defining the import path as a string, you have to define a function that imports the module.
 
 ```ts
@@ -621,6 +623,7 @@ await handler.handle(resolver, [ctx])
 ```
 
 ## Module caller
+
 The module caller is similar to module importer. However, instead of lazy loading a class, you pass the class constructor to this method.
 
 ```ts
@@ -630,10 +633,7 @@ class AuthMiddleware {
   handle() {}
 }
 
-const fn = moduleCaller(
-  AuthMiddleware,
-  'handle'
-).toCallable()
+const fn = moduleCaller(AuthMiddleware, 'handle').toCallable()
 
 // Later call it
 const container = new Container()
@@ -650,10 +650,7 @@ class AuthMiddleware {
   handle() {}
 }
 
-const handler = moduleImporter(
-  AuthMiddleware,
-  'handle'
-).toHandleMethod()
+const handler = moduleImporter(AuthMiddleware, 'handle').toHandleMethod()
 
 // Later call it
 const container = new Container()

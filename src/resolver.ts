@@ -8,7 +8,7 @@
  */
 
 import { inspect } from 'node:util'
-import { InvalidArgumentsException } from '@poppinss/utils'
+import { InvalidArgumentsException, RuntimeException } from '@poppinss/utils'
 
 import type {
   Make,
@@ -356,6 +356,16 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
         dependencies = await containerProvider(binding, '_constructor', this, runtimeValues)
       }
 
+      /**
+       * Class has dependencies for which we do not have runtime values and neither
+       * we have typehints. Therefore we throw an exception
+       */
+      if (dependencies.length < binding.length) {
+        throw new RuntimeException(
+          `Cannot construct "${binding.name}" class. Container is not able to resolve its dependencies`
+        )
+      }
+
       const value = new binding(...dependencies) as Promise<Make<Binding>>
 
       if (debug.enabled) {
@@ -435,6 +445,18 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       dependencies = await bindingProvider(binding, method, this, containerProvider, runtimeValues)
     } else {
       dependencies = await containerProvider(binding, method, this, runtimeValues)
+    }
+
+    /**
+     * Method has dependencies for which we do not have runtime values and neither
+     * we have typehints. Therefore we throw an exception
+     */
+    if (dependencies.length < value[method].length) {
+      throw new RuntimeException(
+        `Cannot call "${binding.name}.${String(
+          method
+        )}" method. Container is not able to resolve its dependencies`
+      )
     }
 
     return value[method](...dependencies)

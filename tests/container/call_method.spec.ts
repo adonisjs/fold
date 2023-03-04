@@ -144,4 +144,40 @@ test.group('Container | Call method', () => {
       'Missing method "foo" on "UserService {}"'
     )
   })
+
+  test('raise error when class method has dependencies but no hints', async ({ assert }) => {
+    class UserService {
+      foo(id: number) {
+        return id
+      }
+    }
+
+    const container = new Container()
+    await assert.rejects(
+      () => container.call(new UserService(), 'foo'),
+      'Cannot call "UserService.foo" method. Container is not able to resolve its dependencies'
+    )
+  })
+
+  test('work fine when runtime values satisfies dependencies', async ({ assert }) => {
+    class UserService {
+      foo(id: number) {
+        return id
+      }
+    }
+
+    const container = new Container()
+    assert.equal(await container.call(new UserService(), 'foo', [1]), 1)
+  })
+
+  test('work fine when method param has a default value', async ({ assert }) => {
+    class UserService {
+      foo(id: number = 2) {
+        return id
+      }
+    }
+
+    const container = new Container()
+    assert.equal(await container.call(new UserService(), 'foo'), 2)
+  })
 })
