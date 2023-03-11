@@ -124,7 +124,7 @@
   },
   "homepage": "https://github.com/adonisjs/fold#readme",
   "dependencies": {
-    "@poppinss/utils": "^6.5.0-0"
+    "@poppinss/utils": "^6.5.0-1"
   },
   "c8": {
     "reporter": [
