@@ -294,10 +294,12 @@ test.group('Container | Make class with contextual bindings', () => {
       return new Argon2()
     })
 
-    expectTypeOf(builder.provide).parameters.toEqualTypeOf<[BindingResolver<any, Hash>]>()
+    expectTypeOf(builder.provide).parameters.toEqualTypeOf<
+      [BindingResolver<Record<any, any>, Hash>]
+    >()
     expectTypeOf(container.contextualBinding<typeof Hash>)
       .parameter(2)
-      .toEqualTypeOf<BindingResolver<any, Hash>>()
+      .toEqualTypeOf<BindingResolver<Record<any, any>, Hash>>()
 
     const controller = await container.make(UsersController)
     expectTypeOf(controller).toEqualTypeOf<UsersController>()
@@ -335,10 +337,12 @@ test.group('Container | Make class with contextual bindings', () => {
       return new Argon2()
     })
 
-    expectTypeOf(builder.provide).parameters.toEqualTypeOf<[BindingResolver<any, Hash>]>()
+    expectTypeOf(builder.provide).parameters.toEqualTypeOf<
+      [BindingResolver<Record<any, any>, Hash>]
+    >()
     expectTypeOf(container.contextualBinding<typeof Hash>)
       .parameter(2)
-      .toEqualTypeOf<BindingResolver<any, Hash>>()
+      .toEqualTypeOf<BindingResolver<Record<any, any>, Hash>>()
 
     /**
      * As soon as a binding for the class is defined, the binding
@@ -387,10 +391,12 @@ test.group('Container | Make class with contextual bindings', () => {
       return new Argon2()
     })
 
-    expectTypeOf(builder.provide).parameters.toEqualTypeOf<[BindingResolver<any, Hash>]>()
+    expectTypeOf(builder.provide).parameters.toEqualTypeOf<
+      [BindingResolver<Record<any, any>, Hash>]
+    >()
     expectTypeOf(container.contextualBinding<typeof Hash>)
       .parameter(2)
-      .toEqualTypeOf<BindingResolver<any, Hash>>()
+      .toEqualTypeOf<BindingResolver<Record<any, any>, Hash>>()
 
     /**
      * When the binding is registered in the container, we consider
@@ -432,10 +438,12 @@ test.group('Container | Make class with contextual bindings', () => {
       return resolver.make(Hash)
     })
 
-    expectTypeOf(builder.provide).parameters.toEqualTypeOf<[BindingResolver<any, Hash>]>()
+    expectTypeOf(builder.provide).parameters.toEqualTypeOf<
+      [BindingResolver<Record<any, any>, Hash>]
+    >()
     expectTypeOf(container.contextualBinding<typeof Hash>)
       .parameter(2)
-      .toEqualTypeOf<BindingResolver<any, Hash>>()
+      .toEqualTypeOf<BindingResolver<Record<any, any>, Hash>>()
 
     const controller = await container.make(UsersController)
     expectTypeOf(controller).toEqualTypeOf<UsersController>()
@@ -464,10 +472,12 @@ test.group('Container | Make class with contextual bindings', () => {
       return new Foo()
     })
 
-    expectTypeOf(builder.provide).parameters.toEqualTypeOf<[BindingResolver<any, Foo>]>()
+    expectTypeOf(builder.provide).parameters.toEqualTypeOf<
+      [BindingResolver<Record<any, any>, Foo>]
+    >()
     expectTypeOf(container.contextualBinding<typeof Hash>)
       .parameter(2)
-      .toEqualTypeOf<BindingResolver<any, Hash>>()
+      .toEqualTypeOf<BindingResolver<Record<any, any>, Hash>>()
 
     const controller = await container.make(UsersController)
     expectTypeOf(controller).toEqualTypeOf<UsersController>()

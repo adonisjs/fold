@@ -254,7 +254,7 @@ test.group('Container | swap', () => {
 
     expectTypeOf(container.contextualBinding<typeof Hash>)
       .parameter(2)
-      .toEqualTypeOf<BindingResolver<any, Hash>>()
+      .toEqualTypeOf<BindingResolver<Record<any, any>, Hash>>()
 
     const controller = await container.make(UsersController)
     expectTypeOf(controller).toEqualTypeOf<UsersController>()
