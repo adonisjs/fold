@@ -4,7 +4,7 @@
 
 <br />
 
-[![gh-workflow-image]][gh-workflow-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url] [![snyk-image]][snyk-url]
+[![gh-workflow-image]][gh-workflow-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url]
 
 ## Why this project exists?
 
@@ -662,12 +662,10 @@ const resolver = container.createResolver()
 await handler.handle(resolver, [ctx])
 ```
 
-[gh-workflow-image]: https://img.shields.io/github/actions/workflow/status/adonisjs/fold/test.yml?style=for-the-badge
-[gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/test.yml 'Github action'
+[gh-workflow-image]: https://img.shields.io/github/actions/workflow/status/adonisjs/fold/checks.yml?style=for-the-badge
+[gh-workflow-url]: https://github.com/adonisjs/fold/actions/workflows/checks.yml 'Github action'
 [npm-image]: https://img.shields.io/npm/v/@adonisjs/fold/latest.svg?style=for-the-badge&logo=npm
 [npm-url]: https://www.npmjs.com/package/@adonisjs/fold/v/latest 'npm'
 [typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?style=for-the-badge&logo=typescript
 [license-url]: LICENSE.md
 [license-image]: https://img.shields.io/github/license/adonisjs/fold?style=for-the-badge
-[snyk-image]: https://img.shields.io/snyk/vulnerabilities/github/adonisjs/fold?label=Snyk%20Vulnerabilities&style=for-the-badge
-[snyk-url]: https://snyk.io/test/github/adonisjs/fold?targetFile=package.json 'snyk'
