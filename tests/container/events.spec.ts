@@ -152,4 +152,24 @@ test.group('Container | Events', () => {
     assert.instanceOf(route, FakedRoute)
     assert.deepEqual(event, { binding: Route, value: route })
   })
+
+  test('register emitter using the useEmitter method', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container()
+    class Route {}
+
+    container.useEmitter(emitter)
+    container.bind('route', () => {
+      return new Route()
+    })
+
+    const [event, route] = await Promise.all([
+      pEvent(emitter, 'container:resolved'),
+      container.make('route'),
+    ])
+
+    expectTypeOf(route).toBeAny()
+    assert.instanceOf(route, Route)
+    assert.deepEqual(event, { binding: 'route', value: route })
+  })
 })

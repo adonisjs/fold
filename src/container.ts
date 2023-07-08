@@ -100,6 +100,14 @@ export class Container<KnownBindings extends Record<any, any>> {
   }
 
   /**
+   * Define an emitter instance to use
+   */
+  useEmitter(emitter: Exclude<ContainerOptions['emitter'], undefined>) {
+    this.#options.emitter = emitter
+    return this
+  }
+
+  /**
    * Create a container resolver to resolve bindings, or make classes.
    *
    * ```ts
