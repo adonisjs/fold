@@ -95,7 +95,7 @@ export function moduleExpression(expression: string, parentURL: URL | string) {
      */
     toCallable<
       T extends Container<any> | ContainerResolver<any> | undefined = undefined,
-      Args extends any[] = any[]
+      Args extends any[] = any[],
     >(container?: T): ModuleCallable<T, Args> {
       let defaultExport: any = null
       const [importPath, method] = this.parse()
@@ -151,7 +151,7 @@ export function moduleExpression(expression: string, parentURL: URL | string) {
      */
     toHandleMethod<
       T extends Container<any> | ContainerResolver<any> | undefined = undefined,
-      Args extends any[] = any[]
+      Args extends any[] = any[],
     >(container?: T): ModuleHandler<T, Args> {
       let defaultExport: any = null
       const [importPath, method] = this.parse()

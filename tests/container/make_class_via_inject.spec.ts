@@ -125,7 +125,10 @@ test.group('Container | Make class via inject', () => {
 
     @inject()
     class UserService extends BaseService {
-      constructor(db: Database, public emitter: Emitter) {
+      constructor(
+        db: Database,
+        public emitter: Emitter
+      ) {
         super(db)
       }
     }

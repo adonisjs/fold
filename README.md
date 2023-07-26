@@ -65,7 +65,7 @@ class Database {}
 class UserService {
   static containerInjections = {
     _constructor: {
-      dependencies: [Database]
+      dependencies: [Database],
     },
   }
 

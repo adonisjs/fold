@@ -75,7 +75,7 @@ export function moduleImporter(
      */
     toCallable<
       T extends Container<any> | ContainerResolver<any> | undefined = undefined,
-      Args extends any[] = any[]
+      Args extends any[] = any[],
     >(container?: T): ModuleCallable<T, Args> {
       let defaultExport: any = null
 
@@ -130,7 +130,7 @@ export function moduleImporter(
      */
     toHandleMethod<
       T extends Container<any> | ContainerResolver<any> | undefined = undefined,
-      Args extends any[] = any[]
+      Args extends any[] = any[],
     >(container?: T): ModuleHandler<T, Args> {
       let defaultExport: any = null
 

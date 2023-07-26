@@ -62,7 +62,7 @@ export function moduleCaller(target: Constructor<any>, method: string) {
      */
     toCallable<
       T extends Container<any> | ContainerResolver<any> | undefined = undefined,
-      Args extends any[] = any[]
+      Args extends any[] = any[],
     >(container?: T): ModuleCallable<T, Args> {
       /**
        * When container defined at the time of the calling this function,
@@ -112,7 +112,7 @@ export function moduleCaller(target: Constructor<any>, method: string) {
      */
     toHandleMethod<
       T extends Container<any> | ContainerResolver<any> | undefined = undefined,
-      Args extends any[] = any[]
+      Args extends any[] = any[],
     >(container?: T): ModuleHandler<T, Args> {
       if (container) {
         return {
