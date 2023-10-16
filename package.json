@@ -28,7 +28,7 @@
     "clean": "del-cli build",
     "benchmark": "npm run build && node --experimental-import-meta-resolve build/benchmark/module_expression.js && node --experimental-import-meta-resolve build/benchmark/module_importer.js",
     "typecheck": "tsc --noEmit",
-    "compile": "npm run lint && npm run clean && tsc",
+    "compile": "npm run lint && npm run clean && tsup-node",
     "build": "npm run compile",
     "release": "np",
     "version": "npm run build",
@@ -71,6 +71,7 @@
     "prettier": "^3.0.3",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.9.1",
+    "tsup": "^7.2.0",
     "typescript": "^5.2.2"
   },
   "commitlint": {
@@ -110,5 +111,16 @@
   "eslintConfig": {
     "extends": "@adonisjs/eslint-config/package"
   },
-  "prettier": "@adonisjs/prettier-config"
+  "prettier": "@adonisjs/prettier-config",
+  "tsup": {
+    "entry": [
+      "./index.ts",
+      "./src/types.ts"
+    ],
+    "outDir": "./build",
+    "clean": true,
+    "format": "esm",
+    "dts": true,
+    "target": "esnext"
+  }
 }
