@@ -56,7 +56,7 @@
     "@japa/assert": "^2.0.0",
     "@japa/file-system": "^2.0.0",
     "@japa/runner": "^3.0.2",
-    "@swc/core": "^1.3.78",
+    "@swc/core": "1.3.82",
     "@types/node": "^20.8.6",
     "benchmark": "^2.1.4",
     "c8": "^8.0.1",
