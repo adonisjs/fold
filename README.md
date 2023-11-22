@@ -27,13 +27,13 @@ I have explained the [reasons for using an IoC container](https://github.com/the
 Install the package from the npm packages registry.
 
 ```sh
-npm i @adonisjs/fold
+npm i @adonisjs/fold@next
 
 # yarn lovers
-yarn add @adonisjs/fold
+yarn add @adonisjs/fold@next
 
 # pnpm followers
-pnpm add @adonisjs/fold
+pnpm add @adonisjs/fold@next
 ```
 
 Once done, you can import the `Container` class from the package and create an instance of it. For the most part, you will use a single instance of the container.
