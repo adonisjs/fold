@@ -280,8 +280,8 @@ export class Container<KnownBindings extends Record<any, any>> {
       Binding extends AbstractConstructor<infer A>
         ? A
         : Binding extends keyof KnownBindings
-        ? KnownBindings[Binding]
-        : never
+          ? KnownBindings[Binding]
+          : never
     >
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
@@ -317,8 +317,8 @@ export class Container<KnownBindings extends Record<any, any>> {
     value: Binding extends AbstractConstructor<infer A>
       ? A
       : Binding extends keyof KnownBindings
-      ? KnownBindings[Binding]
-      : never
+        ? KnownBindings[Binding]
+        : never
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
       throw new InvalidArgumentsException(
@@ -365,8 +365,8 @@ export class Container<KnownBindings extends Record<any, any>> {
       Binding extends AbstractConstructor<infer A>
         ? A
         : Binding extends keyof KnownBindings
-        ? KnownBindings[Binding]
-        : never
+          ? KnownBindings[Binding]
+          : never
     >
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
@@ -448,8 +448,8 @@ export class Container<KnownBindings extends Record<any, any>> {
     callback: Binding extends AbstractConstructor<infer A>
       ? HookCallback<KnownBindings, A>
       : Binding extends keyof KnownBindings
-      ? HookCallback<KnownBindings, KnownBindings[Binding]>
-      : never
+        ? HookCallback<KnownBindings, KnownBindings[Binding]>
+        : never
   ): void {
     binding = (this.#aliases.get(binding) as Binding) || binding
 

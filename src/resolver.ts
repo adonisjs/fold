@@ -514,8 +514,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     value: Binding extends AbstractConstructor<infer A>
       ? A
       : Binding extends keyof KnownBindings
-      ? KnownBindings[Binding]
-      : never
+        ? KnownBindings[Binding]
+        : never
   ): void {
     if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
       throw new InvalidArgumentsException(
