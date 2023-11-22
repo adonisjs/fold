@@ -2,22 +2,25 @@
   "name": "@adonisjs/fold",
   "version": "9.9.3-10",
   "description": "A simple and straight forward implementation for IoC container in JavaScript",
+  "type": "module",
   "main": "build/index.js",
   "files": [
-    "build"
+    "build",
+    "!build/benchmarks",
+    "!build/bin",
+    "!build/tests"
   ],
+  "engines": {
+    "node": ">=18.16.0"
+  },
   "imports": {
     "#controllers/*": "./tests/app/controllers/*.js",
     "#middleware/*": "./tests/app/middleware/*.js",
-    "#services/*": "./build/benchmark/services/*.js"
+    "#services/*": "./build/benchmarks/services/*.js"
   },
   "exports": {
     ".": "./build/index.js",
     "./types": "./build/src/types.js"
-  },
-  "type": "module",
-  "engines": {
-    "node": ">=18.16.0"
   },
   "scripts": {
     "pretest": "npm run lint",
@@ -26,7 +29,8 @@
     "clean": "del-cli build",
     "benchmark": "npm run build && node --experimental-import-meta-resolve build/benchmark/module_expression.js && node --experimental-import-meta-resolve build/benchmark/module_importer.js",
     "typecheck": "tsc --noEmit",
-    "compile": "npm run lint && npm run clean && tsup-node",
+    "precompile": "npm run lint && npm run clean",
+    "compile": "tsup-node && tsc --emitDeclarationOnly --declaration",
     "build": "npm run compile",
     "release": "np",
     "version": "npm run build",
@@ -35,16 +39,12 @@
     "format": "prettier --write .",
     "sync-labels": "github-label-sync --labels .github/labels.json adonisjs/fold"
   },
-  "publishConfig": {
-    "access": "public",
-    "tag": "next"
-  },
+  "license": "MIT",
   "keywords": [
     "ioc",
     "container"
   ],
   "author": "virk,adonisjs",
-  "license": "MIT",
   "devDependencies": {
     "@adonisjs/eslint-config": "^1.1.9",
     "@adonisjs/prettier-config": "^1.1.9",
@@ -72,10 +72,12 @@
     "tsup": "^8.0.1",
     "typescript": "5.2.2"
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
+  "dependencies": {
+    "@poppinss/utils": "^6.5.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "next"
   },
   "np": {
     "message": "chore(release): %s",
@@ -94,8 +96,10 @@
     "url": "https://github.com/adonisjs/fold/issues"
   },
   "homepage": "https://github.com/adonisjs/fold#readme",
-  "dependencies": {
-    "@poppinss/utils": "^6.5.1"
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   },
   "c8": {
     "reporter": [
@@ -118,7 +122,8 @@
     "outDir": "./build",
     "clean": true,
     "format": "esm",
-    "dts": true,
+    "dts": false,
+    "sourcemap": true,
     "target": "esnext"
   }
 }
