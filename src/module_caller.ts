@@ -13,7 +13,7 @@ import type { ModuleHandler, ModuleCallable, Constructor } from './types.js'
 
 /**
  * The moduleCaller works around a very specific pattern we use with
- * AdonisJS, ie to constructor classes and call methods using the
+ * AdonisJS, ie to construct classes and call methods using the
  * container.
  *
  * For example: Controllers of AdonisJS allows defining a controller
@@ -116,6 +116,7 @@ export function moduleCaller(target: Constructor<any>, method: string) {
     >(container?: T): ModuleHandler<T, Args> {
       if (container) {
         return {
+          name: `${target.name}.${method}`,
           async handle(...args: Args) {
             return container.call(await container.make(target), method, args)
           },
@@ -123,6 +124,7 @@ export function moduleCaller(target: Constructor<any>, method: string) {
       }
 
       return {
+        name: `${target.name}.${method}`,
         async handle(resolver: ContainerResolver<any> | Container<any>, ...args: Args) {
           return resolver.call(await resolver.make(target), method, args)
         },

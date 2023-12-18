@@ -136,6 +136,7 @@ export function moduleImporter(
 
       if (container) {
         return {
+          name: importFn.name,
           async handle(...args: Args) {
             defaultExport = defaultExport || (await importDefault(importFn))
             return container.call(await container.make(defaultExport), method, args)
@@ -144,6 +145,7 @@ export function moduleImporter(
       }
 
       return {
+        name: importFn.name,
         async handle(resolver: ContainerResolver<any> | Container<any>, ...args: Args) {
           defaultExport = defaultExport || (await importDefault(importFn))
           return resolver.call(await resolver.make(defaultExport), method, args)

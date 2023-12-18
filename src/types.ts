@@ -176,8 +176,10 @@ export type ModuleCallable<T, Args extends any[]> = T extends undefined
  */
 export type ModuleHandler<T, Args extends any[]> = T extends undefined
   ? {
+      name?: string
       handle(resolver: ContainerResolver<any> | Container<any>, ...args: Args): Promise<any>
     }
   : {
+      name?: string
       handle(...args: Args): Promise<any>
     }
