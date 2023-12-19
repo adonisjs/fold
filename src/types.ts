@@ -101,7 +101,7 @@ export type Swaps = Map<AbstractConstructor<any>, BindingResolver<Record<any, an
 export type BindingValues = Map<BindingKey, any>
 
 /**
- * The data emitted using the `container:resolve` event. If known bindings
+ * The data emitted by the `container_binding:resolved` event. If known bindings
  * are defined, then the bindings and values will be correctly
  * inferred.
  */
