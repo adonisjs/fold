@@ -167,9 +167,7 @@ test.group('Container | Make class', () => {
     }
   })
 
-  test('fail when class has dependencies when containerInjections are empty', async ({
-    assert,
-  }) => {
+  test('fail when class has dependencies but containerInjections are empty', async ({ assert }) => {
     class UserService {
       static containerInjections = {
         _constructor: {
@@ -182,7 +180,7 @@ test.group('Container | Make class', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct "[class UserService]" class. Container is not able to resolve its dependencies'
+      'Cannot construct "[class UserService]" class. Container is not able to resolve its dependencies. Did you mean to use @inject decorator'
     )
   })
 
@@ -225,7 +223,7 @@ test.group('Container | Make class', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct "[class UserService]" class. Container is not able to resolve its dependencies'
+      'Cannot construct "[class UserService]" class. Container is not able to resolve its dependencies. Did you mean to use @inject decorator'
     )
   })
 

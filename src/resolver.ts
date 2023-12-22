@@ -148,12 +148,12 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       const error = createError(
         `Cannot inject "[class ${binding.name}]" in "[class ${parent.name}]"`
       )
-      error.help = `Container is not able to resolve "${parent.name}" class dependencies`
+      error.help = `Container is not able to resolve "${parent.name}" class dependencies. Did you mean to use @inject decorator`
       return error
     }
 
     return createError(
-      `Cannot construct "[class ${binding.name}]" class. Container is not able to resolve its dependencies`
+      `Cannot construct "[class ${binding.name}]" class. Container is not able to resolve its dependencies. Did you mean to use @inject decorator`
     )
   }
 
@@ -484,7 +484,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       throw createError(
         `Cannot call "${binding.name}.${String(
           method
-        )}" method. Container is not able to resolve its dependencies`
+        )}" method. Container is not able to resolve its dependencies. Did you mean to use @inject decorator`
       )
     }
 

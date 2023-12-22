@@ -184,7 +184,7 @@ test.group('Container | Make class | Known bindings', () => {
     const container = new Container()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct "[class UserService]" class. Container is not able to resolve its dependencies'
+      'Cannot construct "[class UserService]" class. Container is not able to resolve its dependencies. Did you mean to use @inject decorator'
     )
   })
 
@@ -225,7 +225,7 @@ test.group('Container | Make class | Known bindings', () => {
     const container = new Container<{ foo: 'bar' }>()
     await assert.rejects(
       () => container.make(UserService),
-      'Cannot construct "[class UserService]" class. Container is not able to resolve its dependencies'
+      'Cannot construct "[class UserService]" class. Container is not able to resolve its dependencies. Did you mean to use @inject decorator'
     )
   })
 

@@ -164,7 +164,7 @@ test.group('Container | Call method', () => {
     const container = new Container()
     await assert.rejects(
       () => container.call(new UserService(), 'foo'),
-      'Cannot call "UserService.foo" method. Container is not able to resolve its dependencies'
+      'Cannot call "UserService.foo" method. Container is not able to resolve its dependencies. Did you mean to use @inject decorator'
     )
   })
 
