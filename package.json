@@ -25,9 +25,9 @@
   "scripts": {
     "pretest": "npm run lint",
     "test": "cross-env NODE_DEBUG=adonisjs:fold c8 npm run quick:test",
-    "quick:test": "node --loader=ts-node/esm --experimental-import-meta-resolve bin/test.ts",
+    "quick:test": "node --loader=ts-node/esm bin/test.ts",
     "clean": "del-cli build",
-    "benchmark": "npm run build && node --experimental-import-meta-resolve build/benchmark/module_expression.js && node --experimental-import-meta-resolve build/benchmark/module_importer.js",
+    "benchmark": "npm run build && node build/benchmarks/module_expression.js && node build/benchmarks/module_importer.js",
     "typecheck": "tsc --noEmit",
     "precompile": "npm run lint && npm run clean",
     "compile": "tsup-node && tsc --emitDeclarationOnly --declaration",
@@ -117,6 +117,12 @@
   "tsup": {
     "entry": [
       "./index.ts",
+      "./benchmarks/module_expression.ts",
+      "./benchmarks/module_importer.ts",
+      "./benchmarks/services/comments.ts",
+      "./benchmarks/services/posts.ts",
+      "./benchmarks/services/thread.ts",
+      "./benchmarks/services/users.ts",
       "./src/types.ts"
     ],
     "outDir": "./build",
