@@ -11,12 +11,5 @@ insert_final_newline = true
 [*.json]
 insert_final_newline = ignore
 
-[**.min.js]
-indent_style = ignore
-insert_final_newline = ignore
-
-[MakeFile]
-indent_style = space
-
 [*.md]
 trim_trailing_whitespace = false

@@ -1,11 +1,10 @@
 {
-  "extends": "./node_modules/@adonisjs/mrm-preset/_tsconfig",
+  "extends": "@adonisjs/tsconfig/tsconfig.package.json",
   "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./build",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "types": [
-      "@types/node",
-      "reflect-metadata"
-    ]
+    "types": ["@types/node", "reflect-metadata"]
   }
 }
