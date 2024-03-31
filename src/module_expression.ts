@@ -8,9 +8,9 @@
  */
 
 import { Container } from './container.js'
-import { resolveCachedWithHotFallback, resolveDefault } from './helpers.js'
 import { ContainerResolver } from './resolver.js'
 import type { ModuleHandler, ModuleCallable } from './types.js'
+import { resolveCachedWithHotFallback, resolveDefault } from './helpers.js'
 
 /**
  * The moduleExpression module works around a very specific pattern we use
