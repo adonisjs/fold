@@ -11,6 +11,7 @@ import { importDefault } from '@poppinss/utils'
 
 import { Container } from './container.js'
 import { ContainerResolver } from './resolver.js'
+import { resolveCachedWithHotFallback } from './helpers.js'
 import type { ModuleHandler, ModuleCallable, Constructor } from './types.js'
 
 /**
@@ -85,7 +86,10 @@ export function moduleImporter(
        */
       if (container) {
         return async function (...args: Args) {
-          defaultExport = defaultExport || (await importDefault(importFn))
+          defaultExport = await resolveCachedWithHotFallback(
+            defaultExport,
+            async () => await importDefault(importFn)
+          )
           return container.call(await container.make(defaultExport), method, args)
         } as ModuleCallable<T, Args>
       }
@@ -94,7 +98,10 @@ export function moduleImporter(
        * Otherwise the return function asks for the resolver or container
        */
       return async function (resolver: ContainerResolver<any> | Container<any>, ...args: Args) {
-        defaultExport = defaultExport || (await importDefault(importFn))
+        defaultExport = await resolveCachedWithHotFallback(
+          defaultExport,
+          async () => await importDefault(importFn)
+        )
         return resolver.call(await resolver.make(defaultExport), method, args)
       } as ModuleCallable<T, Args>
     },
@@ -138,7 +145,10 @@ export function moduleImporter(
         return {
           name: importFn.name,
           async handle(...args: Args) {
-            defaultExport = defaultExport || (await importDefault(importFn))
+            defaultExport = await resolveCachedWithHotFallback(
+              defaultExport,
+              async () => await importDefault(importFn)
+            )
             return container.call(await container.make(defaultExport), method, args)
           },
         } as ModuleHandler<T, Args>
@@ -147,7 +157,10 @@ export function moduleImporter(
       return {
         name: importFn.name,
         async handle(resolver: ContainerResolver<any> | Container<any>, ...args: Args) {
-          defaultExport = defaultExport || (await importDefault(importFn))
+          defaultExport = await resolveCachedWithHotFallback(
+            defaultExport,
+            async () => await importDefault(importFn)
+          )
           return resolver.call(await resolver.make(defaultExport), method, args)
         },
       } as ModuleHandler<T, Args>

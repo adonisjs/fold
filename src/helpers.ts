@@ -144,3 +144,14 @@ export async function resolveDefault(importPath: string, parentURL: URL | string
 
   return moduleExports.default
 }
+
+/**
+ * - if `import.meta.hot` is true then the callback will always be evaluated
+ * - otherwise, the callback will be evaluated only when the cached value is missing
+ */
+export async function resolveCachedWithHotFallback(cachedValue: any, callback: () => any) {
+  // @ts-expect-error import.meta.hot is not defined in this context.
+  if (import.meta.hot) return await callback()
+
+  return cachedValue || (await callback())
+}
