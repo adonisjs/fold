@@ -85,7 +85,9 @@ export function moduleImporter(
        */
       if (container) {
         return async function (...args: Args) {
-          defaultExport = defaultExport || (await importDefault(importFn))
+          if (!defaultExport || 'hot' in import.meta) {
+            defaultExport = await importDefault(importFn)
+          }
           return container.call(await container.make(defaultExport), method, args)
         } as ModuleCallable<T, Args>
       }
@@ -94,7 +96,9 @@ export function moduleImporter(
        * Otherwise the return function asks for the resolver or container
        */
       return async function (resolver: ContainerResolver<any> | Container<any>, ...args: Args) {
-        defaultExport = defaultExport || (await importDefault(importFn))
+        if (!defaultExport || 'hot' in import.meta) {
+          defaultExport = await importDefault(importFn)
+        }
         return resolver.call(await resolver.make(defaultExport), method, args)
       } as ModuleCallable<T, Args>
     },
@@ -138,7 +142,9 @@ export function moduleImporter(
         return {
           name: importFn.name,
           async handle(...args: Args) {
-            defaultExport = defaultExport || (await importDefault(importFn))
+            if (!defaultExport || 'hot' in import.meta) {
+              defaultExport = await importDefault(importFn)
+            }
             return container.call(await container.make(defaultExport), method, args)
           },
         } as ModuleHandler<T, Args>
@@ -147,7 +153,9 @@ export function moduleImporter(
       return {
         name: importFn.name,
         async handle(resolver: ContainerResolver<any> | Container<any>, ...args: Args) {
-          defaultExport = defaultExport || (await importDefault(importFn))
+          if (!defaultExport || 'hot' in import.meta) {
+            defaultExport = await importDefault(importFn)
+          }
           return resolver.call(await resolver.make(defaultExport), method, args)
         },
       } as ModuleHandler<T, Args>

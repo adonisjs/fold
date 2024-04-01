@@ -106,7 +106,9 @@ export function moduleExpression(expression: string, parentURL: URL | string) {
        */
       if (container) {
         return async function (...args: Args) {
-          defaultExport = defaultExport || (await resolveDefault(importPath, parentURL))
+          if (!defaultExport || 'hot' in import.meta) {
+            defaultExport = await resolveDefault(importPath, parentURL)
+          }
           return container.call(await container.make(defaultExport), method, args)
         } as ModuleCallable<T, Args>
       }
@@ -115,7 +117,9 @@ export function moduleExpression(expression: string, parentURL: URL | string) {
        * Otherwise the return function asks for the resolver or container
        */
       return async function (resolver: ContainerResolver<any> | Container<any>, ...args: Args) {
-        defaultExport = defaultExport || (await resolveDefault(importPath, parentURL))
+        if (!defaultExport || 'hot' in import.meta) {
+          defaultExport = await resolveDefault(importPath, parentURL)
+        }
         return resolver.call(await resolver.make(defaultExport), method, args)
       } as ModuleCallable<T, Args>
     },
@@ -159,7 +163,9 @@ export function moduleExpression(expression: string, parentURL: URL | string) {
       if (container) {
         return {
           async handle(...args: Args) {
-            defaultExport = defaultExport || (await resolveDefault(importPath, parentURL))
+            if (!defaultExport || 'hot' in import.meta) {
+              defaultExport = await resolveDefault(importPath, parentURL)
+            }
             return container.call(await container.make(defaultExport), method, args)
           },
         } as ModuleHandler<T, Args>
@@ -167,7 +173,9 @@ export function moduleExpression(expression: string, parentURL: URL | string) {
 
       return {
         async handle(resolver: ContainerResolver<any> | Container<any>, ...args: Args) {
-          defaultExport = defaultExport || (await resolveDefault(importPath, parentURL))
+          if (!defaultExport || 'hot' in import.meta) {
+            defaultExport = await resolveDefault(importPath, parentURL)
+          }
           return resolver.call(await resolver.make(defaultExport), method, args)
         },
       } as ModuleHandler<T, Args>
