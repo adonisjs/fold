@@ -86,7 +86,7 @@ This property can define the dependencies for the class methods (including the c
 
 ### TypeScript to the rescue
 
-Wait, you can use decorators with combination of TypeScript's [emitDecoratorMetaData](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata) option to perform reflection. You will also need to install [`reflect-metadata`](https://www.npmjs.com/package/reflect-metadata) in order for TypeScript to exract metadata from your classes.
+Wait, you can use decorators with combination of TypeScript's [emitDecoratorMetaData](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata) option to perform reflection. You will also need to install [`reflect-metadata`](https://www.npmjs.com/package/reflect-metadata) in order for TypeScript to extract metadata from your classes.
 
 It is worth noting, TypeScript decorators are not as powerful as the reflection API in other languages. For example, in PHP, you can use interfaces for reflection. Whereas in TypeScript, you cannot.
 
