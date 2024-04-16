@@ -26,6 +26,7 @@
     "pretest": "npm run lint",
     "test": "cross-env NODE_DEBUG=adonisjs:fold c8 npm run quick:test",
     "quick:test": "node --loader=ts-node/esm bin/test.ts",
+    "citgm": "cross-env FORCE_COLOR=0 npm run quick:test",
     "clean": "del-cli build",
     "benchmark": "npm run build && node build/benchmarks/module_expression.js && node build/benchmarks/module_importer.js",
     "typecheck": "tsc --noEmit",
