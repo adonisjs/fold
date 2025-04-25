@@ -171,7 +171,7 @@ export type ModuleCallable<T, Args extends any[]> = T extends undefined
   : (...args: Args) => Promise<any>
 
 /**
- * The shape of the handle method objects that imports a module expression
+ * The shape of the handle method object that imports a module expression
  * and runs it using the container
  */
 export type ModuleHandler<T, Args extends any[]> = T extends undefined

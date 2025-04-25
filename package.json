@@ -1,7 +1,7 @@
 {
   "name": "@adonisjs/fold",
   "version": "10.1.3",
-  "description": "A simple and straight forward implementation for IoC container in JavaScript",
+  "description": "Simplest and straightforward implementation of IoC container in JavaScript",
   "type": "module",
   "main": "build/index.js",
   "files": [
@@ -60,7 +60,6 @@
     "del-cli": "^6.0.0",
     "eslint": "^9.25.1",
     "expect-type": "^1.2.1",
-    "husky": "^9.1.7",
     "p-event": "^6.0.1",
     "prettier": "^3.5.3",
     "reflect-metadata": "^0.2.2",

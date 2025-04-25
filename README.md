@@ -1,6 +1,6 @@
 # AdonisJS Fold
 
-> Simplest, straightforward implementation for IoC container in JavaScript
+> Simplest and straightforward implementation of IoC container in JavaScript
 
 <br />
 
