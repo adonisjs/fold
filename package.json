@@ -52,7 +52,7 @@
     "@japa/file-system": "^2.3.2",
     "@japa/runner": "^4.2.0",
     "@release-it/conventional-changelog": "^10.0.1",
-    "@swc/core": "^1.10.7",
+    "@swc/core": "1.10.7",
     "@types/node": "^22.15.0",
     "benchmark": "^2.1.4",
     "c8": "^10.1.3",
