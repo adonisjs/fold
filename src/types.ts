@@ -7,7 +7,8 @@
  * file that was distributed with this source code.
  */
 
-import type { Exception } from '@poppinss/utils'
+import type { Exception } from '@poppinss/utils/exception'
+import type { AbstractConstructor } from '@poppinss/utils/types'
 
 import type { Container } from './container.js'
 import type { ContainerResolver } from './resolver.js'
@@ -17,23 +18,6 @@ import type { ContainerResolver } from './resolver.js'
  * used to point errors to the original source
  */
 export type ErrorCreator = (message: string) => Exception
-
-/**
- * Extract functions from a type
- */
-export type ExtractFunctions<T> = {
-  [P in keyof T]: T[P] extends (...args: any[]) => any ? P : never
-}[keyof T]
-
-/**
- * Shape of a class constructor
- */
-export type Constructor<T> = new (...args: any[]) => T
-
-/**
- * Shape of a abstract class constructor
- */
-export type AbstractConstructor<T> = abstract new (...args: any[]) => T
 
 /**
  * Shape of a class constructor with injections

@@ -7,9 +7,11 @@
  * file that was distributed with this source code.
  */
 
-import { RuntimeException } from '@poppinss/utils'
+import { RuntimeException } from '@poppinss/utils/exception'
+import type { AbstractConstructor, Constructor } from '@poppinss/utils/types'
+
 import type { Container } from './container.js'
-import type { AbstractConstructor, BindingResolver, Constructor, Make } from './types.js'
+import type { BindingResolver, Make } from './types.js'
 
 /**
  * A fluent builder to register contextual bindings with the

@@ -7,10 +7,11 @@
  * file that was distributed with this source code.
  */
 
-import { defineStaticProperty, RuntimeException } from '@poppinss/utils'
+import { defineStaticProperty } from '@poppinss/utils'
+import { RuntimeException } from '@poppinss/utils/exception'
 
 import debug from '../debug.js'
-import { ErrorCreator, InspectableConstructor } from '../types.js'
+import type { ErrorCreator, InspectableConstructor } from '../types.js'
 
 /**
  * Creating a debugging error that points to the source

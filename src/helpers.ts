@@ -7,9 +7,9 @@
  * file that was distributed with this source code.
  */
 
-import { RuntimeException } from '@poppinss/utils'
+import type { Constructor } from '@poppinss/utils/types'
+import { RuntimeException } from '@poppinss/utils/exception'
 
-import type { Constructor } from './types.js'
 import { Deferred } from './deferred_promise.js'
 
 /**

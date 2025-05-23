@@ -1,6 +1,16 @@
+/*
+ * @adonisjs/fold
+ *
+ * (c) AdonisJS
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 import { test } from '@japa/runner'
-import { RuntimeException } from '@poppinss/utils'
 import { expectTypeOf } from 'expect-type'
+import { RuntimeException } from '@poppinss/utils/exception'
+
 import { Container } from '../src/container.js'
 import { containerProvider } from '../src/provider.js'
 

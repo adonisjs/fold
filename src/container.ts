@@ -8,7 +8,8 @@
  */
 
 import { inspect } from 'node:util'
-import { InvalidArgumentsException } from '@poppinss/utils'
+import { InvalidArgumentsException } from '@poppinss/utils/exception'
+import type { AbstractConstructor, Constructor, ExtractFunctions } from '@poppinss/utils/types'
 
 import type {
   Make,
@@ -16,14 +17,11 @@ import type {
   Swaps,
   Bindings,
   BindingKey,
-  Constructor,
   ErrorCreator,
   HookCallback,
   BindingValues,
   BindingResolver,
-  ExtractFunctions,
   ContainerOptions,
-  AbstractConstructor,
   ContextualBindings,
 } from './types.js'
 

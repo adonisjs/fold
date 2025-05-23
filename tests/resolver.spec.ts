@@ -1,3 +1,12 @@
+/*
+ * @adonisjs/fold
+ *
+ * (c) AdonisJS
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 import { test } from '@japa/runner'
 import { expectTypeOf } from 'expect-type'
 import { Container } from '../src/container.js'

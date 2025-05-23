@@ -7,9 +7,11 @@
  * file that was distributed with this source code.
  */
 
+import type { Constructor } from '@poppinss/utils/types'
+
 import { Container } from './container.js'
 import { ContainerResolver } from './resolver.js'
-import type { ModuleHandler, ModuleCallable, Constructor } from './types.js'
+import type { ModuleHandler, ModuleCallable } from './types.js'
 
 /**
  * The moduleCaller works around a very specific pattern we use with
