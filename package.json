@@ -40,28 +40,29 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@poppinss/utils": "^7.0.0-next.1"
+    "@poppinss/utils": "^7.0.0-next.1",
+    "parse-imports": "^2.2.1"
   },
   "devDependencies": {
-    "@adonisjs/eslint-config": "^2.0.0",
-    "@adonisjs/prettier-config": "^1.4.4",
-    "@adonisjs/tsconfig": "^1.4.0",
+    "@adonisjs/eslint-config": "^3.0.0-next.0",
+    "@adonisjs/prettier-config": "^1.4.5",
+    "@adonisjs/tsconfig": "^2.0.0-next.0",
     "@japa/assert": "^4.0.1",
     "@japa/file-system": "^2.3.2",
     "@japa/runner": "^4.2.0",
-    "@poppinss/ts-exec": "^1.2.0",
+    "@poppinss/ts-exec": "^1.4.0",
     "@release-it/conventional-changelog": "^10.0.1",
-    "@types/node": "^22.15.21",
+    "@types/node": "^24.0.0",
     "benchmark": "^2.1.4",
     "c8": "^10.1.3",
     "cross-env": "^7.0.3",
     "del-cli": "^6.0.0",
-    "eslint": "^9.27.0",
+    "eslint": "^9.28.0",
     "expect-type": "^1.2.1",
     "p-event": "^6.0.1",
     "prettier": "^3.5.3",
     "reflect-metadata": "^0.2.2",
-    "release-it": "^19.0.2",
+    "release-it": "^19.0.3",
     "tsup": "^8.5.0",
     "typescript": "~5.8.3"
   },

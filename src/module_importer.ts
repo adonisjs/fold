@@ -10,8 +10,8 @@
 import { importDefault } from '@poppinss/utils'
 import type { Constructor } from '@poppinss/utils/types'
 
-import { Container } from './container.js'
-import { ContainerResolver } from './resolver.js'
+import { type Container } from './container.js'
+import { type ContainerResolver } from './resolver.js'
 import type { ModuleHandler, ModuleCallable } from './types.js'
 
 /**

@@ -503,7 +503,7 @@ Route.get('users', '#controllers/users.index')
 **Why do we do this?**
 There are a couple of reasons for using module expressions.
 
-- Performance: Lazy loading controllers ensures that we keep the application boot process quick. Otherwise, we will pull all the controllers and their imports within a single routes file and that will surely impact the boot time of the application.
+- Performance: Lazy loading controllers ensures that we keep the application boot process quick. Otherwise, we will pull all the controllers and their imports within a single routes file and that will impact the boot time of the application.
 - Visual clutter: Imagine importing all the controllers within a single routes file (or maybe 2-3 different route files) and then instantiating them manually. This surely brings some visual clutter in your codebase (agree visual clutter is subjective).
 
 So given we use **module expressions** widely in the AdonisJS ecosystem. We have abstracted the logic of parsing string based expressions into dedicated helpers to re-use and ease.
@@ -654,6 +654,27 @@ const handler = moduleImporter(AuthMiddleware, 'handle').toHandleMethod()
 const container = new Container()
 const resolver = container.createResolver()
 await handler.handle(resolver, [ctx])
+```
+
+### parseBindingReference
+
+Parses a binding reference and returns a human readable name for it. The binding reference could be a **magic string**, **a class reference**, or a **lazy import**. This method is used by AdonisJS when listing routes and its handlers.
+
+```ts
+await parseBindingReference('#controllers/users_controller')
+// { moduleNameOrPath: '#controllers/users_controller', method: 'handle' }
+```
+
+```ts
+const UsersController = () => import('#controllers/users_controller')
+await parseBindingReference([UsersController, 'index'])
+// { moduleNameOrPath: '#controllers/users_controller', method: 'index' }
+```
+
+```ts
+import UsersController from '#controllers/users_controller'
+await parseBindingReference([UsersController, 'index'])
+// { moduleNameOrPath: 'UsersController', method: 'index' }
 ```
 
 [gh-workflow-image]: https://img.shields.io/github/actions/workflow/status/adonisjs/fold/checks.yml?style=for-the-badge

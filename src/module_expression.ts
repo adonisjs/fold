@@ -7,9 +7,9 @@
  * file that was distributed with this source code.
  */
 
-import { Container } from './container.js'
+import { type Container } from './container.js'
 import { resolveDefault } from './helpers.js'
-import { ContainerResolver } from './resolver.js'
+import { type ContainerResolver } from './resolver.js'
 import type { ModuleHandler, ModuleCallable } from './types.js'
 
 /**

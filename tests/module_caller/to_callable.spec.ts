@@ -11,7 +11,7 @@ import { test } from '@japa/runner'
 
 import { Container } from '../../src/container.js'
 import { moduleCaller } from '../../src/module_caller.js'
-import { ContainerResolver } from '../../src/resolver.js'
+import { type ContainerResolver } from '../../src/resolver.js'
 
 test.group('moduleCaller | toCallable', () => {
   test('make callable from module caller', async ({ assert }) => {
