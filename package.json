@@ -1,6 +1,6 @@
 {
   "name": "@adonisjs/fold",
-  "version": "10.1.3",
+  "version": "10.2.0",
   "description": "Simplest and straightforward implementation of IoC container in JavaScript",
   "type": "module",
   "main": "build/index.js",
