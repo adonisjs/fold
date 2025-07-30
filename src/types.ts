@@ -167,3 +167,10 @@ export type ModuleHandler<T, Args extends any[]> = T extends undefined
       name?: string
       handle(...args: Args): Promise<any>
     }
+
+/**
+ * Data shared with the container.make tracing channel
+ */
+export type ContainerMakeTracingData = {
+  binding: AbstractConstructor<any> | string | symbol
+}

@@ -27,6 +27,7 @@ import type {
 import debug from './debug.js'
 import { isClass } from './helpers.js'
 import { containerProvider } from './provider.js'
+import { containerMake } from './tracing_channels.ts'
 
 /**
  * Container resolver exposes the APIs to resolve bindings. You can think
@@ -208,36 +209,11 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   }
 
   /**
-   * Find if the resolver has a binding registered using the
-   * "bind", the "singleton", or the "bindValue" methods.
-   */
-  hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
-  hasBinding(binding: BindingKey): boolean
-  hasBinding(binding: BindingKey): boolean {
-    return (
-      this.#containerAliases.has(binding) ||
-      this.#bindingValues.has(binding) ||
-      this.#containerBindingValues.has(binding) ||
-      this.#containerBindings.has(binding)
-    )
-  }
-
-  /**
-   * Find if the resolver has all the bindings registered using the
-   * "bind", the "singleton", or the "bindValue" methods.
-   */
-  hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
-  hasAllBindings(bindings: BindingKey[]): boolean
-  hasAllBindings(bindings: BindingKey[]): boolean {
-    return bindings.every((binding) => this.hasBinding(binding))
-  }
-
-  /**
    * Resolves binding in context of a parent. The method is same as
    * the "make" method, but instead takes a parent class
    * constructor.
    */
-  async resolveFor<Binding>(
+  async #resolveFor<Binding>(
     parent: unknown,
     binding: Binding,
     runtimeValues?: any[],
@@ -400,6 +376,55 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     }
 
     throw createError(`Cannot resolve binding "${String(binding)}" from the container`)
+  }
+
+  /**
+   * Find if the resolver has a binding registered using the
+   * "bind", the "singleton", or the "bindValue" methods.
+   */
+  hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
+  hasBinding(binding: BindingKey): boolean
+  hasBinding(binding: BindingKey): boolean {
+    return (
+      this.#containerAliases.has(binding) ||
+      this.#bindingValues.has(binding) ||
+      this.#containerBindingValues.has(binding) ||
+      this.#containerBindings.has(binding)
+    )
+  }
+
+  /**
+   * Find if the resolver has all the bindings registered using the
+   * "bind", the "singleton", or the "bindValue" methods.
+   */
+  hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
+  hasAllBindings(bindings: BindingKey[]): boolean
+  hasAllBindings(bindings: BindingKey[]): boolean {
+    return bindings.every((binding) => this.hasBinding(binding))
+  }
+
+  /**
+   * Resolves binding in context of a parent. The method is same as
+   * the "make" method, but instead takes a parent class
+   * constructor.
+   */
+  async resolveFor<Binding>(
+    parent: unknown,
+    binding: Binding,
+    runtimeValues?: any[],
+    createError: ErrorCreator = (message) => new RuntimeException(message)
+  ): Promise<Make<Binding>> {
+    return containerMake.tracePromise(
+      this.#resolveFor,
+      {
+        binding: binding as string | symbol | AbstractConstructor<any>,
+      },
+      this,
+      parent,
+      binding,
+      runtimeValues,
+      createError
+    )
   }
 
   /**
