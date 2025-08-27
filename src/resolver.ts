@@ -25,7 +25,7 @@ import type {
   InspectableConstructor,
 } from './types.ts'
 import debug from './debug.ts'
-import { isClass } from './helpers.ts'
+import { isClass } from './utils.ts'
 import { containerProvider } from './provider.ts'
 import { containerMake } from './tracing_channels.ts'
 

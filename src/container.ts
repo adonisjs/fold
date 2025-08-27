@@ -26,7 +26,7 @@ import type {
 } from './types.ts'
 
 import debug from './debug.ts'
-import { enqueue, isClass } from './helpers.ts'
+import { enqueue, isClass } from './utils.ts'
 import { ContainerResolver } from './resolver.ts'
 import { ContextBindingsBuilder } from './contextual_bindings_builder.ts'
 

@@ -8,7 +8,7 @@
  */
 
 import { type Container } from './container.ts'
-import { resolveDefault } from './helpers.ts'
+import { resolveDefault } from './utils.ts'
 import { type ContainerResolver } from './resolver.ts'
 import type { ModuleHandler, ModuleCallable } from './types.ts'
 

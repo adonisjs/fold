@@ -11,7 +11,7 @@
 import benchmark from 'benchmark'
 import Thread from '#services/thread'
 import { Container } from '../index.ts'
-import { resolveDefault } from '../src/helpers.ts'
+import { resolveDefault } from '../src/utils.ts'
 import { moduleExpression } from '../src/module_expression.ts'
 
 const suite = new benchmark.Suite()
