@@ -24,6 +24,6 @@ import type { ContainerMakeTracingData } from './types.ts'
  * ```
  */
 export const containerMake = diagnostics_channel.tracingChannel<
-  'adonisjs:container.make',
+  'adonisjs.container.make',
   ContainerMakeTracingData
->('adonisjs:container.make')
+>('adonisjs.container.make')
