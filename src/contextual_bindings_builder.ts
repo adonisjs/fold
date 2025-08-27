@@ -38,6 +38,9 @@ export class ContextBindingsBuilder<
    */
   #container: Container<KnownBindings>
 
+  /**
+   * Initialize the contextual bindings builder
+   */
   constructor(parent: Constructor<any>, container: Container<KnownBindings>) {
     this.#parent = parent
     this.#container = container
@@ -46,6 +49,8 @@ export class ContextBindingsBuilder<
   /**
    * Specify the binding for which to register a custom
    * resolver.
+   *
+   * @returns The contextual bindings builder for chaining
    */
   asksFor<Binding extends PinnedBinding>(
     binding: Binding
@@ -56,6 +61,8 @@ export class ContextBindingsBuilder<
 
   /**
    * Provide a resolver to resolve the parent dependency
+   *
+   * @returns Registers the contextual binding resolver
    */
   provide(resolver: BindingResolver<KnownBindings, Make<PinnedBinding>>): void {
     if (!this.#binding) {

@@ -102,6 +102,9 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    */
   #options: ContainerOptions
 
+  /**
+   * Initialize the container resolver with container bindings and options
+   */
   constructor(
     container: {
       bindings: Bindings
@@ -124,6 +127,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
 
   /**
    * Constructs exception for invalid binding value
+   *
+   * @returns The constructed InvalidArgumentsException
    */
   #invalidBindingException(
     parent: any,
@@ -141,6 +146,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
 
   /**
    * Constructs exception for binding with missing dependencies
+   *
+   * @returns The constructed exception for missing dependencies
    */
   #missingDependenciesException(parent: any, binding: any, createError: ErrorCreator) {
     if (parent) {
@@ -158,6 +165,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
 
   /**
    * Returns the provider for the class constructor
+   *
+   * @returns The container provider for the binding
    */
   #getBindingProvider(binding: InspectableConstructor) {
     return binding.containerProvider
@@ -166,6 +175,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
    * Returns the binding resolver for a parent and a binding. Returns
    * undefined when no contextual binding exists
+   *
+   * @returns The binding resolver or undefined if no contextual binding exists
    */
   #getBindingResolver(
     parent: any,
@@ -186,6 +197,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
 
   /**
    * Notify emitter
+   *
+   * @returns Emits container binding resolved event
    */
   #emit(binding: BindingKey, value: any) {
     if (!this.#options.emitter) {
@@ -196,6 +209,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
 
   /**
    * Execute hooks for a given binding
+   *
+   * @returns Executes all callbacks for the binding
    */
   async #execHooks(binding: BindingKey, value: any) {
     const callbacks = this.#containerHooks.get(binding)
@@ -381,6 +396,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
    * Find if the resolver has a binding registered using the
    * "bind", the "singleton", or the "bindValue" methods.
+   *
+   * @returns True if binding exists, false otherwise
    */
   hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
   hasBinding(binding: BindingKey): boolean
@@ -396,6 +413,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
    * Find if the resolver has all the bindings registered using the
    * "bind", the "singleton", or the "bindValue" methods.
+   *
+   * @returns True if all bindings exist, false otherwise
    */
   hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
   hasAllBindings(bindings: BindingKey[]): boolean
@@ -416,9 +435,11 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   ): Promise<Make<Binding>> {
     return containerMake.tracePromise(
       this.#resolveFor,
-      {
-        binding: binding as string | symbol | AbstractConstructor<any>,
-      },
+      containerMake.hasSubscribers
+        ? {
+            binding: binding as string | symbol | AbstractConstructor<any>,
+          }
+        : undefined,
       this,
       parent,
       binding,
@@ -520,6 +541,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * ```ts
    * container.bindValue(Route, new Route())
    * ```
+   *
+   * @returns Binds the value to the resolver
    */
   bindValue<Binding extends keyof KnownBindings>(
     /**

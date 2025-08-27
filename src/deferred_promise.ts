@@ -15,8 +15,19 @@
  * class constructor.
  */
 export class Deferred<T> {
+  /**
+   * Function to resolve the promise with a value
+   */
   resolve!: (value: T | PromiseLike<T>) => void
+
+  /**
+   * Function to reject the promise with a reason
+   */
   reject!: (reason?: any) => void
+
+  /**
+   * The underlying promise instance
+   */
   promise: Promise<T> = new Promise<T>((resolve, reject) => {
     this.reject = reject
     this.resolve = resolve

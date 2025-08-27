@@ -93,12 +93,17 @@ export class Container<KnownBindings extends Record<any, any>> {
    */
   #options: ContainerOptions
 
+  /**
+   * Initialize the container with optional configuration
+   */
   constructor(options?: ContainerOptions) {
     this.#options = options || {}
   }
 
   /**
    * Define an emitter instance to use
+   *
+   * @returns The container instance for chaining
    */
   useEmitter(emitter: Exclude<ContainerOptions['emitter'], undefined>) {
     this.#options.emitter = emitter
@@ -120,6 +125,8 @@ export class Container<KnownBindings extends Record<any, any>> {
    * resolver.bindValue(HttpContext, new HttpContext())
    * await resolver.make(UsersController)
    * ```
+   *
+   * @returns A new container resolver instance
    */
   createResolver() {
     return new ContainerResolver<KnownBindings>(
@@ -138,6 +145,8 @@ export class Container<KnownBindings extends Record<any, any>> {
   /**
    * Find if the container has a binding registered using the
    * "bind", the "singleton", or the "bindValue" methods.
+   *
+   * @returns True if binding exists, false otherwise
    */
   hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
   hasBinding(binding: BindingKey): boolean
@@ -150,6 +159,8 @@ export class Container<KnownBindings extends Record<any, any>> {
   /**
    * Find if the container has all the bindings registered using the
    * "bind", the "singleton", or the "bindValue" methods.
+   *
+   * @returns True if all bindings exist, false otherwise
    */
   hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
   hasAllBindings(binding: BindingKey[]): boolean
@@ -211,6 +222,8 @@ export class Container<KnownBindings extends Record<any, any>> {
    * Register an alias for a binding. The value can be a reference
    * to an existing binding or to a class constructor that will
    * instantiate to the same value as the alias.
+   *
+   * @returns Sets the alias for the binding
    */
   alias<Alias extends keyof KnownBindings>(
     /**
