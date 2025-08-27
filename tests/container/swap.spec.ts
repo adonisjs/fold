@@ -11,9 +11,9 @@ import 'reflect-metadata'
 import { test } from '@japa/runner'
 import { expectTypeOf } from 'expect-type'
 
-import { inject } from '../../index.js'
-import { Container } from '../../src/container.js'
-import type { BindingResolver } from '../../src/types.js'
+import { inject } from '../../index.ts'
+import { Container } from '../../src/container.ts'
+import type { BindingResolver } from '../../src/types.ts'
 
 test.group('Container | swap', () => {
   test('swap a class implementation', async ({ assert }) => {

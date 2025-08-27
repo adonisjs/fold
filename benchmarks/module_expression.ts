@@ -10,9 +10,9 @@
 // @ts-expect-error
 import benchmark from 'benchmark'
 import Thread from '#services/thread'
-import { Container } from '../index.js'
-import { resolveDefault } from '../src/helpers.js'
-import { moduleExpression } from '../src/module_expression.js'
+import { Container } from '../index.ts'
+import { resolveDefault } from '../src/helpers.ts'
+import { moduleExpression } from '../src/module_expression.ts'
 
 const suite = new benchmark.Suite()
 

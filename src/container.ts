@@ -23,12 +23,12 @@ import type {
   BindingResolver,
   ContainerOptions,
   ContextualBindings,
-} from './types.js'
+} from './types.ts'
 
-import debug from './debug.js'
-import { enqueue, isClass } from './helpers.js'
-import { ContainerResolver } from './resolver.js'
-import { ContextBindingsBuilder } from './contextual_bindings_builder.js'
+import debug from './debug.ts'
+import { enqueue, isClass } from './helpers.ts'
+import { ContainerResolver } from './resolver.ts'
+import { ContextBindingsBuilder } from './contextual_bindings_builder.ts'
 
 /**
  * The container class exposes the API to register bindings, values

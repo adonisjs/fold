@@ -8,7 +8,7 @@
  */
 
 import { test } from '@japa/runner'
-import { moduleExpression } from '../../src/module_expression.js'
+import { moduleExpression } from '../../src/module_expression.ts'
 
 test.group('moduleExpression | parse', () => {
   test('parse module expression with no methods', async ({ assert }) => {

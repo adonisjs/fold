@@ -23,10 +23,10 @@ import type {
   ContainerOptions,
   ContextualBindings,
   InspectableConstructor,
-} from './types.js'
-import debug from './debug.js'
-import { isClass } from './helpers.js'
-import { containerProvider } from './provider.js'
+} from './types.ts'
+import debug from './debug.ts'
+import { isClass } from './helpers.ts'
+import { containerProvider } from './provider.ts'
 import { containerMake } from './tracing_channels.ts'
 
 /**

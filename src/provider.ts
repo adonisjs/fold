@@ -7,9 +7,9 @@
  * file that was distributed with this source code.
  */
 
-import debug from './debug.js'
-import type { ContainerResolver } from './resolver.js'
-import type { InspectableConstructor } from './types.js'
+import debug from './debug.ts'
+import type { ContainerResolver } from './resolver.ts'
+import type { InspectableConstructor } from './types.ts'
 
 /**
  * The default provider for resolving dependencies. It uses the resolver

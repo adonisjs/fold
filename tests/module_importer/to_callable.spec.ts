@@ -9,8 +9,8 @@
 
 import { test } from '@japa/runner'
 import { fileURLToPath } from 'node:url'
-import { Container } from '../../src/container.js'
-import { moduleImporter } from '../../src/module_importer.js'
+import { Container } from '../../src/container.ts'
+import { moduleImporter } from '../../src/module_importer.ts'
 
 const BASE_URL = new URL('../app/', import.meta.url)
 const BASE_PATH = fileURLToPath(BASE_URL)

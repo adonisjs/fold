@@ -9,9 +9,9 @@
 
 import { test } from '@japa/runner'
 
-import { Container } from '../../src/container.js'
-import { moduleCaller } from '../../src/module_caller.js'
-import { type ContainerResolver } from '../../src/resolver.js'
+import { Container } from '../../src/container.ts'
+import { moduleCaller } from '../../src/module_caller.ts'
+import { type ContainerResolver } from '../../src/resolver.ts'
 
 test.group('moduleCaller | toCallable', () => {
   test('make callable from module caller', async ({ assert }) => {

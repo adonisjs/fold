@@ -11,8 +11,8 @@ import { test } from '@japa/runner'
 import { expectTypeOf } from 'expect-type'
 import { RuntimeException } from '@poppinss/utils/exception'
 
-import { Container } from '../src/container.js'
-import { containerProvider } from '../src/provider.js'
+import { Container } from '../src/container.ts'
+import { containerProvider } from '../src/provider.ts'
 
 test.group('Provider', () => {
   test('return empty array when class has no dependencies', async ({ assert }) => {

@@ -10,8 +10,8 @@
 import { RuntimeException } from '@poppinss/utils/exception'
 import type { AbstractConstructor, Constructor } from '@poppinss/utils/types'
 
-import type { Container } from './container.js'
-import type { BindingResolver, Make } from './types.js'
+import type { Container } from './container.ts'
+import type { BindingResolver, Make } from './types.ts'
 
 /**
  * A fluent builder to register contextual bindings with the

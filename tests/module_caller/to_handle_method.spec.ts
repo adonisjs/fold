@@ -9,9 +9,9 @@
 
 import { test } from '@japa/runner'
 
-import { Container } from '../../src/container.js'
-import { moduleCaller } from '../../src/module_caller.js'
-import { type ContainerResolver } from '../../src/resolver.js'
+import { Container } from '../../src/container.ts'
+import { moduleCaller } from '../../src/module_caller.ts'
+import { type ContainerResolver } from '../../src/resolver.ts'
 
 test.group('moduleCaller | toHandleMethod', () => {
   test('make handle method object from module caller', async ({ assert }) => {

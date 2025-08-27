@@ -7,10 +7,10 @@
  * file that was distributed with this source code.
  */
 
-import { type Container } from './container.js'
-import { resolveDefault } from './helpers.js'
-import { type ContainerResolver } from './resolver.js'
-import type { ModuleHandler, ModuleCallable } from './types.js'
+import { type Container } from './container.ts'
+import { resolveDefault } from './helpers.ts'
+import { type ContainerResolver } from './resolver.ts'
+import type { ModuleHandler, ModuleCallable } from './types.ts'
 
 /**
  * The moduleExpression module works around a very specific pattern we use

@@ -12,8 +12,8 @@ import benchmark from 'benchmark'
 import { importDefault } from '@poppinss/utils'
 
 import Thread from '#services/thread'
-import { Container } from '../index.js'
-import { moduleImporter } from '../src/module_importer.js'
+import { Container } from '../index.ts'
+import { moduleImporter } from '../src/module_importer.ts'
 
 const suite = new benchmark.Suite()
 

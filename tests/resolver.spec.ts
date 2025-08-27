@@ -9,8 +9,8 @@
 
 import { test } from '@japa/runner'
 import { expectTypeOf } from 'expect-type'
-import { Container } from '../src/container.js'
-import { type ContainerProvider } from '../src/types.js'
+import { Container } from '../src/container.ts'
+import { type ContainerProvider } from '../src/types.ts'
 
 test.group('Resolver', () => {
   test('give priority to resolver values over binding values', async ({ assert }) => {

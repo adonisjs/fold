@@ -8,7 +8,7 @@
  */
 
 import { test } from '@japa/runner'
-import { enqueue } from '../src/helpers.js'
+import { enqueue } from '../src/helpers.ts'
 
 test.group('Enqueue', () => {
   test('parallel calls should invoke the underlying method once', async ({ assert }) => {

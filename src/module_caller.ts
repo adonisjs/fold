@@ -9,9 +9,9 @@
 
 import type { Constructor } from '@poppinss/utils/types'
 
-import { type Container } from './container.js'
-import { type ContainerResolver } from './resolver.js'
-import type { ModuleHandler, ModuleCallable } from './types.js'
+import { type Container } from './container.ts'
+import { type ContainerResolver } from './resolver.ts'
+import type { ModuleHandler, ModuleCallable } from './types.ts'
 
 /**
  * The moduleCaller works around a very specific pattern we use with

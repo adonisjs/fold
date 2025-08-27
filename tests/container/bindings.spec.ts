@@ -9,7 +9,7 @@
 
 import { test } from '@japa/runner'
 import { expectTypeOf } from 'expect-type'
-import { Container } from '../../src/container.js'
+import { Container } from '../../src/container.ts'
 
 test.group('Container | Bindings', () => {
   test('register a binding to the container', async ({ assert }) => {

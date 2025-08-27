@@ -9,7 +9,7 @@
 
 import { test } from '@japa/runner'
 import { expectTypeOf } from 'expect-type'
-import { Container } from '../../src/container.js'
+import { Container } from '../../src/container.ts'
 
 test.group('Container | Make class', () => {
   test('create a fresh instance of the container', ({ assert }) => {

@@ -10,8 +10,8 @@
 import type { Exception } from '@poppinss/utils/exception'
 import type { AbstractConstructor } from '@poppinss/utils/types'
 
-import type { Container } from './container.js'
-import type { ContainerResolver } from './resolver.js'
+import type { Container } from './container.ts'
+import type { ContainerResolver } from './resolver.ts'
 
 /**
  * A function to create custom errors when container fails. It can be

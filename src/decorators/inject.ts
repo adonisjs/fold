@@ -10,8 +10,8 @@
 import { defineStaticProperty } from '@poppinss/utils'
 import { RuntimeException } from '@poppinss/utils/exception'
 
-import debug from '../debug.js'
-import type { ErrorCreator, InspectableConstructor } from '../types.js'
+import debug from '../debug.ts'
+import type { ErrorCreator, InspectableConstructor } from '../types.ts'
 
 /**
  * Creating a debugging error that points to the source

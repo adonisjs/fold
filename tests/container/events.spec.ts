@@ -12,7 +12,7 @@ import { EventEmitter } from 'node:events'
 import { expectTypeOf } from 'expect-type'
 import { pEvent, pEventMultiple } from 'p-event'
 
-import { Container } from '../../src/container.js'
+import { Container } from '../../src/container.ts'
 
 test.group('Container | Events', () => {
   test('emit event when a binding is resolved', async ({ assert }) => {

@@ -11,9 +11,9 @@ import 'reflect-metadata'
 import { test } from '@japa/runner'
 import { EventEmitter } from 'node:events'
 import { expectTypeOf } from 'expect-type'
-import { Container } from '../../src/container.js'
-import { inject } from '../../src/decorators/inject.js'
-import type { BindingResolver } from '../../src/types.js'
+import { Container } from '../../src/container.ts'
+import { inject } from '../../src/decorators/inject.ts'
+import type { BindingResolver } from '../../src/types.ts'
 
 test.group('Container | Make class via inject', () => {
   test('inject constructor dependencies using @inject', async ({ assert }) => {

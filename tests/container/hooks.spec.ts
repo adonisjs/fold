@@ -11,7 +11,7 @@ import { test } from '@japa/runner'
 import { EventEmitter } from 'node:events'
 import { expectTypeOf } from 'expect-type'
 
-import { Container } from '../../src/container.js'
+import { Container } from '../../src/container.ts'
 
 test.group('Container | Hooks', () => {
   test('run hook when a binding is resolved', async ({ assert }) => {

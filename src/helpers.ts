@@ -10,7 +10,7 @@
 import type { Constructor } from '@poppinss/utils/types'
 import { RuntimeException } from '@poppinss/utils/exception'
 
-import { Deferred } from './deferred_promise.js'
+import { Deferred } from './deferred_promise.ts'
 
 /**
  * Type guard and check if value is a class constructor. Plain old
