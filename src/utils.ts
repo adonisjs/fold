@@ -17,7 +17,7 @@ import { Deferred } from './deferred_promise.ts'
  * functions are not considered as class constructor.
  */
 export function isClass<T>(value: unknown): value is Constructor<T> {
-  return typeof value === 'function' && value.toString().startsWith('class ')
+  return typeof value === 'function' && /^class(\s|{)/.test(value.toString())
 }
 
 /**
