@@ -85,7 +85,7 @@ test.group('Container | Bindings', () => {
     )
   })
 
-  test('return fresh value everytime from the factory function', async ({ assert }) => {
+  test('return fresh value every time from the factory function', async ({ assert }) => {
     const container = new Container()
     class Route {}
 
@@ -208,7 +208,7 @@ test.group('Container | Bindings Singleton', () => {
     )
   })
 
-  test('return cached value everytime from the factory function', async ({ assert }) => {
+  test('return cached value every time from the factory function', async ({ assert }) => {
     const container = new Container()
     class Route {}
 
