@@ -14,7 +14,7 @@ Therefore, with this project, I live to the ethos of JavaScript and yet build a 
 
 I have explained the [reasons for using an IoC container](https://github.com/thetutlage/meta/discussions/4) in this post. It might be a great idea to read the post first ✌️
 
-> **Note**: AdonisJS fold is highly inspired by the Laravel IoC container. Thanks to Taylor for imaginging such a simple, yet powerful API.
+> **Note**: AdonisJS fold is highly inspired by the Laravel IoC container. Thanks to Taylor for imagining such a simple, yet powerful API.
 
 ## Goals of the project
 
@@ -283,7 +283,7 @@ Contextual bindings allows you to register custom dependency resolvers on a give
 For example: You have a `UserService` and a `BlogService` and both of them needs an instance of the Drive disk to write and read files. You want the `UserService` to use the local disk driver and `BlogService` to use the s3 disk driver.
 
 > **Note**
-> Contextual bindings can be defined for class constructors and not for container bindngs
+> Contextual bindings can be defined for class constructors and not for container bindings
 
 ```ts
 import { Disk } from '@adonisjs/core/driver'
@@ -373,9 +373,9 @@ const container = new Container({ emitter })
 
 You can use container hooks when you want to modify a resolved value before it is returned from the `make` method.
 
-- The hook is called everytime a binding is resolved from the container.
+- The hook is called every time a binding is resolved from the container.
 - It is called only once for the singleton bindings.
-- The hook gets called everytime you construct an instance of a class by passing the class constructor directly.
+- The hook gets called every time you construct an instance of a class by passing the class constructor directly.
 
 > **Note**: The hook callback can also be an async function
 
@@ -440,7 +440,7 @@ Defining types will ensure the `bind`, `singleton` and `bindValue` method accept
 
 ```ts
 class Route {}
-class Databse {}
+class Database {}
 
 type ContainerBindings = {
   route: Route
@@ -573,7 +573,7 @@ const handler = moduleExpression('#controllers/users.index', import.meta.url).to
 await handler.handle([ctx])
 ```
 
-### Bechmarks
+### Benchmarks
 
 Following are benchmarks to see the performance loss that happens when using module expressions.
 

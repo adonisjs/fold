@@ -21,7 +21,7 @@ export function isClass<T>(value: unknown): value is Constructor<T> {
 }
 
 /**
- * Runs a function inside an async function. This ensure that syncrohonous
+ * Runs a function inside an async function. This ensure that synchronous
  * errors are handled in the same way rejected promise is handled
  */
 async function runAsAsync(callback: Function, args: any[]) {

@@ -67,7 +67,7 @@ test.group('Container | Bindings', () => {
     assert.instanceOf(route, Route)
   })
 
-  test('return fresh value everytime from the factory function', async ({ assert }) => {
+  test('return fresh value every time from the factory function', async ({ assert }) => {
     class Route {}
     const container = new Container<{ route: Route }>()
 
@@ -145,7 +145,7 @@ test.group('Container | Bindings Singleton', () => {
     assert.instanceOf(route, Route)
   })
 
-  test('return cached value everytime from the factory function', async ({ assert }) => {
+  test('return cached value every time from the factory function', async ({ assert }) => {
     class Route {}
     const container = new Container<{ route: Route }>()
 
