@@ -11,6 +11,7 @@ import { test } from '@japa/runner'
 import { expectTypeOf } from 'expect-type'
 import { Container } from '../src/container.ts'
 import { type ContainerProvider } from '../src/types.ts'
+import { ContainerResolver } from '../src/resolver.ts'
 
 test.group('Resolver', () => {
   test('give priority to resolver values over binding values', async ({ assert }) => {
@@ -148,5 +149,14 @@ test.group('Resolver', () => {
 
     assert.isTrue(resolver.hasAllBindings([Route, 'route', routeSymbol]))
     assert.isFalse(resolver.hasAllBindings([Route, 'db', routeSymbol]))
+  })
+
+  test('resolve self', async ({ assert }) => {
+    const container = new Container()
+    const resolver = container.createResolver()
+
+    const resolvedService = await resolver.make(ContainerResolver)
+    expectTypeOf(resolvedService).toEqualTypeOf<ContainerResolver<Record<string, any>>>()
+    assert.strictEqual(resolvedService, resolver)
   })
 })

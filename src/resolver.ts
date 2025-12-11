@@ -123,6 +123,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     this.#containerAliases = container.aliases
     this.#containerContextualBindings = container.contextualBindings
     this.#options = options
+    this.#bindingValues.set(ContainerResolver, this)
   }
 
   /**
