@@ -324,21 +324,21 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      * Followed by the CONTAINER bindings
      */
     if (this.#containerBindings.has(binding)) {
-      const { resolver, isSingleton } = this.#containerBindings.get(binding)!
+      const containerBinding = this.#containerBindings.get(binding)!
       let value
-      let executeHooks = isSingleton ? false : true
+      let executeHooks = true
 
       /**
        * Invoke binding resolver to get the value. In case of singleton,
        * the "enqueue" method returns an object with the value and a
        * boolean telling if a cached value is resolved.
        */
-      if (isSingleton) {
-        const result = await resolver(this, runtimeValues)
+      if (containerBinding.isSingleton) {
+        const result = await containerBinding.resolver(this, runtimeValues)
         value = result.value
         executeHooks = !result.cached
       } else {
-        value = await resolver(this, runtimeValues)
+        value = await containerBinding.resolver(this, runtimeValues)
       }
 
       if (debug.enabled) {
@@ -346,8 +346,22 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       }
 
       if (executeHooks) {
-        await this.#execHooks(binding, value)
+        const hooksPromise = this.#execHooks(binding, value)
+
+        // if singleton, store the hooks promise that will be awaited for subsequent resolutions
+        if (containerBinding.isSingleton) {
+          containerBinding.hooksPromise = hooksPromise.then(() => {
+            delete containerBinding.hooksPromise
+          })
+        }
+
+        await hooksPromise
       }
+
+      if (containerBinding.isSingleton) {
+        await containerBinding.hooksPromise
+      }
+
       this.#emit(binding, value)
 
       return value

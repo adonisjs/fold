@@ -63,6 +63,7 @@ export type Bindings = Map<
         runtimeValues?: any[]
       ) => Promise<{ value: any; cached: boolean }>
       isSingleton: true
+      hooksPromise?: Promise<void>
     }
 >
 
