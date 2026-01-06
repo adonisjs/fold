@@ -22,23 +22,38 @@ import type { ModuleHandler, ModuleCallable } from './types.ts'
  * For example: Middleware of AdonisJS allows registering middleware as an
  * array of import calls.
  *
- * ```ts
- * defineMiddleware([
- *   () => import('#middleware/silent_auth')
- * ])
- *
- * defineMiddleware({
- *   auth: () => import('#middleware/auth')
- * })
- * ```
- *
  * Behind the scenes, we have to run following operations in order to call the
- * handle method on the defined middleware.
+ * handle method on the defined middleware:
  *
  * - Lazily call the registered callbacks to import the middleware.
  * - Check if the module has a default export.
  * - Create an instance of the default export class using the container.
  * - Call the `handle` method on the middleware class using the container.
+ *
+ * @param importFn - Function that returns a promise with the module's default export
+ * @param method - The method name to call on the imported class instance
+ *
+ * @example
+ * ```ts
+ * defineMiddleware([
+ *   () => import('#middleware/silent_auth')
+ * ])
+ * ```
+ *
+ * @example
+ * ```ts
+ * defineMiddleware({
+ *   auth: () => import('#middleware/auth')
+ * })
+ * ```
+ *
+ * @example
+ * ```ts
+ * const callable = moduleImporter(() => import('#middleware/auth'), 'handle')
+ *   .toCallable(container)
+ *
+ * await callable(ctx)
+ * ```
  */
 export function moduleImporter(
   importFn: () => Promise<{ default: Constructor<any> }>,

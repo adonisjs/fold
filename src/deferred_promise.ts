@@ -8,11 +8,27 @@
  */
 
 /**
- * Exports the `resolve` and the reject methods as part of the
+ * A promise wrapper that exposes the `resolve` and `reject` methods as part of the
  * class public API.
  *
  * It allows resolving and rejecting promises outside of the
- * class constructor.
+ * promise constructor callback.
+ *
+ * @template T - The type of value the promise will resolve to
+ *
+ * @example
+ * ```ts
+ * const deferred = new Deferred<string>()
+ *
+ * // Resolve from anywhere
+ * deferred.resolve('Hello')
+ *
+ * // Or reject
+ * deferred.reject(new Error('Failed'))
+ *
+ * // Wait for resolution
+ * await deferred.promise
+ * ```
  */
 export class Deferred<T> {
   /**

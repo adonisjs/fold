@@ -13,26 +13,56 @@ import { RuntimeException } from '@poppinss/utils/exception'
 import { Deferred } from './deferred_promise.ts'
 
 /**
- * Type guard and check if value is a class constructor. Plain old
- * functions are not considered as class constructor.
+ * Type guard to check if value is a class constructor. Plain old
+ * functions are not considered as class constructors.
+ *
+ * @param value - The value to check
+ *
+ * @example
+ * ```ts
+ * isClass(Database) // true
+ * isClass(function foo() {}) // false
+ * isClass(() => {}) // false
+ * ```
  */
 export function isClass<T>(value: unknown): value is Constructor<T> {
   return typeof value === 'function' && /^class(\s|{)/.test(value.toString())
 }
 
 /**
- * Runs a function inside an async function. This ensure that synchronous
- * errors are handled in the same way rejected promise is handled
+ * Runs a function inside an async function. This ensures that synchronous
+ * errors are handled in the same way a rejected promise is handled
+ *
+ * @param callback - The function to run
+ * @param args - Arguments to pass to the function
  */
 async function runAsAsync(callback: Function, args: any[]) {
   return callback(...args)
 }
 
 /**
- * Converts a function to a self contained queue, where each call to
+ * Converts a function to a self-contained queue, where each call to
  * the function is queued until the first call resolves or rejects.
  *
  * After the first call, the value is cached and used forever.
+ * This is used to implement singleton bindings in the container.
+ *
+ * @param callback - The function to enqueue
+ *
+ * @example
+ * ```ts
+ * const queuedFn = enqueue(async () => {
+ *   return new Database()
+ * })
+ *
+ * // First call executes the function
+ * const db1 = await queuedFn()
+ *
+ * // Second call returns cached value
+ * const db2 = await queuedFn()
+ *
+ * // db1 === db2.value
+ * ```
  */
 export function enqueue(callback: Function) {
   /**
@@ -126,6 +156,17 @@ export function enqueue(callback: Function) {
 
 /**
  * Dynamically import a module and ensure it has a default export
+ *
+ * @param importPath - The module path to import
+ * @param parentURL - The parent URL for resolving the import path
+ *
+ * @example
+ * ```ts
+ * const UserController = await resolveDefault(
+ *   '#controllers/users_controller',
+ *   import.meta.url
+ * )
+ * ```
  */
 export async function resolveDefault(importPath: string, parentURL: URL | string) {
   const resolvedPath = await import.meta.resolve!(importPath, parentURL)

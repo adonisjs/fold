@@ -40,6 +40,9 @@ export class ContextBindingsBuilder<
 
   /**
    * Initialize the contextual bindings builder
+   *
+   * @param parent - The parent class constructor for the contextual binding
+   * @param container - The container instance to register bindings with
    */
   constructor(parent: Constructor<any>, container: Container<KnownBindings>) {
     this.#parent = parent
@@ -50,7 +53,15 @@ export class ContextBindingsBuilder<
    * Specify the binding for which to register a custom
    * resolver.
    *
-   * @returns The contextual bindings builder for chaining
+   * @param binding - The dependency class that the parent asks for
+   *
+   * @example
+   * ```ts
+   * container
+   *   .when(UsersController)
+   *   .asksFor(Hash)
+   *   .provide(() => new Argon2())
+   * ```
    */
   asksFor<Binding extends PinnedBinding>(
     binding: Binding
@@ -62,7 +73,15 @@ export class ContextBindingsBuilder<
   /**
    * Provide a resolver to resolve the parent dependency
    *
-   * @returns Registers the contextual binding resolver
+   * @param resolver - Factory function that returns the contextual implementation
+   *
+   * @example
+   * ```ts
+   * container
+   *   .when(UsersController)
+   *   .asksFor(Hash)
+   *   .provide(() => new Argon2())
+   * ```
    */
   provide(resolver: BindingResolver<KnownBindings, Make<PinnedBinding>>): void {
     if (!this.#binding) {

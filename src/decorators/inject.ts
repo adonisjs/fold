@@ -16,6 +16,8 @@ import type { ErrorCreator, InspectableConstructor } from '../types.ts'
 /**
  * Creating a debugging error that points to the source
  * using the @inject decorator
+ *
+ * @param original - The original error to extract stack trace from
  */
 function createDebuggingError(original: Error) {
   return function createError(message: string) {
@@ -28,6 +30,10 @@ function createDebuggingError(original: Error) {
 /**
  * Initiating the "containerInjections" property on the target, which is assumed
  * to be the class constructor.
+ *
+ * @param target - The class constructor or prototype
+ * @param method - The method name or constructor identifier
+ * @param createError - Error creator function for debugging
  */
 function initiateContainerInjections(
   target: any,
@@ -44,6 +50,9 @@ function initiateContainerInjections(
 /**
  * Defining the injections for the constructor of the class using
  * reflection
+ *
+ * @param target - The class constructor to define injections for
+ * @param createError - Error creator function for debugging
  */
 function defineConstructorInjections(target: InspectableConstructor, createError: ErrorCreator) {
   const params = Reflect.getMetadata('design:paramtypes', target)
@@ -64,6 +73,10 @@ function defineConstructorInjections(target: InspectableConstructor, createError
 
 /**
  * Defining the injections for the class instance method
+ *
+ * @param target - The class prototype
+ * @param method - The method name to define injections for
+ * @param createError - Error creator function for debugging
  */
 function defineMethodInjections(target: any, method: string | symbol, createError: ErrorCreator) {
   const constructor = target.constructor as InspectableConstructor
@@ -90,8 +103,26 @@ function defineMethodInjections(target: any, method: string | symbol, createErro
 
 /**
  * The "@inject" decorator uses Reflection to inspect the dependencies of a class
- * or a method and defines them as metaData on the class for the container to
+ * or a method and defines them as metadata on the class for the container to
  * discover them.
+ *
+ * @example
+ * ```ts
+ * @inject()
+ * class UsersController {
+ *   constructor(private database: Database) {}
+ * }
+ * ```
+ *
+ * @example
+ * ```ts
+ * class UsersController {
+ *   @inject()
+ *   async index(request: Request, response: Response) {
+ *     // Method with dependency injection
+ *   }
+ * }
+ * ```
  */
 export function inject() {
   /**

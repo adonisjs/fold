@@ -14,6 +14,25 @@ import type { InspectableConstructor } from './types.ts'
 /**
  * The default provider for resolving dependencies. It uses the resolver
  * to resolve all the values.
+ *
+ * This function examines the class constructor or method for dependency
+ * injection metadata (added via the @inject decorator) and resolves
+ * each dependency using the container resolver.
+ *
+ * @param binding - The class constructor with container injection metadata
+ * @param property - The property key (constructor or method name)
+ * @param resolver - Container resolver to resolve dependencies
+ * @param runtimeValues - Optional runtime values to override injected dependencies
+ *
+ * @example
+ * ```ts
+ * const dependencies = await containerProvider(
+ *   UsersController,
+ *   '_constructor',
+ *   resolver,
+ *   []
+ * )
+ * ```
  */
 export async function containerProvider(
   binding: InspectableConstructor,

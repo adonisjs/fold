@@ -104,6 +104,9 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
 
   /**
    * Initialize the container resolver with container bindings and options
+   *
+   * @param container - Object containing all container bindings, values, swaps, hooks, and aliases
+   * @param options - Container configuration options
    */
   constructor(
     container: {
@@ -129,7 +132,9 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
    * Constructs exception for invalid binding value
    *
-   * @returns The constructed InvalidArgumentsException
+   * @param parent - The parent class that requested the binding
+   * @param binding - The invalid binding value
+   * @param createError - Error creator function
    */
   #invalidBindingException(
     parent: any,
@@ -148,7 +153,9 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
    * Constructs exception for binding with missing dependencies
    *
-   * @returns The constructed exception for missing dependencies
+   * @param parent - The parent class that requested the binding
+   * @param binding - The binding with missing dependencies
+   * @param createError - Error creator function
    */
   #missingDependenciesException(parent: any, binding: any, createError: ErrorCreator) {
     if (parent) {
@@ -167,7 +174,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
    * Returns the provider for the class constructor
    *
-   * @returns The container provider for the binding
+   * @param binding - The class constructor to get the provider for
    */
   #getBindingProvider(binding: InspectableConstructor) {
     return binding.containerProvider
@@ -177,7 +184,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * Returns the binding resolver for a parent and a binding. Returns
    * undefined when no contextual binding exists
    *
-   * @returns The binding resolver or undefined if no contextual binding exists
+   * @param parent - The parent class constructor
+   * @param binding - The binding class to resolve
    */
   #getBindingResolver(
     parent: any,
@@ -197,9 +205,10 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   }
 
   /**
-   * Notify emitter
+   * Notify emitter about binding resolution
    *
-   * @returns Emits container binding resolved event
+   * @param binding - The binding key that was resolved
+   * @param value - The resolved value
    */
   #emit(binding: BindingKey, value: any) {
     if (!this.#options.emitter) {
@@ -211,7 +220,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
    * Execute hooks for a given binding
    *
-   * @returns Executes all callbacks for the binding
+   * @param binding - The binding key
+   * @param value - The resolved value to pass to hooks
    */
   async #execHooks(binding: BindingKey, value: any) {
     const callbacks = this.#containerHooks.get(binding)
@@ -228,6 +238,11 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * Resolves binding in context of a parent. The method is same as
    * the "make" method, but instead takes a parent class
    * constructor.
+   *
+   * @param parent - The parent class requesting the binding
+   * @param binding - The binding to resolve
+   * @param runtimeValues - Optional runtime values for dependencies
+   * @param createError - Error creator function
    */
   async #resolveFor<Binding>(
     parent: unknown,
@@ -414,7 +429,13 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * Find if the resolver has a binding registered using the
    * "bind", the "singleton", or the "bindValue" methods.
    *
-   * @returns True if binding exists, false otherwise
+   * @param binding - The binding key to check for
+   *
+   * @example
+   * ```ts
+   * resolver.hasBinding('route')
+   * resolver.hasBinding(Route)
+   * ```
    */
   hasBinding<Binding extends keyof KnownBindings>(binding: Binding): boolean
   hasBinding(binding: BindingKey): boolean
@@ -431,7 +452,13 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * Find if the resolver has all the bindings registered using the
    * "bind", the "singleton", or the "bindValue" methods.
    *
-   * @returns True if all bindings exist, false otherwise
+   * @param bindings - Array of binding keys to check for
+   *
+   * @example
+   * ```ts
+   * resolver.hasAllBindings(['route', 'encryption'])
+   * resolver.hasAllBindings([Route, Encryption])
+   * ```
    */
   hasAllBindings<Binding extends keyof KnownBindings>(bindings: Binding[]): boolean
   hasAllBindings(bindings: BindingKey[]): boolean
@@ -442,7 +469,17 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   /**
    * Resolves binding in context of a parent. The method is same as
    * the "make" method, but instead takes a parent class
-   * constructor.
+   * constructor. This is used internally for dependency resolution.
+   *
+   * @param parent - The parent class requesting the binding
+   * @param binding - The binding to resolve
+   * @param runtimeValues - Optional runtime values for dependencies
+   * @param createError - Error creator function
+   *
+   * @example
+   * ```ts
+   * const db = await resolver.resolveFor(UsersController, Database)
+   * ```
    */
   async resolveFor<Binding>(
     parent: unknown,
@@ -474,9 +511,15 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    *   dependencies are further resolved as well.
    * - All other values are returned as it is.
    *
+   * @param binding - The binding key or class constructor to resolve
+   * @param runtimeValues - Optional runtime values for dependencies
+   * @param createError - Error creator function
+   *
+   * @example
    * ```ts
    * await resolver.make('route')
    * await resolver.make(Database)
+   * await resolver.make(UsersController, [request, response])
    * ```
    */
   make<Binding extends keyof KnownBindings>(
@@ -509,8 +552,15 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * dependencies are resolved in the same manner as a class constructor
    * dependencies.
    *
+   * @param value - The object instance containing the method
+   * @param method - The method name to call
+   * @param runtimeValues - Optional runtime values for method dependencies
+   * @param createError - Error creator function
+   *
+   * @example
    * ```ts
-   * await resolver.call(await resolver.make(UsersController), 'index')
+   * const controller = await resolver.make(UsersController)
+   * await resolver.call(controller, 'index')
    * ```
    */
   async call<Value extends Record<any, any>, Method extends ExtractFunctions<Value>>(
@@ -553,13 +603,18 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   }
 
   /**
-   * Register a binding as a value
+   * Register a binding as a value. Values bound to the resolver are
+   * isolated from the container and only available within this resolver instance.
    *
+   * @param binding - The binding key (string, symbol, or class constructor)
+   * @param value - The pre-resolved value to bind
+   *
+   * @example
    * ```ts
-   * container.bindValue(Route, new Route())
+   * const resolver = container.createResolver()
+   * resolver.bindValue(HttpContext, ctx)
+   * await resolver.make(UsersController) // Will receive the ctx
    * ```
-   *
-   * @returns Binds the value to the resolver
    */
   bindValue<Binding extends keyof KnownBindings>(
     /**

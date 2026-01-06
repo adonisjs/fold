@@ -21,16 +21,27 @@ import type { ModuleHandler, ModuleCallable } from './types.ts'
  * For example: Controllers of AdonisJS allows defining a controller
  * as follows
  *
+ * Behind the scenes, we have to run following operations in order to call the
+ * method on the controller:
+ *
+ * - Create an instance of the controller class using the container.
+ * - Call the method using the container with dependency injection support.
+ *
+ * @param target - The class constructor to instantiate
+ * @param method - The method name to call on the instance
+ *
+ * @example
  * ```ts
  * route.get('/', [HomeController, 'index'])
  * ```
  *
- * Behind the scenes, we have to run following operations in order to call the
- * handle method on the defined middleware.
+ * @example
+ * ```ts
+ * const callable = moduleCaller(HomeController, 'handle')
+ *   .toCallable(container)
  *
- * - Create an instance of the controller class using the container.
- * - Call the method using the container. Hence having the ability to use
- *   DI
+ * await callable(ctx)
+ * ```
  */
 export function moduleCaller(target: Constructor<any>, method: string) {
   return {

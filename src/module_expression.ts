@@ -19,12 +19,8 @@ import type { ModuleHandler, ModuleCallable } from './types.ts'
  * For example: With the router of AdonisJS, we can bind a controller to a route
  * as follows.
  *
- * ```ts
- * Route.get('users', '#controllers/users_controller.index')
- * ```
- *
  * Behind the scenes, we have to run following operations in order to call a
- * method on the users_controller class.
+ * method on the users_controller class:
  *
  * - Dynamic import `#controllers/users_controller` module
  * - Check if the module has a default export.
@@ -36,6 +32,22 @@ import type { ModuleHandler, ModuleCallable } from './types.ts'
  *
  * So, instead of writing all this parsing logic, we encapsulate it inside the
  * "moduleExpression" module.
+ *
+ * @param expression - The module expression string (e.g., '#controllers/users_controller.index')
+ * @param parentURL - The parent URL for resolving the module
+ *
+ * @example
+ * ```ts
+ * Route.get('users', '#controllers/users_controller.index')
+ * ```
+ *
+ * @example
+ * ```ts
+ * const callable = moduleExpression('#controllers/users_controller.index', import.meta.url)
+ *   .toCallable(container)
+ *
+ * await callable(ctx)
+ * ```
  */
 export function moduleExpression(expression: string, parentURL: URL | string) {
   return {
