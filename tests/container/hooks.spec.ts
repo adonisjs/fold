@@ -7,6 +7,7 @@
  * file that was distributed with this source code.
  */
 
+import * as timers from 'node:timers'
 import { test } from '@japa/runner'
 import { EventEmitter } from 'node:events'
 import { expectTypeOf } from 'expect-type'
@@ -228,5 +229,31 @@ test.group('Container | Hooks', () => {
 
     assert.instanceOf(route, Route)
     assert.equal(route.invocations, 1)
+  })
+
+  test('wait for hook when a singleton is resolved paralely', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container<{ route: Route }>({ emitter })
+    class Route {
+      invocations: number = 0
+    }
+
+    container.singleton('route', () => {
+      return new Route()
+    })
+
+    container.resolving('route', async (route) => {
+      await timers.promises.setTimeout(100)
+
+      route.invocations++
+    })
+
+    await Promise.all(
+      new Array(2).fill(0).map(async () => {
+        const route = await container.make('route')
+
+        assert.equal(route.invocations, 1)
+      })
+    )
   })
 })
