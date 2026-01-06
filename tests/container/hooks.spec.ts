@@ -231,7 +231,7 @@ test.group('Container | Hooks', () => {
     assert.equal(route.invocations, 1)
   })
 
-  test('wait for hook when a singleton is resolved paralely', async ({ assert }) => {
+  test('wait for hook when a singleton is resolved parallely', async ({ assert }) => {
     const emitter = new EventEmitter()
     const container = new Container<{ route: Route }>({ emitter })
     class Route {
@@ -255,5 +255,26 @@ test.group('Container | Hooks', () => {
         assert.equal(route.invocations, 1)
       })
     )
+  })
+
+  test('wait for hook when a singleton is resolved sequentially', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container<{ route: Route }>({ emitter })
+    class Route {
+      invocations: number = 0
+    }
+
+    container.singleton('route', () => {
+      return new Route()
+    })
+
+    container.resolving('route', async (route) => {
+      await timers.promises.setTimeout(100)
+      route.invocations++
+    })
+
+    await container.make('route')
+    const route = await container.make('route')
+    assert.equal(route.invocations, 1)
   })
 })

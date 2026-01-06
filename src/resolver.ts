@@ -340,7 +340,9 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       if (executeHooks) {
         const hooksPromise = this.#execHooks(binding, value)
 
-        // if singleton, store the hooks promise that will be awaited for subsequent resolutions
+        /**
+         * if singleton, store the hooks promise that will be awaited for subsequent resolutions
+         */
         if (containerBinding.isSingleton) {
           containerBinding.hooksPromise = hooksPromise.then(() => {
             delete containerBinding.hooksPromise
@@ -350,7 +352,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
         await hooksPromise
       }
 
-      if (containerBinding.isSingleton) {
+      if (containerBinding.isSingleton && containerBinding.hooksPromise) {
         await containerBinding.hooksPromise
       }
 
