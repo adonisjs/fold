@@ -81,6 +81,7 @@ export async function containerProvider(
         }
 
         const injection = injections[index]
+        if (!injection) return value
         return resolver.resolveFor(binding, injection, undefined, createError)
       })
     )
