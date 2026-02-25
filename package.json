@@ -24,7 +24,7 @@
   },
   "scripts": {
     "pretest": "npm run lint",
-    "test": "cross-env NODE_DEBUG=adonisjs:fold c8 npm run quick:test",
+    "test": "cross-env NODE_DEBUG=adonisjs:fold npm run quick:test",
     "quick:test": "node --import=@poppinss/ts-exec bin/test.ts",
     "citgm": "cross-env FORCE_COLOR=0 npm run quick:test",
     "clean": "del-cli build",
