@@ -20,8 +20,10 @@ import type {
   ErrorCreator,
   HookCallback,
   BindingValues,
+  BindingCondition,
   BindingResolver,
   ContainerOptions,
+  ConditionalBindings,
   ContextualBindings,
 } from './types.ts'
 
@@ -77,6 +79,12 @@ export class Container<KnownBindings extends Record<any, any>> {
    * registered inside the bindings map
    */
   #bindings: Bindings = new Map()
+
+  /**
+   * Registered conditional bindings. A condition is evaluated by the resolver
+   * and therefore has access to values local to that resolver.
+   */
+  #conditionalBindings: ConditionalBindings = new Map()
 
   /**
    * Registered bindings as values. The values are preferred over the bindings.
@@ -153,6 +161,7 @@ export class Container<KnownBindings extends Record<any, any>> {
     return new ContainerResolver<KnownBindings>(
       {
         bindings: this.#bindings,
+        conditionalBindings: this.#conditionalBindings,
         bindingValues: this.#bindingValues,
         swaps: this.#swaps,
         hooks: this.#hooks,
@@ -179,7 +188,10 @@ export class Container<KnownBindings extends Record<any, any>> {
   hasBinding(binding: BindingKey): boolean
   hasBinding(binding: BindingKey): boolean {
     return (
-      this.#aliases.has(binding) || this.#bindingValues.has(binding) || this.#bindings.has(binding)
+      this.#aliases.has(binding) ||
+      this.#bindingValues.has(binding) ||
+      this.#conditionalBindings.has(binding) ||
+      this.#bindings.has(binding)
     )
   }
 
@@ -366,6 +378,65 @@ export class Container<KnownBindings extends Record<any, any>> {
 
     debug('adding binding to container "%O"', binding)
     this.#bindings.set(binding, { resolver, isSingleton: false })
+  }
+
+  /**
+   * Register a binding that is used when its condition returns true. The
+   * condition is evaluated for every resolution and receives the resolver
+   * performing that resolution.
+   *
+   * Conditional bindings are evaluated in registration order. The first
+   * matching binding is used, otherwise resolution falls back to a regular
+   * binding or the default container behavior.
+   *
+   * @param binding - The binding key (string, symbol, or class constructor)
+   * @param condition - Predicate deciding whether the binding should be used
+   * @param resolver - Factory function that resolves the binding value
+   *
+   * @example
+   * ```ts
+   * container.bindWhen(
+   *   PaymentGateway,
+   *   async (resolver) => {
+   *     const ctx = await resolver.make(HttpContext)
+   *     return ctx.auth.user?.featureFlags.includes('new-payment') === true
+   *   },
+   *   (resolver) => resolver.make(BetaPaymentGateway)
+   * )
+   * ```
+   */
+  bindWhen<Binding extends keyof KnownBindings>(
+    binding: Binding extends string | symbol ? Binding : never,
+    condition: BindingCondition<KnownBindings>,
+    resolver: BindingResolver<KnownBindings, KnownBindings[Binding]>
+  ): void
+  bindWhen<Binding extends AbstractConstructor<any>>(
+    binding: Binding,
+    condition: BindingCondition<KnownBindings>,
+    resolver: BindingResolver<KnownBindings, InstanceType<Binding>>
+  ): void
+  bindWhen<Binding>(
+    binding: Binding,
+    condition: BindingCondition<KnownBindings>,
+    resolver: BindingResolver<
+      KnownBindings,
+      Binding extends AbstractConstructor<infer A>
+        ? A
+        : Binding extends keyof KnownBindings
+          ? KnownBindings[Binding]
+          : never
+    >
+  ): void {
+    if (typeof binding !== 'string' && typeof binding !== 'symbol' && !isClass(binding)) {
+      throw new InvalidArgumentsException(
+        'The container binding key must be of type "string", "symbol", or a "class constructor"'
+      )
+    }
+
+    debug('adding conditional binding to container "%O"', binding)
+    const bindings = this.#conditionalBindings.get(binding) || []
+    bindings.push({ condition, resolver })
+    this.#conditionalBindings.set(binding, bindings)
   }
 
   /**

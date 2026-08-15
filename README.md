@@ -229,6 +229,27 @@ I am answering this question from a framework creator perspective. I never use t
 
 So, if you create packages for AdonisJS, I highly recommend using factory functions. Leave the `@inject` decorator for the end user.
 
+## Conditional bindings
+
+Use `container.bindWhen` to select a binding using values local to the resolver performing the resolution. The condition may be synchronous or asynchronous and is evaluated every time the binding is resolved.
+
+```ts
+container.bind(PaymentGateway, (resolver) => {
+  return resolver.make(StripePaymentGateway)
+})
+
+container.bindWhen(
+  PaymentGateway,
+  async (resolver) => {
+    const ctx = await resolver.make(HttpContext)
+    return ctx.auth.user?.featureFlags.includes('new-payment') === true
+  },
+  (resolver) => resolver.make(BetaPaymentGateway)
+)
+```
+
+You may register multiple conditional bindings for the same key. Conditions are evaluated in registration order and the first match is used. When none match, the container falls back to a regular binding or its default resolution behavior.
+
 ## Binding singletons
 
 You can bind a singleton to the container using the `container.singleton` method. It is the same as the `container.bind` method, except the factory function is called only once, and the return value is cached forever.
@@ -436,7 +457,7 @@ This is where the `@bind` decorator comes into the picture. To perform database 
 
 If you are using the container inside a TypeScript project, then you can define the types for all the bindings in advance at the time of creating the container instance.
 
-Defining types will ensure the `bind`, `singleton` and `bindValue` method accepts only the known bindings and assert their types as well.
+Defining types will ensure the `bind`, `bindWhen`, `singleton` and `bindValue` method accepts only the known bindings and assert their types as well.
 
 ```ts
 class Route {}
