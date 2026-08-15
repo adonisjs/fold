@@ -67,6 +67,19 @@ export type BindingResolver<KnownBindings extends Record<any, any>, Value> = (
 ) => Value | Promise<Value>
 
 /**
+ * Shape of a condition used by conditional bindings
+ *
+ * @template KnownBindings - Known bindings record type
+ * @param resolver - Container resolver instance
+ * @param runtimeValues - Optional runtime values
+ * @returns Whether the associated binding resolver should be used
+ */
+export type BindingCondition<KnownBindings extends Record<any, any>> = (
+  resolver: ContainerResolver<KnownBindings>,
+  runtimeValues?: any[]
+) => boolean | Promise<boolean>
+
+/**
  * Shape of the registered bindings
  *
  * Map structure containing binding keys and their resolver configurations
@@ -82,6 +95,20 @@ export type Bindings = Map<
       isSingleton: true
       hooksPromise?: Promise<void>
     }
+>
+
+/**
+ * Shape of the registered conditional bindings
+ *
+ * Conditions are evaluated in registration order and the first matching
+ * binding is used.
+ */
+export type ConditionalBindings = Map<
+  BindingKey,
+  {
+    condition: BindingCondition<Record<any, any>>
+    resolver: BindingResolver<Record<any, any>, any>
+  }[]
 >
 
 /**

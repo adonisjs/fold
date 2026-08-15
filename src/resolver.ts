@@ -21,6 +21,7 @@ import type {
   BindingValues,
   BindingResolver,
   ContainerOptions,
+  ConditionalBindings,
   ContextualBindings,
   InspectableConstructor,
 } from './types.ts'
@@ -71,6 +72,12 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   #containerBindings: Bindings
 
   /**
+   * Pre-registered conditional bindings. They are shared between the container
+   * and resolver and evaluated using this resolver.
+   */
+  #containerConditionalBindings: ConditionalBindings
+
+  /**
    * Pre-registered bindings. They are shared between the container
    * and resolver.
    *
@@ -111,6 +118,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   constructor(
     container: {
       bindings: Bindings
+      conditionalBindings: ConditionalBindings
       bindingValues: BindingValues
       swaps: Swaps
       hooks: Hooks
@@ -120,6 +128,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     options: ContainerOptions
   ) {
     this.#containerBindings = container.bindings
+    this.#containerConditionalBindings = container.conditionalBindings
     this.#containerBindingValues = container.bindingValues
     this.#containerSwaps = container.swaps
     this.#containerHooks = container.hooks
@@ -328,6 +337,29 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     }
 
     /**
+     * Followed by CONDITIONAL CONTAINER bindings. Conditions are evaluated in
+     * registration order and the first matching resolver is used.
+     */
+    const conditionalBindings = this.#containerConditionalBindings.get(binding)
+    if (conditionalBindings) {
+      for (const conditionalBinding of conditionalBindings) {
+        if (!(await conditionalBinding.condition(this, runtimeValues))) {
+          continue
+        }
+
+        const value = await conditionalBinding.resolver(this, runtimeValues)
+
+        if (debug.enabled) {
+          debug('resolved conditional binding %O, resolved value :%O', binding, value)
+        }
+
+        await this.#execHooks(binding, value)
+        this.#emit(binding, value)
+        return value
+      }
+    }
+
+    /**
      * Followed by the CONTAINER bindings
      */
     if (this.#containerBindings.has(binding)) {
@@ -444,6 +476,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       this.#containerAliases.has(binding) ||
       this.#bindingValues.has(binding) ||
       this.#containerBindingValues.has(binding) ||
+      this.#containerConditionalBindings.has(binding) ||
       this.#containerBindings.has(binding)
     )
   }
