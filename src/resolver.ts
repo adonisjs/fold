@@ -17,6 +17,7 @@ import type {
   Swaps,
   Bindings,
   BindingKey,
+  BindingEntry,
   ErrorCreator,
   BindingValues,
   BindingResolver,
@@ -118,7 +119,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   constructor(
     container: {
       bindings: Bindings
-      conditionalBindings: ConditionalBindings
+      conditionalBindings?: ConditionalBindings
       bindingValues: BindingValues
       swaps: Swaps
       hooks: Hooks
@@ -128,7 +129,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     options: ContainerOptions
   ) {
     this.#containerBindings = container.bindings
-    this.#containerConditionalBindings = container.conditionalBindings
+    this.#containerConditionalBindings = container.conditionalBindings || new Map()
     this.#containerBindingValues = container.bindingValues
     this.#containerSwaps = container.swaps
     this.#containerHooks = container.hooks
@@ -244,6 +245,57 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   }
 
   /**
+   * Resolves a registered binding entry to its value. The entry may either
+   * come from the regular bindings or from a matched conditional binding,
+   * both of which share the same shape and therefore the same singleton
+   * and hooks behavior.
+   *
+   * @param binding - The binding key being resolved
+   * @param entry - The registered binding entry
+   * @param runtimeValues - Optional runtime values for dependencies
+   */
+  async #resolveBindingEntry(binding: BindingKey, entry: BindingEntry, runtimeValues?: any[]) {
+    let value
+    let executeHooks = true
+
+    /**
+     * Invoke binding resolver to get the value. In case of singleton,
+     * the "enqueue" method returns an object with the value and a
+     * boolean telling if a cached value is resolved.
+     */
+    if (entry.isSingleton) {
+      const result = await entry.resolver(this, runtimeValues)
+      value = result.value
+      executeHooks = !result.cached
+    } else {
+      value = await entry.resolver(this, runtimeValues)
+    }
+
+    if (executeHooks) {
+      const hooksPromise = this.#execHooks(binding, value)
+
+      /**
+       * if singleton, store the hooks promise that will be awaited for subsequent resolutions
+       */
+      if (entry.isSingleton) {
+        entry.hooksPromise = hooksPromise.then(() => {
+          delete entry.hooksPromise
+        })
+      }
+
+      await hooksPromise
+    }
+
+    if (entry.isSingleton && entry.hooksPromise) {
+      await entry.hooksPromise
+    }
+
+    this.#emit(binding, value)
+
+    return value
+  }
+
+  /**
    * Resolves binding in context of a parent. The method is same as
    * the "make" method, but instead takes a parent class
    * constructor.
@@ -339,22 +391,24 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     /**
      * Followed by CONDITIONAL CONTAINER bindings. Conditions are evaluated in
      * registration order and the first matching resolver is used.
+     *
+     * The condition receives this resolver alongside the parent asking for the
+     * binding, so it can decide using values local to the resolver, or the
+     * class the binding is getting injected into.
      */
     const conditionalBindings = this.#containerConditionalBindings.get(binding)
     if (conditionalBindings) {
       for (const conditionalBinding of conditionalBindings) {
-        if (!(await conditionalBinding.condition(this, runtimeValues))) {
+        if (!(await conditionalBinding.condition(this, runtimeValues, parent))) {
           continue
         }
 
-        const value = await conditionalBinding.resolver(this, runtimeValues)
+        const value = await this.#resolveBindingEntry(binding, conditionalBinding, runtimeValues)
 
         if (debug.enabled) {
           debug('resolved conditional binding %O, resolved value :%O', binding, value)
         }
 
-        await this.#execHooks(binding, value)
-        this.#emit(binding, value)
         return value
       }
     }
@@ -364,46 +418,11 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
      */
     if (this.#containerBindings.has(binding)) {
       const containerBinding = this.#containerBindings.get(binding)!
-      let value
-      let executeHooks = true
-
-      /**
-       * Invoke binding resolver to get the value. In case of singleton,
-       * the "enqueue" method returns an object with the value and a
-       * boolean telling if a cached value is resolved.
-       */
-      if (containerBinding.isSingleton) {
-        const result = await containerBinding.resolver(this, runtimeValues)
-        value = result.value
-        executeHooks = !result.cached
-      } else {
-        value = await containerBinding.resolver(this, runtimeValues)
-      }
+      const value = await this.#resolveBindingEntry(binding, containerBinding, runtimeValues)
 
       if (debug.enabled) {
         debug('resolved binding %O, resolved value :%O', binding, value)
       }
-
-      if (executeHooks) {
-        const hooksPromise = this.#execHooks(binding, value)
-
-        /**
-         * if singleton, store the hooks promise that will be awaited for subsequent resolutions
-         */
-        if (containerBinding.isSingleton) {
-          containerBinding.hooksPromise = hooksPromise.then(() => {
-            delete containerBinding.hooksPromise
-          })
-        }
-
-        await hooksPromise
-      }
-
-      if (containerBinding.isSingleton && containerBinding.hooksPromise) {
-        await containerBinding.hooksPromise
-      }
-
-      this.#emit(binding, value)
 
       return value
     }
@@ -454,12 +473,27 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       return value
     }
 
-    throw createError(`Cannot resolve binding "${String(binding)}" from the container`)
+    const error = createError(`Cannot resolve binding "${String(binding)}" from the container`)
+
+    /**
+     * The binding only has conditional bindings registered for it and none of
+     * their conditions matched. Point to the missing fallback, otherwise the
+     * error reads like the binding was never registered at all.
+     */
+    if (conditionalBindings?.length) {
+      error.help = `The binding has ${conditionalBindings.length} conditional binding(s) registered, but none of their conditions returned true. Register a fallback using the "container.bind()" method`
+    }
+
+    throw error
   }
 
   /**
-   * Find if the resolver has a binding registered using the
-   * "bind", the "singleton", or the "bindValue" methods.
+   * Find if the resolver has a binding registered using the "bind", the
+   * "singleton", the "bindValue", or the "if" methods.
+   *
+   * A registered binding is not always resolvable. When a binding key only
+   * has conditional bindings registered for it, this method returns true,
+   * but resolving it still fails if none of the conditions match.
    *
    * @param binding - The binding key to check for
    *
@@ -482,8 +516,8 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   }
 
   /**
-   * Find if the resolver has all the bindings registered using the
-   * "bind", the "singleton", or the "bindValue" methods.
+   * Find if the resolver has all the bindings registered using the "bind",
+   * the "singleton", the "bindValue", or the "if" methods.
    *
    * @param bindings - Array of binding keys to check for
    *

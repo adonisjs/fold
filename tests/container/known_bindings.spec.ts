@@ -10,6 +10,7 @@
 import { test } from '@japa/runner'
 import { expectTypeOf } from 'expect-type'
 import { Container } from '../../src/container.ts'
+import type { ContainerResolver } from '../../src/resolver.ts'
 
 test.group('Container | Bindings', () => {
   test('register a binding to the container', async ({ assert }) => {
@@ -355,6 +356,82 @@ test.group('Container | Aliases', () => {
     assert.isTrue(container.hasBinding(routeSymbol))
     assert.isTrue(container.hasBinding('adonisjs.router'))
     assert.isFalse(container.hasBinding('db'))
+  })
+
+  test('assert types of a conditional binding', async ({ assert }) => {
+    const container = new Container<{ route: Route }>()
+    class Route {}
+
+    container
+      .if(() => true)
+      .bind('route', () => {
+        return new Route()
+      })
+
+    const route = await container.make('route')
+
+    expectTypeOf(route).toEqualTypeOf<Route>()
+    assert.instanceOf(route, Route)
+  })
+
+  test('assert types of a conditional singleton', async ({ assert }) => {
+    const container = new Container<{ route: Route }>()
+    class Route {}
+
+    container
+      .if(() => true)
+      .singleton('route', () => {
+        return new Route()
+      })
+
+    const route = await container.make('route')
+
+    expectTypeOf(route).toEqualTypeOf<Route>()
+    assert.instanceOf(route, Route)
+  })
+
+  test('disallow unknown bindings and mismatched values in conditional bindings', async ({
+    assert,
+  }) => {
+    const container = new Container<{ route: Route }>()
+
+    /**
+     * Both classes need a distinguishing member, otherwise they are
+     * structurally identical and assignable to each other
+     */
+    class Route {
+      isRoute = true
+    }
+    class Database {
+      isDatabase = true
+    }
+
+    // @ts-expect-error "db" is not a known binding
+    container.if(() => true).bind('db', () => new Database())
+
+    // @ts-expect-error Database is not assignable to Route
+    container.if(() => true).bind('route', () => new Database())
+
+    // @ts-expect-error Database is not assignable to Route
+    container.if(() => true).singleton('route', () => new Database())
+
+    assert.isTrue(container.hasBinding('route'))
+  })
+
+  test('assert types of the condition arguments', async ({ assert }) => {
+    const container = new Container<{ route: Route }>()
+    class Route {}
+
+    container
+      .if((resolver, runtimeValues, parent) => {
+        expectTypeOf(resolver).toEqualTypeOf<ContainerResolver<{ route: Route }>>()
+        expectTypeOf(runtimeValues).toEqualTypeOf<any[] | undefined>()
+        expectTypeOf(parent).toEqualTypeOf<unknown>()
+        return true
+      })
+      .bind('route', () => new Route())
+
+    assert.instanceOf(await container.make('route'), Route)
   })
 
   test('return true from hasAllBindings when checking for alias', async ({ assert }) => {

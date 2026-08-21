@@ -156,14 +156,12 @@ test.group('Container | Conditional bindings', () => {
     const resolver = container.createResolver()
 
     container.bind(PaymentGateway, () => new StripePaymentGateway())
-    container.bindWhen(
-      PaymentGateway,
-      async (currentResolver) => {
+    container
+      .if(async (currentResolver) => {
         const featureFlags = await currentResolver.make(FeatureFlags)
         return featureFlags.flags.includes('new-payment')
-      },
-      () => new BetaPaymentGateway()
-    )
+      })
+      .bind(PaymentGateway, () => new BetaPaymentGateway())
     resolver.bindValue(FeatureFlags, new FeatureFlags(['new-payment']))
 
     const paymentGateway = await resolver.make(PaymentGateway)
@@ -178,14 +176,12 @@ test.group('Container | Conditional bindings', () => {
     const betaResolver = container.createResolver()
 
     container.bind(PaymentGateway, () => new StripePaymentGateway())
-    container.bindWhen(
-      PaymentGateway,
-      async (currentResolver) => {
+    container
+      .if(async (currentResolver) => {
         const featureFlags = await currentResolver.make(FeatureFlags)
         return featureFlags.flags.includes('new-payment')
-      },
-      () => new BetaPaymentGateway()
-    )
+      })
+      .bind(PaymentGateway, () => new BetaPaymentGateway())
     resolver.bindValue(FeatureFlags, new FeatureFlags([]))
     betaResolver.bindValue(FeatureFlags, new FeatureFlags(['new-payment']))
 
@@ -197,22 +193,18 @@ test.group('Container | Conditional bindings', () => {
     const container = new Container()
     const invocations: string[] = []
 
-    container.bindWhen(
-      PaymentGateway,
-      () => {
+    container
+      .if(() => {
         invocations.push('first')
         return true
-      },
-      () => new BetaPaymentGateway()
-    )
-    container.bindWhen(
-      PaymentGateway,
-      () => {
+      })
+      .bind(PaymentGateway, () => new BetaPaymentGateway())
+    container
+      .if(() => {
         invocations.push('second')
         return true
-      },
-      () => new StripePaymentGateway()
-    )
+      })
+      .bind(PaymentGateway, () => new StripePaymentGateway())
 
     assert.instanceOf(await container.make(PaymentGateway), BetaPaymentGateway)
     assert.deepEqual(invocations, ['first'])
@@ -222,11 +214,7 @@ test.group('Container | Conditional bindings', () => {
     const container = new Container()
 
     container.bind(PaymentGateway, () => new StripePaymentGateway())
-    container.bindWhen(
-      PaymentGateway,
-      () => false,
-      () => new BetaPaymentGateway()
-    )
+    container.if(() => false).bind(PaymentGateway, () => new BetaPaymentGateway())
 
     assert.instanceOf(await container.make(PaymentGateway), StripePaymentGateway)
   })
@@ -234,11 +222,7 @@ test.group('Container | Conditional bindings', () => {
   test('run hooks for conditional bindings', async ({ assert }) => {
     const container = new Container()
 
-    container.bindWhen(
-      PaymentGateway,
-      () => true,
-      () => new BetaPaymentGateway()
-    )
+    container.if(() => true).bind(PaymentGateway, () => new BetaPaymentGateway())
     container.resolving(PaymentGateway, (paymentGateway) => {
       paymentGateway.name = 'hooked'
     })
@@ -251,14 +235,129 @@ test.group('Container | Conditional bindings', () => {
   test('report conditional bindings as registered bindings', ({ assert }) => {
     const container = new Container()
 
-    container.bindWhen(
-      PaymentGateway,
-      () => false,
-      () => new BetaPaymentGateway()
-    )
+    container.if(() => false).bind(PaymentGateway, () => new BetaPaymentGateway())
 
     assert.isTrue(container.hasBinding(PaymentGateway))
     assert.isTrue(container.createResolver().hasBinding(PaymentGateway))
+  })
+
+  test('use a string as the conditional binding key', async ({ assert }) => {
+    const container = new Container()
+
+    container.bind('gateway', () => new StripePaymentGateway())
+    container.if(() => true).bind('gateway', () => new BetaPaymentGateway())
+
+    assert.instanceOf(await container.make('gateway'), BetaPaymentGateway)
+  })
+
+  test('use a symbol as the conditional binding key', async ({ assert }) => {
+    const container = new Container()
+    const gateway = Symbol('gateway')
+
+    container.bind(gateway, () => new StripePaymentGateway())
+    container.if(() => true).bind(gateway, () => new BetaPaymentGateway())
+
+    assert.instanceOf(await container.make(gateway), BetaPaymentGateway)
+  })
+
+  test('propagate the error thrown by a condition', async ({ assert }) => {
+    const container = new Container()
+
+    container.bind(PaymentGateway, () => new StripePaymentGateway())
+    container
+      .if(() => {
+        throw new Error('Cannot read the feature flags')
+      })
+      .bind(PaymentGateway, () => new BetaPaymentGateway())
+
+    await assert.rejects(() => container.make(PaymentGateway), 'Cannot read the feature flags')
+  })
+
+  test('give precedence to swaps over conditional bindings', async ({ assert }) => {
+    const container = new Container()
+
+    container.if(() => true).bind(PaymentGateway, () => new BetaPaymentGateway())
+    container.swap(PaymentGateway, () => new StripePaymentGateway())
+
+    assert.instanceOf(await container.make(PaymentGateway), StripePaymentGateway)
+
+    container.restore(PaymentGateway)
+    assert.instanceOf(await container.make(PaymentGateway), BetaPaymentGateway)
+  })
+
+  test('give precedence to contextual bindings over conditional bindings', async ({ assert }) => {
+    const container = new Container()
+
+    class CheckoutController {
+      static containerInjections = { _constructor: { dependencies: [PaymentGateway] } }
+      constructor(public paymentGateway: PaymentGateway) {}
+    }
+
+    container.if(() => true).bind(PaymentGateway, () => new BetaPaymentGateway())
+    container
+      .when(CheckoutController)
+      .asksFor(PaymentGateway)
+      .provide(() => new StripePaymentGateway())
+
+    const controller = await container.make(CheckoutController)
+
+    assert.instanceOf(controller.paymentGateway, StripePaymentGateway)
+    assert.instanceOf(await container.make(PaymentGateway), BetaPaymentGateway)
+  })
+
+  test('give precedence to container values over conditional bindings', async ({ assert }) => {
+    const container = new Container()
+    const gateway = new StripePaymentGateway()
+
+    container.if(() => true).bind(PaymentGateway, () => new BetaPaymentGateway())
+    container.bindValue(PaymentGateway, gateway)
+
+    assert.strictEqual(await container.make(PaymentGateway), gateway)
+  })
+
+  test('give precedence to resolver values over conditional bindings', async ({ assert }) => {
+    const container = new Container()
+    const gateway = new StripePaymentGateway()
+
+    container.if(() => true).bind(PaymentGateway, () => new BetaPaymentGateway())
+
+    const resolver = container.createResolver()
+    resolver.bindValue(PaymentGateway, gateway)
+
+    assert.strictEqual(await resolver.make(PaymentGateway), gateway)
+    assert.instanceOf(await container.make(PaymentGateway), BetaPaymentGateway)
+  })
+
+  test('explain unmatched conditions when resolution fails', async ({ assert }) => {
+    const container = new Container()
+
+    container.if(() => false).bind('gateway', () => new BetaPaymentGateway())
+    container.if(() => false).bind('gateway', () => new StripePaymentGateway())
+
+    assert.isTrue(container.hasBinding('gateway'))
+
+    try {
+      await container.make('gateway')
+      assert.fail('Expected the resolution to fail')
+    } catch (error) {
+      assert.equal(error.message, 'Cannot resolve binding "gateway" from the container')
+      assert.equal(
+        error.help,
+        'The binding has 2 conditional binding(s) registered, but none of their conditions returned true. Register a fallback using the "container.bind()" method'
+      )
+    }
+  })
+
+  test('do not explain unmatched conditions for an unregistered binding', async ({ assert }) => {
+    const container = new Container()
+
+    try {
+      await container.make('gateway')
+      assert.fail('Expected the resolution to fail')
+    } catch (error) {
+      assert.equal(error.message, 'Cannot resolve binding "gateway" from the container')
+      assert.isUndefined(error.help)
+    }
   })
 
   test('disallow invalid conditional binding names', ({ assert }) => {
@@ -266,14 +365,112 @@ test.group('Container | Conditional bindings', () => {
 
     assert.throws(
       () =>
-        container.bindWhen(
-          // @ts-expect-error
-          1,
-          () => true,
-          () => new BetaPaymentGateway()
-        ),
+        container
+          .if(() => true)
+          .bind(
+            // @ts-expect-error
+            1,
+            () => new BetaPaymentGateway()
+          ),
       'The container binding key must be of type "string", "symbol", or a "class constructor"'
     )
+  })
+
+  test('receive the parent asking for the binding inside the condition', async ({ assert }) => {
+    const container = new Container()
+    const parents: unknown[] = []
+
+    class CheckoutController {
+      static containerInjections = { _constructor: { dependencies: [PaymentGateway] } }
+      constructor(public paymentGateway: PaymentGateway) {}
+    }
+
+    container.bind(PaymentGateway, () => new StripePaymentGateway())
+    container
+      .if((_, __, parent) => {
+        parents.push(parent)
+        return parent === CheckoutController
+      })
+      .bind(PaymentGateway, () => new BetaPaymentGateway())
+
+    const controller = await container.make(CheckoutController)
+    const standalone = await container.make(PaymentGateway)
+
+    assert.instanceOf(controller.paymentGateway, BetaPaymentGateway)
+    assert.instanceOf(standalone, StripePaymentGateway)
+    assert.deepEqual(parents, [CheckoutController, null])
+  })
+
+  test('cache the value of a conditional singleton', async ({ assert }) => {
+    const container = new Container()
+    let invocations = 0
+
+    container
+      .if(() => true)
+      .singleton(PaymentGateway, () => {
+        invocations++
+        return new BetaPaymentGateway()
+      })
+
+    const first = await container.make(PaymentGateway)
+    const second = await container.make(PaymentGateway)
+
+    assert.strictEqual(first, second)
+    assert.equal(invocations, 1)
+  })
+
+  test('evaluate the condition of a singleton on every resolution', async ({ assert }) => {
+    const container = new Container()
+    let useBeta = true
+    let conditions = 0
+
+    container.bind(PaymentGateway, () => new StripePaymentGateway())
+    container
+      .if(() => {
+        conditions++
+        return useBeta
+      })
+      .singleton(PaymentGateway, () => new BetaPaymentGateway())
+
+    const beta = await container.make(PaymentGateway)
+    useBeta = false
+    const stripe = await container.make(PaymentGateway)
+
+    assert.instanceOf(beta, BetaPaymentGateway)
+    assert.instanceOf(stripe, StripePaymentGateway)
+    assert.equal(conditions, 2)
+  })
+
+  test('run hooks only once for a conditional singleton', async ({ assert }) => {
+    const container = new Container()
+    let hooks = 0
+
+    container.if(() => true).singleton(PaymentGateway, () => new BetaPaymentGateway())
+    container.resolving(PaymentGateway, () => {
+      hooks++
+    })
+
+    await container.make(PaymentGateway)
+    await container.make(PaymentGateway)
+
+    assert.equal(hooks, 1)
+  })
+
+  test('receive runtime values inside the condition', async ({ assert }) => {
+    const container = new Container()
+    const received: (any[] | undefined)[] = []
+
+    container.bind(PaymentGateway, () => new StripePaymentGateway())
+    container
+      .if((_, runtimeValues) => {
+        received.push(runtimeValues)
+        return runtimeValues?.[0] === 'beta'
+      })
+      .bind(PaymentGateway, () => new BetaPaymentGateway())
+
+    assert.instanceOf(await container.make(PaymentGateway, ['beta']), BetaPaymentGateway)
+    assert.instanceOf(await container.make(PaymentGateway), StripePaymentGateway)
+    assert.deepEqual(received, [['beta'], undefined])
   })
 })
 

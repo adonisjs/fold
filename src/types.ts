@@ -71,21 +71,28 @@ export type BindingResolver<KnownBindings extends Record<any, any>, Value> = (
  *
  * @template KnownBindings - Known bindings record type
  * @param resolver - Container resolver instance
- * @param runtimeValues - Optional runtime values
+ * @param runtimeValues - Optional runtime values. They are only available when
+ *   the binding is resolved directly via "make" or "call". Dependencies
+ *   resolved for a class receive "undefined"
+ * @param parent - The class asking for this binding, or "null" when the binding
+ *   is resolved directly via "make"
  * @returns Whether the associated binding resolver should be used
  */
 export type BindingCondition<KnownBindings extends Record<any, any>> = (
   resolver: ContainerResolver<KnownBindings>,
-  runtimeValues?: any[]
+  runtimeValues?: any[],
+  parent?: unknown
 ) => boolean | Promise<boolean>
 
 /**
- * Shape of the registered bindings
+ * Shape of a single registered binding. The entry holds the resolver
+ * alongside the flag to know if the resolved value must be cached
+ * after the first resolution.
  *
- * Map structure containing binding keys and their resolver configurations
+ * The same entry shape is used by the regular and the conditional bindings,
+ * so both get identical singleton and hooks behavior.
  */
-export type Bindings = Map<
-  BindingKey,
+export type BindingEntry =
   | { resolver: BindingResolver<Record<any, any>, any>; isSingleton: false }
   | {
       resolver: (
@@ -95,20 +102,23 @@ export type Bindings = Map<
       isSingleton: true
       hooksPromise?: Promise<void>
     }
->
+
+/**
+ * Shape of the registered bindings
+ *
+ * Map structure containing binding keys and their resolver configurations
+ */
+export type Bindings = Map<BindingKey, BindingEntry>
 
 /**
  * Shape of the registered conditional bindings
  *
- * Conditions are evaluated in registration order and the first matching
- * binding is used.
+ * A binding key may have multiple conditional bindings. The conditions are
+ * evaluated in registration order and the first matching entry is used.
  */
 export type ConditionalBindings = Map<
   BindingKey,
-  {
-    condition: BindingCondition<Record<any, any>>
-    resolver: BindingResolver<Record<any, any>, any>
-  }[]
+  ({ condition: BindingCondition<Record<any, any>> } & BindingEntry)[]
 >
 
 /**
