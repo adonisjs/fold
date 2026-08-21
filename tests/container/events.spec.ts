@@ -162,6 +162,51 @@ test.group('Container | Events', () => {
     assert.deepEqual(event, { binding: Route, value: route })
   })
 
+  test('emit event when a conditional binding is resolved', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container({ emitter })
+    class Route {}
+
+    container
+      .if(() => true)
+      .bind('route', () => {
+        return new Route()
+      })
+
+    const [event, route] = await Promise.all([
+      pEvent(emitter, 'container_binding:resolved'),
+      container.make('route'),
+    ])
+
+    expectTypeOf(route).toBeAny()
+    assert.instanceOf(route, Route)
+    assert.deepEqual(event, { binding: 'route', value: route })
+  })
+
+  test('emit event when a conditional singleton is resolved multiple times', async ({ assert }) => {
+    const emitter = new EventEmitter()
+    const container = new Container({ emitter })
+    class Route {}
+
+    container
+      .if(() => true)
+      .singleton('route', () => {
+        return new Route()
+      })
+
+    const [events, route, route1] = await Promise.all([
+      pEventMultiple(emitter, 'container_binding:resolved', { count: 2 }),
+      container.make('route'),
+      container.make('route'),
+    ])
+
+    assert.strictEqual(route, route1)
+    assert.deepEqual(events, [
+      { binding: 'route', value: route },
+      { binding: 'route', value: route },
+    ])
+  })
+
   test('register emitter using the useEmitter method', async ({ assert }) => {
     const emitter = new EventEmitter()
     const container = new Container()

@@ -231,24 +231,104 @@ So, if you create packages for AdonisJS, I highly recommend using factory functi
 
 ## Conditional bindings
 
-Use `container.bindWhen` to select a binding using values local to the resolver performing the resolution. The condition may be synchronous or asynchronous and is evaluated every time the binding is resolved.
+Use `container.if` to select a binding at resolution time. The condition may be synchronous or asynchronous, and it is evaluated every time the binding is resolved.
+
+For example: You are rolling out a new payment gateway to a small set of users. Every class asking for `PaymentGateway` keeps doing so, and the container decides which implementation they get.
 
 ```ts
 container.bind(PaymentGateway, (resolver) => {
   return resolver.make(StripePaymentGateway)
 })
 
-container.bindWhen(
-  PaymentGateway,
-  async (resolver) => {
+container
+  .if(async (resolver) => {
     const ctx = await resolver.make(HttpContext)
     return ctx.auth.user?.featureFlags.includes('new-payment') === true
-  },
-  (resolver) => resolver.make(BetaPaymentGateway)
-)
+  })
+  .bind(PaymentGateway, (resolver) => resolver.make(BetaPaymentGateway))
 ```
 
 You may register multiple conditional bindings for the same key. Conditions are evaluated in registration order and the first match is used. When none match, the container falls back to a regular binding or its default resolution behavior.
+
+### Conditional singletons
+
+The builder also exposes a `singleton` method. Just like `container.singleton`, the factory function is called only once and its return value is cached forever.
+
+The condition is still evaluated on every resolution. Only the factory function result is cached.
+
+```ts
+container
+  .if(() => env.get('SEARCH_DRIVER') === 'typesense')
+  .singleton(SearchService, (resolver) => resolver.make(TypesenseSearchService))
+```
+
+### Condition arguments
+
+A condition receives the resolver performing the resolution, the runtime values, and the parent class asking for the binding.
+
+```ts
+container.if((resolver, runtimeValues, parent) => true)
+```
+
+The `resolver` gives the condition access to values local to that resolver. In the example at the top of this section, `HttpContext` is available because the AdonisJS starter kits bind it per request using `ContainerBindingsMiddleware`.
+
+The `parent` is the class the binding is getting injected into, or `null` when the binding is resolved directly using `make`. Use it to combine a predicate with the calling class.
+
+```ts
+container
+  .if((_, __, parent) => parent === CheckoutController && isBetaUser())
+  .bind(PaymentGateway, (resolver) => resolver.make(BetaPaymentGateway))
+```
+
+The `runtimeValues` are only available when the binding is resolved directly using `make` or `call`. Dependencies resolved for a class receive `undefined`.
+
+### Conditions run everywhere
+
+A condition is evaluated for every resolution of its binding key, not just during HTTP requests. The same binding is also resolved inside queue workers, Ace commands, and at boot time, where request specific values do not exist.
+
+Guard against their absence, otherwise the condition throws when it reaches for a binding that was never registered.
+
+```ts
+container
+  .if(async (resolver) => {
+    if (!resolver.hasBinding(HttpContext)) {
+      return false
+    }
+
+    const ctx = await resolver.make(HttpContext)
+    return ctx.auth.user?.featureFlags.includes('new-payment') === true
+  })
+  .bind(PaymentGateway, (resolver) => resolver.make(BetaPaymentGateway))
+```
+
+### Resolution order
+
+The container tries the following sources in order and returns the first one that produces a value.
+
+| Order | Source               | Registered using                         | Applies to            |
+| ----- | -------------------- | ---------------------------------------- | --------------------- |
+| 1     | Swaps                | `container.swap`                         | Classes only          |
+| 2     | Contextual bindings  | `container.when().asksFor().provide()`   | Classes with a parent |
+| 3     | Resolver values      | `resolver.bindValue`                     | All binding keys      |
+| 4     | Container values     | `container.bindValue`                    | All binding keys      |
+| 5     | Conditional bindings | `container.if().bind()`                  | All binding keys      |
+| 6     | Bindings             | `container.bind` / `container.singleton` | All binding keys      |
+| 7     | Class construction   | —                                        | Classes only          |
+
+Two consequences worth knowing. Swaps win over conditional bindings, so faking a class in tests works regardless of any condition. And values win over conditional bindings, so `bindValue` overrides a conditional binding the same way it overrides a regular one.
+
+### Conditional bindings and `hasBinding`
+
+`container.hasBinding` returns `true` for a key that only has conditional bindings registered, because the binding genuinely is registered. It may still fail to resolve when none of the conditions match.
+
+```ts
+container.if(() => false).bind('gateway', () => new BetaPaymentGateway())
+
+container.hasBinding('gateway') // true
+await container.make('gateway') // throws
+```
+
+The error points at the unmatched conditions, so register a fallback using `container.bind` when the key must always resolve.
 
 ## Binding singletons
 
@@ -457,7 +537,7 @@ This is where the `@bind` decorator comes into the picture. To perform database 
 
 If you are using the container inside a TypeScript project, then you can define the types for all the bindings in advance at the time of creating the container instance.
 
-Defining types will ensure the `bind`, `bindWhen`, `singleton` and `bindValue` method accepts only the known bindings and assert their types as well.
+Defining types will ensure the `bind`, `singleton`, `bindValue` and `if().bind()` methods accept only the known bindings and assert their types as well.
 
 ```ts
 class Route {}
