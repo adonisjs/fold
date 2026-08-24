@@ -720,6 +720,8 @@ export class Container<KnownBindings extends Record<any, any>> {
    * them match, the resolution falls back to a regular binding or the
    * default container behavior.
    *
+   * @internal
+   *
    * @param condition - Predicate deciding whether the binding should be used
    * @param binding - The binding key (string, symbol, or class constructor)
    * @param resolver - Factory function to resolve the binding value
