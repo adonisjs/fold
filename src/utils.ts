@@ -26,7 +26,7 @@ import { Deferred } from './deferred_promise.ts'
  * ```
  */
 export function isClass<T>(value: unknown): value is Constructor<T> {
-  return typeof value === 'function' && /^class(\s|{)/.test(value.toString())
+  return typeof value === 'function' && /^class(\s|{)/.test(Function.prototype.toString.call(value))
 }
 
 /**

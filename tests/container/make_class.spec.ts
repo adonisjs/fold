@@ -255,4 +255,15 @@ test.group('Container | Make class', () => {
     const service = await container.make(UserService)
     assert.equal(service.config.foo, 'baz')
   })
+
+  test('make instance of a class with a static toString method', async ({ assert }) => {
+    class UserService {
+      static toString() {
+        return 'UserService'
+      }
+    }
+
+    const container = new Container()
+    assert.instanceOf(await container.make(UserService), UserService)
+  })
 })
