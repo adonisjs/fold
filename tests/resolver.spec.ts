@@ -159,4 +159,30 @@ test.group('Resolver', () => {
     expectTypeOf(resolvedService).toEqualTypeOf<ContainerResolver<Record<string, any>>>()
     assert.strictEqual(resolvedService, resolver)
   })
+
+  test('give priority to resolver values over constructing the class', async ({ assert }) => {
+    class UserService {}
+
+    const container = new Container()
+    const resolver = container.createResolver()
+
+    const service = new UserService()
+    resolver.bindValue(UserService, service)
+
+    assert.strictEqual(await resolver.make(UserService), service)
+    assert.notStrictEqual(await container.make(UserService), service)
+  })
+
+  test('return a rejected promise when called without the resolver', async ({ assert }) => {
+    class UserService {}
+    const { make, call } = new Container().createResolver()
+
+    const makePromise = make(UserService)
+    assert.instanceOf(makePromise, Promise)
+    await assert.rejects(() => makePromise)
+
+    const callPromise = call({}, 'foo' as never)
+    assert.instanceOf(callPromise, Promise)
+    await assert.rejects(() => callPromise)
+  })
 })

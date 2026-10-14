@@ -13,6 +13,12 @@ import { RuntimeException } from '@poppinss/utils/exception'
 import { Deferred } from './deferred_promise.ts'
 
 /**
+ * Cache of "isClass" results, since the check relies on the function
+ * source and the container runs it on every resolution
+ */
+const isClassCache = new WeakMap<Function, boolean>()
+
+/**
  * Type guard to check if value is a class constructor. Plain old
  * functions are not considered as class constructors.
  *
@@ -26,7 +32,17 @@ import { Deferred } from './deferred_promise.ts'
  * ```
  */
 export function isClass<T>(value: unknown): value is Constructor<T> {
-  return typeof value === 'function' && /^class(\s|{)/.test(Function.prototype.toString.call(value))
+  if (typeof value !== 'function') {
+    return false
+  }
+
+  let result = isClassCache.get(value)
+  if (result === undefined) {
+    result = /^class(\s|{)/.test(Function.prototype.toString.call(value))
+    isClassCache.set(value, result)
+  }
+
+  return result
 }
 
 /**

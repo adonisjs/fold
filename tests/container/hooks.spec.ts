@@ -277,4 +277,18 @@ test.group('Container | Hooks', () => {
     const route = await container.make('route')
     assert.equal(route.invocations, 1)
   })
+
+  test('run hooks when classes are constructed without an emitter', async ({ assert }) => {
+    const container = new Container()
+    class Route {
+      invocations: number = 0
+    }
+
+    container.resolving(Route, (route) => {
+      route.invocations++
+    })
+
+    const route = await container.make(Route)
+    assert.equal(route.invocations, 1)
+  })
 })

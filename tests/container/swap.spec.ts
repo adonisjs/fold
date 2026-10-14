@@ -261,4 +261,32 @@ test.group('Container | swap', () => {
     assert.instanceOf(controller.hash, FakedHash)
     assert.equal(controller.hash.make('foo'), 'fake')
   })
+
+  test('use swap registered after the class was constructed once', async ({ assert }) => {
+    class UserService {}
+    class FakedUserService extends UserService {}
+
+    const container = new Container()
+    assert.notInstanceOf(await container.make(UserService), FakedUserService)
+
+    container.swap(UserService, () => new FakedUserService())
+    assert.instanceOf(await container.make(UserService), FakedUserService)
+
+    container.restore(UserService)
+    assert.notInstanceOf(await container.make(UserService), FakedUserService)
+  })
+
+  test('use swap without inspecting the swapped class', async ({ assert }) => {
+    class UserService {
+      static get containerProvider(): any {
+        throw new Error('Cannot read containerProvider')
+      }
+    }
+    const fake = new (class FakedUserService {})()
+
+    const container = new Container()
+    container.swap(UserService, () => fake)
+
+    assert.strictEqual(await container.make(UserService), fake)
+  })
 })
