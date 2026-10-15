@@ -266,4 +266,40 @@ test.group('Container | Make class', () => {
     const container = new Container()
     assert.instanceOf(await container.make(UserService), UserService)
   })
+
+  test('return a rejected promise when the class constructor throws', async ({ assert }) => {
+    class UserService {
+      constructor() {
+        throw new Error('Cannot construct UserService')
+      }
+    }
+
+    const container = new Container()
+    const promise = container.make(UserService)
+
+    assert.instanceOf(promise, Promise)
+    await assert.rejects(() => promise, 'Cannot construct UserService')
+  })
+
+  test('return a rejected promise when inspecting the class throws', async ({ assert }) => {
+    class UserService {
+      static get containerProvider(): any {
+        throw new Error('Cannot read containerProvider')
+      }
+    }
+
+    const container = new Container()
+    const promise = container.make(UserService)
+
+    assert.instanceOf(promise, Promise)
+    await assert.rejects(() => promise, 'Cannot read containerProvider')
+  })
+
+  test('throw error when constructing a plain function', async ({ assert }) => {
+    const container = new Container()
+    await assert.rejects(
+      () => container.make(function UserService() {}),
+      'Cannot construct value "[Function: UserService]" using container'
+    )
+  })
 })

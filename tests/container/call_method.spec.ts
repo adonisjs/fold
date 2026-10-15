@@ -9,6 +9,7 @@
 
 import { test } from '@japa/runner'
 import { expectTypeOf } from 'expect-type'
+import { RuntimeException } from '@poppinss/utils/exception'
 import { Container } from '../../src/container.ts'
 
 test.group('Container | Call method', () => {
@@ -197,5 +198,34 @@ test.group('Container | Call method', () => {
 
     const container = new Container()
     assert.equal(await container.call(new UserService(), 'foo'), 2)
+  })
+
+  test('return a rejected promise when the method throws', async ({ assert }) => {
+    class UserService {
+      foo() {
+        throw new Error('Cannot call foo')
+      }
+    }
+
+    const container = new Container()
+    const promise = container.call(new UserService(), 'foo')
+
+    assert.instanceOf(promise, Promise)
+    await assert.rejects(() => promise, 'Cannot call foo')
+  })
+
+  test('report missing method before inspecting the constructor', async ({ assert }) => {
+    const value = Object.create({
+      get constructor() {
+        throw new Error('Cannot read constructor')
+      },
+    })
+
+    const container = new Container()
+    await assert.rejects(
+      () =>
+        container.call(value, 'foo', [], (message) => new RuntimeException(`custom: ${message}`)),
+      'custom: Missing method "foo" on "{}"'
+    )
   })
 })

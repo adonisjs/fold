@@ -191,6 +191,59 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
   }
 
   /**
+   * Find if the runtime values are the complete list of arguments for a
+   * constructor or a method. It is the case when the class has no
+   * custom provider and no injections for the property, since the
+   * "containerProvider" returns the runtime values as it is.
+   *
+   * @param binding - The class constructor
+   * @param property - The property key (constructor or method name)
+   * @param arity - Number of parameters accepted by the constructor or method
+   * @param runtimeValues - Runtime values given to the constructor or method
+   */
+  #hasNoDependencies(
+    binding: InspectableConstructor,
+    property: string | symbol | number,
+    arity: number,
+    runtimeValues?: any[]
+  ) {
+    return (
+      !binding.containerProvider &&
+      !binding.containerInjections?.[property] &&
+      (runtimeValues?.length ?? 0) >= arity
+    )
+  }
+
+  /**
+   * Find if a binding is a class the "make" method can construct directly,
+   * without going through the resolution pipeline. It is the case when
+   * the class has no dependencies, nothing registered against it in
+   * the container and no hooks.
+   *
+   * Aliases must be resolved before calling this method. The class itself
+   * is inspected last, since the resolution pipeline does not read its
+   * static properties when a swap or a binding takes over.
+   *
+   * @param binding - The binding to resolve
+   * @param runtimeValues - Runtime values given to the constructor
+   */
+  #canConstructDirectly(binding: any, runtimeValues?: any[]): binding is Constructor<any> {
+    if (this.#containerSwaps.has(binding) || this.hasBinding(binding)) {
+      return false
+    }
+
+    const hooks = this.#containerHooks.get(binding)
+    if (hooks && hooks.size > 0) {
+      return false
+    }
+
+    return (
+      isClass(binding) &&
+      this.#hasNoDependencies(binding, '_constructor', binding.length, runtimeValues)
+    )
+  }
+
+  /**
    * Returns the binding resolver for a parent and a binding. Returns
    * undefined when no contextual binding exists
    *
@@ -599,19 +652,82 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
     runtimeValues?: any[],
     createError?: ErrorCreator
   ): Promise<Make<Binding>>
-  async make<Binding>(
+  make<Binding>(
     binding: Binding,
     runtimeValues?: any[],
     createError?: ErrorCreator
   ): Promise<Make<Binding>> {
     /**
-     * Make alias
+     * Any error must reject the promise, the same way the async
+     * resolution pipeline does.
      */
-    if (this.#containerAliases.has(binding)) {
-      return this.resolveFor(null, this.#containerAliases.get(binding), runtimeValues, createError)
-    }
+    try {
+      /**
+       * Make alias
+       */
+      if (this.#containerAliases.has(binding)) {
+        return this.resolveFor(
+          null,
+          this.#containerAliases.get(binding),
+          runtimeValues,
+          createError
+        )
+      }
 
-    return this.resolveFor(null, binding, runtimeValues, createError)
+      /**
+       * Trace the resolution only when someone listens to the
+       * tracing channel
+       */
+      if (!containerMake.hasSubscribers) {
+        return this.#make(binding, runtimeValues, createError)
+      }
+
+      return containerMake.tracePromise(
+        this.#make,
+        { binding: binding as string | symbol | AbstractConstructor<any> },
+        this,
+        binding,
+        runtimeValues,
+        createError
+      )
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  }
+
+  /**
+   * Resolves a binding that is not an alias. Classes without dependencies
+   * are constructed directly, other bindings go through the resolution
+   * pipeline.
+   *
+   * The method is traced by the "make" method, so it calls the private
+   * "#resolveFor" method to not trace the same resolution twice. Any
+   * error rejects the promise, so tracing subscribers receive the same
+   * events for the direct construction and for the pipeline.
+   *
+   * @param binding - The binding key or class constructor to resolve
+   * @param runtimeValues - Optional runtime values for dependencies
+   * @param createError - Error creator function
+   */
+  #make<Binding>(
+    binding: Binding,
+    runtimeValues?: any[],
+    createError?: ErrorCreator
+  ): Promise<Make<Binding>> {
+    try {
+      if (this.#canConstructDirectly(binding, runtimeValues)) {
+        const value = new binding(...(runtimeValues || []))
+        if (debug.enabled) {
+          debug('constructed class %O, resolved value :%O', binding, value)
+        }
+        this.#emit(binding, value)
+        return Promise.resolve(value)
+      }
+
+      return this.#resolveFor(null, binding, runtimeValues, createError)
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
   /**
@@ -630,11 +746,57 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * await resolver.call(controller, 'index')
    * ```
    */
-  async call<Value extends Record<any, any>, Method extends ExtractFunctions<Value>>(
+  call<Value extends Record<any, any>, Method extends ExtractFunctions<Value>>(
     value: Value,
     method: Method,
     runtimeValues?: any[],
     createError: ErrorCreator = (message) => new RuntimeException(message)
+  ): Promise<ReturnType<Value[Method]>> {
+    /**
+     * Call methods without dependencies directly. Any error must
+     * reject the promise, the same way the async dependencies
+     * resolution does.
+     *
+     * The method is checked before the constructor, so that a missing
+     * method is reported by the async path using "createError".
+     */
+    try {
+      if (typeof value?.[method] === 'function') {
+        const binding: InspectableConstructor | undefined = value.constructor
+        if (
+          binding &&
+          this.#hasNoDependencies(binding, method, value[method].length, runtimeValues)
+        ) {
+          if (debug.enabled) {
+            debug('calling method %s, on value :%O', method, value)
+          }
+          return Promise.resolve(value[method](...(runtimeValues || [])))
+        }
+      }
+
+      return this.#callWithDependencies(value, method, runtimeValues, createError)
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  }
+
+  /**
+   * Call a method on an object after resolving its dependencies
+   * using the class provider
+   *
+   * @param value - The object instance containing the method
+   * @param method - The method name to call
+   * @param runtimeValues - Optional runtime values for method dependencies
+   * @param createError - Error creator function
+   */
+  async #callWithDependencies<
+    Value extends Record<any, any>,
+    Method extends ExtractFunctions<Value>,
+  >(
+    value: Value,
+    method: Method,
+    runtimeValues: any[] | undefined,
+    createError: ErrorCreator
   ): Promise<ReturnType<Value[Method]>> {
     if (typeof value[method] !== 'function') {
       throw createError(`Missing method "${String(method)}" on "${inspect(value)}"`)
