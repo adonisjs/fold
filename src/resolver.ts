@@ -218,8 +218,7 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * Find if a binding is a class the "make" method can construct directly,
    * without going through the resolution pipeline. It is the case when
    * the class has no dependencies, nothing registered against it in
-   * the container, no hooks, and nobody observes the resolution
-   * through an emitter or the tracing channel.
+   * the container and no hooks.
    *
    * Aliases must be resolved before calling this method. The class itself
    * is inspected last, since the resolution pipeline does not read its
@@ -229,10 +228,6 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
    * @param runtimeValues - Runtime values given to the constructor
    */
   #canConstructDirectly(binding: any, runtimeValues?: any[]): binding is Constructor<any> {
-    if (this.#options.emitter || containerMake.hasSubscribers) {
-      return false
-    }
-
     if (this.#containerSwaps.has(binding) || this.hasBinding(binding)) {
       return false
     }
@@ -680,17 +675,56 @@ export class ContainerResolver<KnownBindings extends Record<any, any>> {
       }
 
       /**
-       * Construct classes without dependencies directly
+       * Trace the resolution only when someone listens to the
+       * tracing channel
        */
+      if (!containerMake.hasSubscribers) {
+        return this.#make(binding, runtimeValues, createError)
+      }
+
+      return containerMake.tracePromise(
+        this.#make,
+        { binding: binding as string | symbol | AbstractConstructor<any> },
+        this,
+        binding,
+        runtimeValues,
+        createError
+      )
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  }
+
+  /**
+   * Resolves a binding that is not an alias. Classes without dependencies
+   * are constructed directly, other bindings go through the resolution
+   * pipeline.
+   *
+   * The method is traced by the "make" method, so it calls the private
+   * "#resolveFor" method to not trace the same resolution twice. Any
+   * error rejects the promise, so tracing subscribers receive the same
+   * events for the direct construction and for the pipeline.
+   *
+   * @param binding - The binding key or class constructor to resolve
+   * @param runtimeValues - Optional runtime values for dependencies
+   * @param createError - Error creator function
+   */
+  #make<Binding>(
+    binding: Binding,
+    runtimeValues?: any[],
+    createError?: ErrorCreator
+  ): Promise<Make<Binding>> {
+    try {
       if (this.#canConstructDirectly(binding, runtimeValues)) {
         const value = new binding(...(runtimeValues || []))
         if (debug.enabled) {
           debug('constructed class %O, resolved value :%O', binding, value)
         }
+        this.#emit(binding, value)
         return Promise.resolve(value)
       }
 
-      return this.resolveFor(null, binding, runtimeValues, createError)
+      return this.#resolveFor(null, binding, runtimeValues, createError)
     } catch (error) {
       return Promise.reject(error)
     }
