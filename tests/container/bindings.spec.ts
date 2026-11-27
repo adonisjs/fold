@@ -339,7 +339,7 @@ test.group('Container | Conditional bindings', () => {
     try {
       await container.make('gateway')
       assert.fail('Expected the resolution to fail')
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, 'Cannot resolve binding "gateway" from the container')
       assert.equal(
         error.help,
@@ -354,7 +354,7 @@ test.group('Container | Conditional bindings', () => {
     try {
       await container.make('gateway')
       assert.fail('Expected the resolution to fail')
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, 'Cannot resolve binding "gateway" from the container')
       assert.isUndefined(error.help)
     }

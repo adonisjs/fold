@@ -22,56 +22,56 @@ test.group('Container | Make class', () => {
     try {
       const obj = await container.make({ foo: 'bar' })
       expectTypeOf(obj).toEqualTypeOf<never>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot construct value "{ foo: 'bar' }" using container`)
     }
 
     try {
       const numeric = await container.make(1)
       expectTypeOf(numeric).toEqualTypeOf<never>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot construct value "1" using container`)
     }
 
     try {
       const bool = await container.make(false)
       expectTypeOf(bool).toEqualTypeOf<never>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot construct value "false" using container`)
     }
 
     try {
       const notDefined = await container.make(undefined)
       expectTypeOf(notDefined).toEqualTypeOf<never>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot construct value "undefined" using container`)
     }
 
     try {
       const nullValue = await container.make(null)
       expectTypeOf(nullValue).toEqualTypeOf<never>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot construct value "null" using container`)
     }
 
     try {
       const mapValue = await container.make(new Map([[1, 1]]))
       expectTypeOf(mapValue).toEqualTypeOf<never>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot construct value "Map(1) { 1 => 1 }" using container`)
     }
 
     try {
       const setValue = await container.make(new Set([1]))
       expectTypeOf(setValue).toEqualTypeOf<never>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot construct value "Set(1) { 1 }" using container`)
     }
 
     try {
       const arrayValue = await container.make(['foo'])
       expectTypeOf(arrayValue).toEqualTypeOf<never>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot construct value "[ 'foo' ]" using container`)
     }
 
@@ -79,7 +79,7 @@ test.group('Container | Make class', () => {
     try {
       const func = await container.make(foo)
       expectTypeOf(func).toEqualTypeOf<never>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot construct value "[Function: foo]" using container`)
     }
   })
@@ -90,14 +90,14 @@ test.group('Container | Make class', () => {
     try {
       const obj = await container.make('bar')
       expectTypeOf(obj).toEqualTypeOf<any>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot resolve binding "bar" from the container`)
     }
 
     try {
       const obj = await container.make(Symbol('bar'))
       expectTypeOf(obj).toEqualTypeOf<any>()
-    } catch (error) {
+    } catch (error: any) {
       assert.equal(error.message, `Cannot resolve binding "Symbol(bar)" from the container`)
     }
   })
@@ -170,7 +170,7 @@ test.group('Container | Make class', () => {
     const container = new Container()
     try {
       await container.make(UserService)
-    } catch (error) {
+    } catch (error: any) {
       assert.match(error.stack, /at createError \(.*make_class/)
       assert.equal(error.message, `Cannot inject "{ foo: 'bar' }" in "[class UserService]"`)
     }
@@ -209,7 +209,7 @@ test.group('Container | Make class', () => {
     const container = new Container()
     try {
       await container.make(UserService)
-    } catch (error) {
+    } catch (error: any) {
       assert.match(error.stack, /at createError \(.*make_class/)
       assert.equal(error.message, 'Cannot inject "[Function: String]" in "[class UserService]"')
     }
